@@ -8,7 +8,7 @@ device = {
     'ip': '192.168.0.1',
     'port': '22',
     'username': 'admin',
-    'password': 'ats60srb',
+    'password': 'admin',
 }
 
 connection = ConnectHandler(**device)
