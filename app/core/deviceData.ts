@@ -44,99 +44,293 @@ export = {
         }
 
     },
+    // getPortStatus1: async (host: string, community: string): Promise<string> => {
+    //     console.log(host, community)
+    //     const result = util.format(
+    //         "%s Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее",
+    //         symbols.SHORT
+    //     );
+
+    //     try {
+    //         const results: string[] = [];
+    //         const dirty = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_model, community).catch((err) => err);
+    //         const model = deviceArr.FilterDeviceModel(dirty)?.toString();
+    //         const JSON_aiflist = await deviceArr.ArrayInterfaceModel(model).catch((err) => err);
+    //         const aiflist = JSON.parse(JSON_aiflist);
+    //         const portIfList = aiflist.interfaceList;
+    //         const portIfRange = aiflist.interfaceRange;
+
+    //         const intRange = await snmpFunctions.getMultiOID(host, joid.linux_server.oid_ifName, community).catch((err) => {
+    //             console.log(err);
+    //             return [];
+    //         });
+
+    //         const intList = await snmpFunctions.getMultiOID(host, joid.linux_server.oid_ifIndex, community).catch((err) => {
+    //             console.log(err);
+    //             return [];
+    //         });
+
+    //         for (let ifId in zip(intList, intRange)) {
+    //             const intDescr = await snmpFunctions.getSingleOID(
+    //                 host,
+    //                 joid.linux_server.oid_ifDescr + intList[ifId],
+    //                 community
+    //             ).catch((err) => {
+    //                 console.log(err);
+    //                 return "";
+    //             });
+    //             const portOperStatus = await snmpFunctions.getSingleOID(
+    //                 host,
+    //                 joid.basic_oids.oid_oper_ports + intList[ifId],
+    //                 community
+    //             ).catch((err) => {
+    //                 console.log(err);
+    //                 return "";
+    //             });
+    //             const portAdminStatus = await snmpFunctions.getSingleOID(
+    //                 host,
+    //                 joid.basic_oids.oid_admin_ports + intList[ifId],
+    //                 community
+    //             ).catch((err) => {
+    //                 console.log(err);
+    //                 return "";
+    //             });
+    //             const get_inerrors = await snmpFunctions.getSingleOID(
+    //                 host,
+    //                 joid.basic_oids.oid_inerrors + intList[ifId],
+    //                 community
+    //             ).catch((err) => {
+    //                 console.log(err);
+    //                 return "";
+    //             });
+
+    //             let operStatus;
+    //             if (portOperStatus == "1") {
+    //                 operStatus = symbols.OK_UP;
+    //             } else if (portOperStatus == "2") {
+    //                 operStatus = symbols.SHORT;
+    //             } else {
+    //                 operStatus = symbols.UNKNOWN;
+    //             }
+
+    //             if (portAdminStatus == "2") {
+    //                 operStatus = util.format('%s Выключен', symbols.NOCABLE);
+    //             }
+
+    //             if (parseInt(get_inerrors) == 0) {
+    //                 results.push(util.format("<code>%s</code> %s | %s", intRange[ifId], operStatus, intDescr));
+    //             } else if (parseInt(get_inerrors) > 0) {
+    //                 results.push(
+    //                     util.format(
+    //                         "<code>%s</code> %s | %s | <i>Ошибки: %s</i> | %s |",
+    //                         intRange[ifId],
+    //                         operStatus,
+    //                         intDescr,
+    //                         get_inerrors,
+    //                         symbols.WarnEmo
+    //                     )
+    //                 );
+    //             }
+    //         }
+
+    //         return `${results.join('\n')}\n\nP.S. Состояния: ${symbols.OK_UP} - Линк есть, ${symbols.SHORT} - Линка нет, ${symbols.NOCABLE} - Порт выключен, ${symbols.UNKNOWN} - Неизвестно \n`;
+    //     } catch (e) {
+    //         console.log(e);
+    //         return result;
+    //     }
+    // },
     getPortStatus: async (host: string, community: string): Promise<string> => {
-        console.log(host, community)
-        const result = util.format(
-            "%s Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее",
-            symbols.SHORT
-        );
-
+        const result = util.format("%s Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее", symbols.SHORT)
         try {
-            const results: string[] = [];
-            const dirty = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_model, community).catch((err) => err);
-            const model = deviceArr.FilterDeviceModel(dirty)?.toString();
-            const JSON_aiflist = await deviceArr.ArrayInterfaceModel(model).catch((err) => err);
-            const aiflist = JSON.parse(JSON_aiflist);
-            const portIfList = aiflist.interfaceList;
-            const portIfRange = aiflist.interfaceRange;
-
-            const intRange = await snmpFunctions.getMultiOID(host, joid.linux_server.oid_ifName, community).catch((err) => {
-                console.log(err);
-                return [];
-            });
-
-            const intList = await snmpFunctions.getMultiOID(host, joid.linux_server.oid_ifIndex, community).catch((err) => {
-                console.log(err);
-                return [];
-            });
-
-            for (let ifId in zip(intList, intRange)) {
-                const intDescr = await snmpFunctions.getSingleOID(
-                    host,
-                    joid.linux_server.oid_ifDescr + intList[ifId],
-                    community
-                ).catch((err) => {
-                    console.log(err);
-                    return "";
+            const results = []
+            const dirty = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_model, community)
+                .then((res) => {
+                    return res;
+                }).catch((err) => {
+                    return err;
                 });
-                const portOperStatus = await snmpFunctions.getSingleOID(
-                    host,
-                    joid.basic_oids.oid_oper_ports + intList[ifId],
-                    community
-                ).catch((err) => {
-                    console.log(err);
-                    return "";
-                });
-                const portAdminStatus = await snmpFunctions.getSingleOID(
-                    host,
-                    joid.basic_oids.oid_admin_ports + intList[ifId],
-                    community
-                ).catch((err) => {
-                    console.log(err);
-                    return "";
-                });
-                const get_inerrors = await snmpFunctions.getSingleOID(
-                    host,
-                    joid.basic_oids.oid_inerrors + intList[ifId],
-                    community
-                ).catch((err) => {
-                    console.log(err);
-                    return "";
-                });
-
-                let operStatus;
-                if (portOperStatus == "1") {
-                    operStatus = symbols.OK_UP;
-                } else if (portOperStatus == "2") {
-                    operStatus = symbols.SHORT;
-                } else {
-                    operStatus = symbols.UNKNOWN;
+            const model = deviceArr.FilterDeviceModel(dirty);
+            const JSON_aiflist = await deviceArr.ArrayInterfaceModel(model)
+                .then((res) => {
+                    return res
+                })
+            const aiflist = JSON.parse(JSON_aiflist)
+            const portIfList = aiflist.interfaceList
+            const portIfRange = aiflist.interfaceRange
+            if (portIfList == "Server" && portIfRange == "Server") {
+                // console.log("portIfList: ", portIfList)
+                // console.log("portIfRange: ", portIfRange)
+                const intRange = await snmpFunctions.getMultiOID(host, joid.linux_server.oid_ifName, community)
+                    .then((res) => {
+                        return res
+                    }, (err) => {
+                        console.log(err)
+                    });
+                const intList = await snmpFunctions.getMultiOID(host, joid.linux_server.oid_ifIndex, community)
+                    .then((res) => {
+                        return res
+                    }, (err) => {
+                        console.log(err)
+                    });
+                // console.log(intRange)
+                // console.log(zip(intList, intRange))
+                for (let ifId in zip(intList, intRange)) {
+                    const intDescr = await snmpFunctions.getSingleOID(host, joid.linux_server.oid_ifDescr + intList[ifId], community)
+                        .then((res) => {
+                            return res
+                        }, (err) => {
+                            console.log(err)
+                        });
+                    const portOperStatus = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_oper_ports + intList[ifId], community)
+                        .then((res) => {
+                            return res
+                        }, (err) => {
+                            console.log(err)
+                        });
+                    const portAdminStatus = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_admin_ports + intList[ifId], community)
+                        .then((res) => {
+                            return res
+                        }, (err) => {
+                            console.log(err)
+                        });
+                    const get_inerrors = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_inerrors + intList[ifId], community)
+                        .then((res) => {
+                            return res
+                        }, (err) => {
+                            console.log(err)
+                        });
+                    // get_inerrors = parseInt(get_inerrors)
+                    let operStatus
+                    if (portOperStatus == "1") {
+                        operStatus = symbols.OK_UP
+                    } else if (portOperStatus == "2") {
+                        operStatus = symbols.SHORT
+                    } else {
+                        operStatus = symbols.UNKNOWN
+                    }
+                    if (portAdminStatus == "2") {
+                        operStatus = util.format('%s Выключен', symbols.NOCABLE)
+                    }
+                    if (parseInt(get_inerrors) == 0) {
+                        results.push(util.format("<code>%s</code> %s | %s", intRange[ifId], operStatus, intDescr))
+                    } else
+                        if (parseInt(get_inerrors) > 0) {
+                            results.push(util.format("<code>%s</code> %s | %s | <i>Ошибки: %s</i> | %s |", intRange[ifId], operStatus, intDescr, get_inerrors, symbols.WarnEmo))
+                        }
                 }
-
-                if (portAdminStatus == "2") {
-                    operStatus = util.format('%s Выключен', symbols.NOCABLE);
+            } else if (portIfList == "auto" && portIfRange == "auto") {
+                // console.log("portIfList: ", portIfList)
+                // console.log("portIfRange: ", portIfRange)
+                const intRange = await snmpFunctions.getMultiOID(host, joid.linux_server.oid_ifName, community)
+                    .then((res) => {
+                        return res
+                    }, (err) => {
+                        console.log(err)
+                    });
+                const intList = await snmpFunctions.getMultiOID(host, joid.linux_server.oid_ifIndex, community)
+                    .then((res) => {
+                        return res
+                    }, (err) => {
+                        console.log(err)
+                    });
+                // console.log(intRange)
+                // console.log(zip(intList, intRange))
+                for (let ifId in zip(intList, intRange)) {
+                    const intDescr = await snmpFunctions.getSingleOID(host, joid.linux_server.oid_ifDescr + intList[ifId], community)
+                        .then((res) => {
+                            return res
+                        }, (err) => {
+                            console.log(err)
+                        });
+                    const portOperStatus = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_oper_ports + intList[ifId], community)
+                        .then((res) => {
+                            return res
+                        }, (err) => {
+                            console.log(err)
+                        });
+                    const portAdminStatus = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_admin_ports + intList[ifId], community)
+                        .then((res) => {
+                            return res
+                        }, (err) => {
+                            console.log(err)
+                        });
+                    const get_inerrors = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_inerrors + intList[ifId], community)
+                        .then((res) => {
+                            return res
+                        }, (err) => {
+                            console.log(err)
+                        });
+                    // get_inerrors = parseInt(get_inerrors)
+                    let operStatus
+                    if (portOperStatus == "1") {
+                        operStatus = symbols.OK_UP
+                    } else if (portOperStatus == "2") {
+                        operStatus = symbols.SHORT
+                    } else {
+                        operStatus = symbols.UNKNOWN
+                    }
+                    if (portAdminStatus == "2") {
+                        operStatus = util.format('%s Выключен', symbols.NOCABLE)
+                    }
+                    if (parseInt(get_inerrors) == 0) {
+                        results.push(util.format("<code>%s</code> %s | %s", intRange[ifId], operStatus, intDescr))
+                    } else
+                        if (parseInt(get_inerrors) > 0) {
+                            results.push(util.format("<code>%s</code> %s | %s | <i>Ошибки: %s</i> | %s |", intRange[ifId], operStatus, intDescr, get_inerrors, symbols.WarnEmo))
+                        }
                 }
-
-                if (parseInt(get_inerrors) == 0) {
-                    results.push(util.format("<code>%s</code> %s | %s", intRange[ifId], operStatus, intDescr));
-                } else if (parseInt(get_inerrors) > 0) {
-                    results.push(
-                        util.format(
-                            "<code>%s</code> %s | %s | <i>Ошибки: %s</i> | %s |",
-                            intRange[ifId],
-                            operStatus,
-                            intDescr,
-                            get_inerrors,
-                            symbols.WarnEmo
-                        )
-                    );
+            } else {
+                for (let ifId in zip(portIfList, portIfRange)) {
+                    const intDescr = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_descr_ports + portIfList[ifId], community)
+                        .then((res) => {
+                            return res
+                        }, (err) => {
+                            console.log(err)
+                        });
+                    const portOperStatus = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_oper_ports + portIfList[ifId], community)
+                        .then((res) => {
+                            return res
+                        }, (err) => {
+                            console.log(err)
+                        });
+                    const portAdminStatus = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_admin_ports + portIfList[ifId], community)
+                        .then((res) => {
+                            return res
+                        }, (err) => {
+                            console.log(err)
+                        });
+                    const get_inerrors = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_inerrors + portIfList[ifId], community)
+                        .then((res) => {
+                            return res
+                        }, (err) => {
+                            console.log(err)
+                        });
+                    // get_inerrors = parseInt(get_inerrors)
+                    let operStatus
+                    if (portOperStatus == "1") {
+                        operStatus = symbols.OK_UP
+                    } else if (portOperStatus == "2") {
+                        operStatus = symbols.SHORT
+                    } else {
+                        operStatus = symbols.UNKNOWN
+                    }
+                    if (portAdminStatus == "2") {
+                        operStatus = util.format('%s Выключен', symbols.NOCABLE)
+                    }
+                    if (parseInt(get_inerrors) == 0) {
+                        results.push(util.format("<code>%s</code> %s | %s", portIfRange[ifId], operStatus, intDescr))
+                    } else
+                        if (parseInt(get_inerrors) > 0) {
+                            results.push(util.format("<code>%s</code> %s | %s | <i>Ошибки: %s</i> | %s |", portIfRange[ifId], operStatus, intDescr, get_inerrors, symbols.WarnEmo))
+                        }
                 }
             }
 
-            return `${results.join('\n')}\n\nP.S. Состояния: ${symbols.OK_UP} - Линк есть, ${symbols.SHORT} - Линка нет, ${symbols.NOCABLE} - Порт выключен, ${symbols.UNKNOWN} - Неизвестно \n`;
+            return (`${results.join('\n')}\n\nP.S. Состояния: ${symbols.OK_UP} - Линк есть, ${symbols.SHORT} - Линка нет, ${symbols.NOCABLE} - Порт выключен, ${symbols.UNKNOWN} - Неизвестно \n`)
         } catch (e) {
-            console.log(e);
-            return result;
+            console.log(e)
+            return result
+
         }
     },
     getVlanList: async (host: string, community: string) => {

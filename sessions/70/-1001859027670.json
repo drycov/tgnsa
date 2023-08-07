@@ -1,0 +1,9 @@
+{
+	"userId": 632646448,
+	"userFirstName": "Denis",
+	"userLastName": "Rykov",
+	"previosCVid": "additional",
+	"currentCVid": "ping_device",
+	"snmpCommunity": "public",
+	"deviceHost": "192.168.0.1"
+}

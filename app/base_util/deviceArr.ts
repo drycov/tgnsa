@@ -92,6 +92,8 @@ export = {
             }
         } else if (dirtyData.includes("IES-612")) {
             swModel = "ZyXEL IES-612"
+        } else if (dirtyData.includes("IES1248")) {
+            swModel = "ZyXEL IES1248-51"
         } else if (dirtyData.includes("ZyXEL IES-1000/SAM1008")) {
             swModel = "ZyXEL SAM1008"
         } else if (dirtyData.includes("SG200-26")) {
@@ -342,6 +344,13 @@ export = {
                 return JSON.stringify({
                     interfaceRange: baseUtil.InterfaceLoader("zyxel_interfaces_adsl_12_2", "interfaceRange"),
                     interfaceList: baseUtil.InterfaceLoader("interface_list_12p", "interfaceList"),
+                    ddm: false,
+                    fibers: 0
+                })
+            case "ZyXEL IES1248-51":
+                return JSON.stringify({
+                    interfaceRange: baseUtil.InterfaceLoader("zyxel_interfaces_adsl_48_2", "interfaceRange"),
+                    interfaceList: baseUtil.InterfaceLoader("interface_list_50p", "interfaceList"),
                     ddm: false,
                     fibers: 0
                 })
