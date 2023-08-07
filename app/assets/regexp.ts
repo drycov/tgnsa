@@ -5,8 +5,8 @@ const createBotnameRegexp = (botname: string) => createRegExp(`\\@${botname}\\s`
 const createSubstringReplacer = (botname: string) => (val: string) => val.trim().replace(createBotnameRegexp(botname), '');
 
 const IpRegexp = createRegExp('^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)(\\.(?!$)|$)){4}$');
-const SubnetRegexp = createRegExp('^((25[0-5]|(2[0-4]|1\d|\d)(\.(?!$)|$)){4})(?:\/([0-9]|[12][0-9]|3[0-2]))?$');
-const P2PSubnetRegexp = createRegExp('^((25[0-5]|(2[0-4]|1\d|\d)(\.(?!$)|$)){4})(?:\/30)$');
+const SubnetRegexp = createRegExp('^(\\d+\\.\\d+\\.\\d+\\.\\d+)(\\/\\d+)$');
+const P2PSubnetRegexp = createRegExp('^(\\d+\\.\\d+\\.\\d+\\.\\d+)(\\/30)$');
 const UserGrantRegexp = createRegExp("\\/enb_");
 const UserRevokeRegexp = createRegExp("\\/dsb_");
 const AdminGrantRegexp = createRegExp("\\/yadm_");
