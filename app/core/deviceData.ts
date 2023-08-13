@@ -552,7 +552,7 @@ const currentDate = helperFunctions.getHumanDate(new Date());
                     }
     
                     
-                    const oidDDMString  = '${joid[oidLoader][oidSuffix]}'.toString;
+                    const oidDDMString  = '${joid[oidLoader][oidSuffix]}';
                     console.log(`${oidDDMString}.6`);
                     const getDDMLevelRX = await snmpFunctions.getSingleOID(host, `${oidDDMString}.9`, community);
                     const getDDMLevelTX = await snmpFunctions.getSingleOID(host, `${oidDDMString}.8`, community);
