@@ -145,6 +145,13 @@ const helperFunctions = {
             });
         });
     },
+    mWtodBW: (val:any) => {
+        let dBm = Math.log10(val);
+        dBm = dBm * 10;
+        const dBW = dBm - 30;
+        return parseFloat(dBW.toFixed(2));
+    }
+    
 
 }
 
