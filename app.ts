@@ -4,17 +4,28 @@ import { run } from "@grammyjs/runner";
 import { FileAdapter } from '@grammyjs/storage-file';
 import * as dotenv from 'dotenv';
 import { Bot, Context, GrammyError, HttpError, session } from "grammy";
-import messages from "./app/assets/messages";
 import labels from "./app/assets/labels";
-import messagesData from "./app/assets/static/messages";
-import helper from './app/helpers/helper';
-import menu from "./app/keyboards/menu";
-import baseMenu from "./app/menus/baseMenu";
+import messages from "./app/assets/messages";
+// import messages from "./app/assets/static/messages";
+// import helperFunctions from './app/helperFunctionss/helperFunctions';
+// import menu from "./app/keyboards/menu";
+// import baseMenu from "./app/menus/baseMenu";
 import deviceMenu from "./app/menus/deviceMenu";
-import main from "./app/menus/mainMenu";
+// import main from "./app/menus/mainMenu";
+import database from "./app/utils/database";
 import joid from "./src/oid.json";
+import mainCommands from "./app/commands/mainCommands";
+import advancedCommands from "./app/commands/advancedCommands";
+import deviceCommands from "./app/commands/deviceCommands";
+import helperFunctions from "./app/utils/helperFunctions";
+import mainMenu from "./app/keyboards/mainMenu";
+import baseMenu from "./app/keyboards/baseMenu";
+import messagesFunctions from "./app/utils/messagesFunctions";
+import snmpFunctions from "./app/utils/snmpFunctions";
+
 dotenv.config();
-const token: string = helper.apptype() || "";
+const token: string = helperFunctions.apptype() || "";
+database();
 
 interface MainContext extends Context {
     session: { [key: string]: any }; // Change the type to match your session data structure
@@ -38,26 +49,26 @@ bot.errorBoundary(
     (err) => console.error("Conversation threw an error!", err),
     conversations(),
     // createConversation(main.start),
-    createConversation(main.main),
-    createConversation(main.regiser),
-    createConversation(baseMenu.additional),
-    createConversation(baseMenu.cidr_calc),
-    createConversation(baseMenu.p2p_calc),
-    createConversation(baseMenu.ping_device),
-    createConversation(baseMenu.massIncident),
-    createConversation(deviceMenu.check_device),
-    createConversation(deviceMenu.portInfo)
+    createConversation(mainCommands.main),
+    // createConversation(main.regiser),
+    createConversation(advancedCommands.additional),
+    createConversation(advancedCommands.cidr_calc),
+    createConversation(advancedCommands.p2p_calc),
+    createConversation(advancedCommands.ping_device),
+    createConversation(advancedCommands.massIncident),
+    createConversation(deviceCommands.check_device),
+    createConversation(deviceCommands.portInfo)
 );
 
 bot.command(["start", "st", "run"], async (ctx) => {
     const userInfo = JSON.stringify(ctx.message?.from, null, '\t');
-    helper.setSessionData(ctx);
+    helperFunctions.setSessionData(ctx);
     try {
         // Interpolate the 'userInfo' variable into the message
-        await ctx.reply(messages.msgWelcome(userInfo));
+        await ctx.reply(messagesFunctions.msgWelcome(userInfo));
         ctx.deleteMessage();
-        await ctx.reply(messagesData.PleaceEnterKbMessage, {
-            reply_markup: menu.onEnter,
+        await ctx.reply(messages.PleaceEnterKbMessage, {
+            reply_markup: baseMenu.onEnter,
         });
     } catch (error) {
         console.error("Error while processing start command:", error);
@@ -79,34 +90,34 @@ bot.callbackQuery("inContinue", async (ctx) => {
 });
 
 bot.command("test", async (ctx) => {
-    // const verificationCodes = helper.generateVerificationCodes();
+    // const verificationCodes = helperFunctions.generateVerificationCodes();
     // console.log(verificationCodes.codeA); // Example output: 1234
     // console.log(verificationCodes.codeB); // Example output: 5678
     // console.log(verificationCodes.jointValue); // Example output: 12345678
     const oid = joid.basic_oids.oid_model.toString()
     console.log(oid, typeof oid)
 
-    const session = await helper.getSingleOID('192.168.0.1', ".1.3.6.1.4.1", 'public')
+    const session = await snmpFunctions.getSingleOID('192.168.0.1', ".1.3.6.1.4.1", 'public')
     console.log(session)
 });
 // bot.on("message", (ctx) => ctx.reply("Got another message!"));
 
 bot.hears(labels.EnterLabel, async (ctx) => {
     ctx.deleteMessage()
-    helper.setSessionData(ctx)
+    helperFunctions.setSessionData(ctx)
     await ctx.conversation.enter("main");
 })
 
 bot.hears(labels.ExitLabel, async (ctx) => {
     ctx.deleteMessage()
-    await ctx.reply(messagesData.GoodbayMessage, {
+    await ctx.reply(messages.GoodbayMessage, {
         reply_markup: {
             remove_keyboard: true
         },
     });
     await ctx.conversation.exit();
-    await ctx.reply(messagesData.PleaceEnterMessage, {
-        reply_markup: menu.onEnter,
+    await ctx.reply(messages.PleaceEnterMessage, {
+        reply_markup: baseMenu.onEnter,
     });
 });
 bot.hears(labels.BackLabel, async (ctx) => {
@@ -116,13 +127,13 @@ bot.hears(labels.BackLabel, async (ctx) => {
 })
 bot.hears(labels.AdvancedMenuLabel, async (ctx) => {
     ctx.deleteMessage()
-    // helper.setSessionData(ctx)
+    // helperFunctions.setSessionData(ctx)
     await ctx.conversation.exit();
     await ctx.conversation.enter("additional");
 })
 bot.hears(labels.CIDRCalcLabel, async (ctx) => {
     ctx.deleteMessage()
-    // helper.setSessionData(ctx)
+    // helperFunctions.setSessionData(ctx)
     await ctx.conversation.exit();
 
     await ctx.conversation.enter("cidr_calc");
@@ -130,14 +141,14 @@ bot.hears(labels.CIDRCalcLabel, async (ctx) => {
 
 bot.hears(labels.P2PCalcLabel, async (ctx) => {
     ctx.deleteMessage()
-    // helper.setSessionData(ctx)
+    // helperFunctions.setSessionData(ctx)
     await ctx.conversation.exit();
 
     await ctx.conversation.enter("p2p_calc");
 })
 bot.hears(labels.PingDeviceLabel, async (ctx) => {
     ctx.deleteMessage()
-    // helper.setSessionData(ctx)
+    // helperFunctions.setSessionData(ctx)
     await ctx.conversation.exit();
 
     await ctx.conversation.enter("ping_device");
@@ -150,20 +161,20 @@ bot.hears(labels.MIAllertLabel, async (ctx) => {
 
     await ctx.conversation.enter("massIncident");
     // } else {
-    //     // logger.info(`ID: ${ctx.session.userId}(${ctx.session.userFirstName} ${ctx.session.userLastName}) ${messagesData.ErrorActionMessage} ${ctx.message.text}`)
-    //     await ctx.reply(messagesData.ErrorNoAclMessage, { reply_markup: menu.main })
+    //     // logger.info(`ID: ${ctx.session.userId}(${ctx.session.userFirstName} ${ctx.session.userLastName}) ${messages.ErrorActionMessage} ${ctx.message.text}`)
+    //     await ctx.reply(messages.ErrorNoAclMessage, { reply_markup: menu.main })
     // }
 })
 bot.hears(labels.CheckDeviceLabel, async (ctx) => {
     ctx.deleteMessage()
-    // helper.setSessionData(ctx)
+    // helperFunctions.setSessionData(ctx)
     await ctx.conversation.exit();
 
     await ctx.conversation.enter("check_device");
 })
 bot.hears(labels.PortInfoLabel, async (ctx) => {
     ctx.deleteMessage()
-    // helper.setSessionData(ctx)
+    // helperFunctions.setSessionData(ctx)
     await ctx.conversation.exit();
 
     await ctx.conversation.enter("portInfo");

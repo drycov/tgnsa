@@ -9,10 +9,13 @@
     "start:dev": "cross-env APP_TYPE=DEV node --inspect=0.0.0.0:9229 --no-warnings --loader ts-node/esm bot.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {"url": "https://github.com/drykov-ttc/ttcNSA.git"},
+  "repository": {
+    "url": "https://github.com/drykov-ttc/ttcNSA.git"
+  },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "ts-node": "^10.9.1",
     "typescript": "^5.1.6"
   },
@@ -22,14 +25,15 @@
     "@grammyjs/runner": "^2.0.3",
     "@grammyjs/storage-file": "^2.3.0",
     "@loskir/grammy-markup": "^1.1.0",
-    "@types/snmp-native": "^1.2.2",
-    "@types/underscore": "^1.11.6",
     "@types/ejs": "^3.1.2",
     "@types/netmask": "^2.0.2",
     "@types/nodemailer": "^6.4.9",
     "@types/ping": "^0.4.1",
     "@types/python-shell": "^1.0.3",
+    "@types/snmp-native": "^1.2.2",
+    "@types/underscore": "^1.11.6",
     "child_process": "^1.0.2",
+    "cross-env": "^7.0.3",
     "dotenv": "^16.3.1",
     "ejs": "^3.1.9",
     "grammy": "^1.17.2",

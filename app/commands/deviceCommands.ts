@@ -2,6 +2,7 @@ import {
     type Conversation
 } from "@grammyjs/conversations";
 import { Context } from "grammy";
+import util from "util";
 import messages from "../assets/messages";
 import { IpCheck } from "../assets/regexp";
 import config from "../config";
@@ -18,26 +19,28 @@ type MyConversation = Conversation<MyContext>;
 
 const deviceCommands = {
     check_device: async (conversation: MyConversation, ctx: MyContext) => {
+        const currentDate = helperFunctions.getHumanDate(new Date());
         ctx.session.currentCVid = "check_device";
         ctx.session.previosCVid = "main";
-
+        let action = "";
+        let message = util.format('{"date":"%s", "%s":%s", ',currentDate,action='userId',ctx.session.userId)
         await ctx.reply(messages.EnterIpMessage, {
             reply_markup: baseMenu.inBack,
         });
 
         ctx = await conversation.wait();
         const host = ctx.message?.text;
-        console.log(helperFunctions.getHumanDate(new Date()) + ' host: ' + host)
+        message += util.format('"%s": "%s", ',action='host',host)
         if (host) {
             const ifTru = IpCheck(host)
-            console.log(helperFunctions.getHumanDate(new Date()) + ' IpCheck: ' + ifTru)
-
+            message +=  util.format('%s: "%s", ',action='Ip_check',ifTru)
+            // console.log(message)
             if (ifTru) {
                 const isAlive = await helperFunctions.isAlive(host).then((res) => {
                     return (res)
                 })
-                console.log(helperFunctions.getHumanDate(new Date()) + ' isAlive:' + isAlive)
-
+                message += util.format('"%s": "%s"}',action='isAlive',isAlive)
+                // console.log(message)
                 if (isAlive) {
                     const community = await snmpFunctions.checkSNMP(host, config.snmp.community
                     ).then(res => res)
@@ -54,16 +57,18 @@ const deviceCommands = {
                                 parse_mode: "HTML",
                             }
                         ).catch(helperFunctions.noop);
+                        console.log(message)
                         return
                     } else {
                         ctx.reply(messages.ErroMessage + "\n" + messages.ErrorSNMPMessage, {
                             parse_mode: "HTML",
                         }).catch(helperFunctions.noop);
+                        message += util.format('}')
+                        console.log(message)
                         return
                     }
                 }
             }
-
         } else {
             // Handle invalid IP address
             ctx.reply(
@@ -73,8 +78,11 @@ const deviceCommands = {
                     reply_markup: baseMenu.inBack,
                 }
             ).catch(helperFunctions.noop);
+            message += util.format('}')
+            console.log(message)
             return
         }
+        console.log(message)
         return
     },
     portInfo: async (conversation: MyConversation, ctx: MyContext) => {

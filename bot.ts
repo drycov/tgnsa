@@ -1,12 +1,12 @@
-import database from "./app/utils/database";
 import { GrammyError, HttpError } from 'grammy';
 import bot from './app/bot'
 
 import { run } from "@grammyjs/runner";
+import database from "./app/utils/database";
 
 const runner = run(bot);
-
 database();
+
 
 bot.catch((err: any) => {
     const ctx = err.ctx;
