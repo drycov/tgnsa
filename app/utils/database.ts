@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
 import config from '../config';
 
-const connectToDatabase = async () => {
+const connectToDatabase = () => {
     try {
-        await mongoose.connect(config.mongoURI, config.mongoOptions);
+         mongoose.connect(config.mongoURI, config.mongoOptions);
         console.log('DB Connect');
         return mongoose;
     } catch (error) {
