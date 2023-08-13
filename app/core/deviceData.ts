@@ -9,8 +9,12 @@ import snmpFunctions from '../utils/snmpFunctions';
 import helperFunctions from '../utils/helperFunctions';
 import symbols from '../assets/symbols';
 import messagesFunctions from '../utils/messagesFunctions';
-export = {
+const currentDate = helperFunctions.getHumanDate(new Date());
+
+ const devicData = {
     getBasicInfo: async (host: string, community: any): Promise<string | false> => {
+        let action = devicData.getBasicInfo.name ;
+        let message = util.format('{"date":"%s", "action":"%s", ',currentDate,action)
         const result = util.format("%s Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее", symbols.SHORT)
 
         try {
@@ -37,8 +41,10 @@ export = {
                 UpTime
             );
         } catch (error) {
+            message += util.format('"%s":"%s"}',"error",error)
+                    console.error(message);
             // const error = `${error})`
-            console.log(error);
+            // console.log(error);
             // logger.info(error);
             return result;
         }
@@ -140,14 +146,18 @@ export = {
     //     }
     // },
     getPortStatus: async (host: string, community: string): Promise<string> => {
+        let action = devicData.getPortStatus.name ;
+        let message = util.format('{"date":"%s", "action":"%s", ',currentDate,action)
         const result = util.format("%s Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее", symbols.SHORT)
         try {
             const results = []
             const dirty = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_model, community)
                 .then((res) => {
                     return res;
-                }).catch((err) => {
-                    return err;
+                }).catch((error) => {
+                    message += util.format('"%s":"%s"}',"error",error)
+                    console.error(message);
+                    return error;
                 });
             const model = deviceArr.FilterDeviceModel(dirty);
             const JSON_aiflist = await deviceArr.ArrayInterfaceModel(model)
@@ -163,14 +173,16 @@ export = {
                 const intRange = await snmpFunctions.getMultiOID(host, joid.linux_server.oid_ifName, community)
                     .then((res) => {
                         return res
-                    }, (err) => {
-                        console.log(err)
+                    }, (error) => {
+                        message += util.format('"%s":"%s"}',"error",error)
+                    console.error(message);
                     });
                 const intList = await snmpFunctions.getMultiOID(host, joid.linux_server.oid_ifIndex, community)
                     .then((res) => {
                         return res
-                    }, (err) => {
-                        console.log(err)
+                    }, (error) => {
+                        message += util.format('"%s":"%s"}',"error",error)
+                    console.error(message);
                     });
                 // console.log(intRange)
                 // console.log(zip(intList, intRange))
@@ -178,26 +190,30 @@ export = {
                     const intDescr = await snmpFunctions.getSingleOID(host, joid.linux_server.oid_ifDescr + intList[ifId], community)
                         .then((res) => {
                             return res
-                        }, (err) => {
-                            console.log(err)
+                        }, (error) => {
+                            message += util.format('"%s":"%s"}',"error",error)
+                    console.error(message);
                         });
                     const portOperStatus = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_oper_ports + intList[ifId], community)
                         .then((res) => {
                             return res
-                        }, (err) => {
-                            console.log(err)
+                        }, (error) => {
+                            message += util.format('"%s":"%s"}',"error",error)
+                    console.error(message);
                         });
                     const portAdminStatus = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_admin_ports + intList[ifId], community)
                         .then((res) => {
                             return res
-                        }, (err) => {
-                            console.log(err)
+                        }, (error) => {
+                            message += util.format('"%s":"%s"}',"error",error)
+                    console.error(message);
                         });
                     const get_inerrors = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_inerrors + intList[ifId], community)
                         .then((res) => {
                             return res
-                        }, (err) => {
-                            console.log(err)
+                        }, (error) => {
+                            message += util.format('"%s":"%s"}',"error",error)
+                    console.error(message);
                         });
                     // get_inerrors = parseInt(get_inerrors)
                     let operStatus
@@ -224,14 +240,16 @@ export = {
                 const intRange = await snmpFunctions.getMultiOID(host, joid.linux_server.oid_ifName, community)
                     .then((res) => {
                         return res
-                    }, (err) => {
-                        console.log(err)
+                    }, (error) => {
+                        message += util.format('"%s":"%s"}',"error",error)
+                console.error(message);
                     });
                 const intList = await snmpFunctions.getMultiOID(host, joid.linux_server.oid_ifIndex, community)
                     .then((res) => {
                         return res
-                    }, (err) => {
-                        console.log(err)
+                    }, (error) => {
+                        message += util.format('"%s":"%s"}',"error",error)
+                console.error(message);
                     });
                 // console.log(intRange)
                 // console.log(zip(intList, intRange))
@@ -239,26 +257,30 @@ export = {
                     const intDescr = await snmpFunctions.getSingleOID(host, joid.linux_server.oid_ifDescr + intList[ifId], community)
                         .then((res) => {
                             return res
-                        }, (err) => {
-                            console.log(err)
+                        }, (error) => {
+                            message += util.format('"%s":"%s"}',"error",error)
+                    console.error(message);
                         });
                     const portOperStatus = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_oper_ports + intList[ifId], community)
                         .then((res) => {
                             return res
-                        }, (err) => {
-                            console.log(err)
+                        }, (error) => {
+                            message += util.format('"%s":"%s"}',"error",error)
+                    console.error(message);
                         });
                     const portAdminStatus = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_admin_ports + intList[ifId], community)
                         .then((res) => {
                             return res
-                        }, (err) => {
-                            console.log(err)
+                        }, (error) => {
+                            message += util.format('"%s":"%s"}',"error",error)
+                    console.error(message);
                         });
                     const get_inerrors = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_inerrors + intList[ifId], community)
                         .then((res) => {
                             return res
-                        }, (err) => {
-                            console.log(err)
+                        }, (error) => {
+                            message += util.format('"%s":"%s"}',"error",error)
+                    console.error(message);
                         });
                     // get_inerrors = parseInt(get_inerrors)
                     let operStatus
@@ -284,26 +306,30 @@ export = {
                     const intDescr = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_descr_ports + portIfList[ifId], community)
                         .then((res) => {
                             return res
-                        }, (err) => {
-                            console.log(err)
+                        }, (error) => {
+                            message += util.format('"%s":"%s"}',"error",error)
+                    console.error(message);
                         });
                     const portOperStatus = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_oper_ports + portIfList[ifId], community)
                         .then((res) => {
                             return res
-                        }, (err) => {
-                            console.log(err)
+                        }, (error) => {
+                            message += util.format('"%s":"%s"}',"error",error)
+                    console.error(message);
                         });
                     const portAdminStatus = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_admin_ports + portIfList[ifId], community)
                         .then((res) => {
                             return res
-                        }, (err) => {
-                            console.log(err)
+                        }, (error) => {
+                            message += util.format('"%s":"%s"}',"error",error)
+                    console.error(message);
                         });
                     const get_inerrors = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_inerrors + portIfList[ifId], community)
                         .then((res) => {
                             return res
-                        }, (err) => {
-                            console.log(err)
+                        }, (error) => {
+                            message += util.format('"%s":"%s"}',"error",error)
+                    console.error(message);
                         });
                     // get_inerrors = parseInt(get_inerrors)
                     let operStatus
@@ -328,12 +354,15 @@ export = {
 
             return (`${results.join('\n')}\n\nP.S. Состояния: ${symbols.OK_UP} - Линк есть, ${symbols.SHORT} - Линка нет, ${symbols.NOCABLE} - Порт выключен, ${symbols.UNKNOWN} - Неизвестно \n`)
         } catch (e) {
-            console.log(e)
+                message += util.format('"%s":"%s"}',"error",e)
+        console.error(message);
             return result
 
         }
     },
     getVlanList: async (host: string, community: string) => {
+        let action = devicData.getVlanList.name ;
+        let message = util.format('{"date":"%s", "action":"%s", ',currentDate,action)
         let res: string[] = [];
         const result = util.format("%s Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее", symbols.SHORT)
         try {
@@ -341,12 +370,16 @@ export = {
                 .then((res) => {
                     return res;
                 }).catch((err) => {
+                    message += util.format('"%s":"%s"}',"error",err)
+        console.error(message);
                     return err;
                 });
             const vlanId = await snmpFunctions.getMultiOID(host, joid.basic_oids.oid_vlan_id, community)
                 .then((res) => {
                     return res;
                 }).catch((err) => {
+                    message += util.format('"%s":"%s"}',"error",err)
+        console.error(message);
                     return err;
                 });
             if (!vlanName || !vlanId) {
@@ -357,11 +390,14 @@ export = {
             }
             return res.join('\n');
         } catch (e) {
-            console.log(e);
+            message += util.format('"%s":"%s"}',"error",e)
+            console.error(message);
             return result;
         }
     },
     getDDMInfo: async (host: string, community: string) => {
+        let action = devicData.getDDMInfo.name ;
+        let message = util.format('{"date":"%s", "action":"%s", ',currentDate,action)
         try {
 
             const results: string[] = [];
@@ -381,6 +417,8 @@ export = {
 
             if (ddm && fibers === 0) {
                 results.push(`${symbols.WarnEmo} Функция DDM не поддерживается или не реализована`);
+                message += util.format('"%s":"%s"}',"error","ddm not supported")
+                console.error(message);
             } else {
                 const noDDMport = portIfList.length - fibers;
                 const DDMport = portIfList.length;
@@ -391,9 +429,11 @@ export = {
                             model.includes("DGS") || model.includes("DES") ? "dlink_oids" :
                                 model.includes("SG200-26") ? "cisco_oids" :
                                     "";
-
+                                    console.log(util.format("oidLoader:%s",oidLoader));
                     if (oidLoader === "") {
                         results.push(`${symbols.WarnEmo} Функция DDM не поддерживается или не реализована\n\n`);
+                        message += util.format('"%s":"%s"}',"error","ddm not supported")
+                        console.error(message);
                         continue;
                     }
 
@@ -405,9 +445,11 @@ export = {
                                 model.includes("DGS-3620") || model.includes("DES-3200") || model.includes("DGS-3000") ?
                                     `dgs36xx_ses32xx_dgs_30xx_ddm_rx_power${portIfList[i]}` :
                                     model.includes("SG200-26") ? `cisco_DDM_S200${portIfList[i]}` : "";
-
+                                    console.log(util.format("oidSuffix:%s",oidSuffix));
                     if (oidSuffix === "") {
                         results.push(`${symbols.WarnEmo} Функция DDM не поддерживается или не реализована\n\n`);
+                        message += util.format('"%s":"%s"}',"error","ddm not supported")
+                        console.error(message);
                         continue;
                     }
                     console.log(`${joid}.${oidLoader}.${oidSuffix}` + '.6')
@@ -445,7 +487,8 @@ export = {
 
             return results.join('\n');
         } catch (e) {
-            console.log(e);
+            message += util.format('"%s":"%s"}',"error",e)
+        console.error(message);
             return util.format(
                 "%s Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее",
                 symbols.SHORT
@@ -468,3 +511,4 @@ export = {
     }
 }
 
+export default devicData;

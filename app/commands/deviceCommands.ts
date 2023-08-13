@@ -20,10 +20,11 @@ type MyConversation = Conversation<MyContext>;
 const deviceCommands = {
     check_device: async (conversation: MyConversation, ctx: MyContext) => {
         const currentDate = helperFunctions.getHumanDate(new Date());
-        ctx.session.currentCVid = "check_device";
-        ctx.session.previosCVid = "main";
         let action = "";
         let message = util.format('{"date":"%s", "%s":%s", ',currentDate,action='userId',ctx.session.userId)
+        ctx.session.currentCVid = "check_device";
+        ctx.session.previosCVid = "main";
+        
         await ctx.reply(messages.EnterIpMessage, {
             reply_markup: baseMenu.inBack,
         });
