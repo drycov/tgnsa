@@ -557,15 +557,16 @@ type OidLoaderType = {
                                     `dgs36xx_ses32xx_dgs_30xx_ddm_rx_power` :
                                     model.includes("SG200-26") ? `cisco_DDM_S200` : "";
                                     console.log(util.format("oidSuffix:%s",oidSuffix));
-                    // if (!oidLoader.hasOwnProperty(oidSuffix)||oidSuffix==="") {
-                        if (oidSuffix==="") {
+                    if (!oidLoader.hasOwnProperty(oidSuffix)||oidSuffix==="") {
+                        // if (oidSuffix==="") {
                         results.push(`${symbols.WarnEmo} Функция DDM не поддерживается или не реализована\n\n`);
                         message += `"error":"ddm not supported"}`;
                         console.error(message);
                         continue;
                     }
 
-                    const oidValue = oidLoader[oidSuffix];
+                    // const oidValue = oidLoader[oidSuffix];
+                    const oidValue = oidLoader['snr_oid_DDMRXPower']
 
                     console.log(`val = ${oidValue}.${portIfList[i]}`)
                     const getDDMLevelRX = await snmpFunctions.getSingleOID(host, `${oidValue}.${portIfList[i]}.9`, community);
@@ -597,6 +598,221 @@ type OidLoaderType = {
                         results.push(`${portIfRange[i]} 🔺TX: ${DDMLevelTX} 🔻RX: ${DDMLevelRX} 🌡C:${getDDMTemperature} ⚡️V: ${DDMVoltage}`);
                     }
                 }
+
+                // if (model.includes("SNR")) {
+                //     for (let i = noDDMport; i < DDMport; i++) {
+                //     const oidLoaderKey = model.includes("SNR") ? "snr_oids" :
+                //         model.includes("Eltex") ? "eltex_oids" :
+                //         model.includes("DGS") || model.includes("DES") ? "dlink_oids" :
+                //         model.includes("SG200-26") ? "cisco_oids" : "";
+                //     // console.log(`oidLoader:${oidLoaderKey}`);
+
+                //     if (oidLoaderKey === "") {
+                //         results.push(`${symbols.WarnEmo} Функция DDM не поддерживается или не реализована\n\n`);
+                //         message += `"error":"ddm not supported"}`;
+                //         console.error(message);
+                //         continue;
+                //     }
+                //     const oidLoader: OidLoaderType = joid[oidLoaderKey];
+                //     const oidValue = oidLoader['snr_oid_DDMRXPower']
+                //         const getDDMLevelRX =  await snmpFunctions.getSingleOID(host, OidLoader("snr_oids", "snr_oid_DDMRXPower") + portIfList[i], roCommunity)
+                //             .then((res) => {
+                //                 return res
+                //             }, (err) => {
+                //                 console.log(err)
+                //             });
+                //         const getDDMLevelTX =  await snmpFunctions.getSingleOID(host, OidLoader("snr_oids", "snr_oid_DDMTXPower") + portIfList[i], roCommunity)
+                //             .then((res) => {
+                //                 return res
+                //             }, (err) => {
+                //                 console.log(err)
+                //             });
+                //         const getDDMTemperature =  await snmpFunctions.getSingleOID(host, OidLoader("snr_oids", "snr_oid_DDMTemperature") + portIfList[i], roCommunity)
+                //             .then((res) => {
+                //                 return res
+                //             }, (err) => {
+                //                 console.log(err)
+                //             });
+                //         const getDDMVoltage =  await snmpFunctions.getSingleOID(host, OidLoader("snr_oids", "snr_oid_DDMVoltage") + portIfList[i], roCommunity)
+                //             .then((res) => {
+                //                 return res
+                //             }, (err) => {
+                //                 console.log(err)
+                //             });
+                //         if (getDDMLevelTX != "NULL" && getDDMLevelRX != "NULL" && getDDMTemperature != "NULL" && getDDMVoltage != "NULL") {
+                //             results.push(`${portIfRange[i]} 🔺TX: ${getDDMLevelTX} 🔻RX: ${getDDMLevelRX} 🌡C:${getDDMTemperature} ⚡️V: ${getDDMVoltage}`)
+                //         }
+                //     }
+                // } 
+                // else if (model.includes("Eltex MES14") || model.includes("Eltex MES24") || model.includes("Eltex MES3708")) {
+                //     for (let i = noDDMport; i < DDMport; i++) {
+                //         const getDDMLevelRX =  await snmpFunctions.getSingleOID(host, OidLoader("eltex_oids", "eltex_DDM_mes14_mes24_mes_3708") + portIfList[i] + '.5.1', roCommunity)
+                //             .then((res) => {
+                //                 return res
+                //             }, (err) => {
+                //                 console.log(err)
+                //             });
+                //         const getDDMLevelTX =  await snmpFunctions.getSingleOID(host, OidLoader("eltex_oids", "eltex_DDM_mes14_mes24_mes_3708") + portIfList[i] + '.4.1', roCommunity)
+                //             .then((res) => {
+                //                 return res
+                //             }, (err) => {
+                //                 console.log(err)
+                //             });
+                //         const getDDMTemperature =  await snmpFunctions.getSingleOID(host, OidLoader("eltex_oids", "eltex_DDM_mes14_mes24_mes_3708") + portIfList[i] + '.1.1', roCommunity)
+                //             .then((res) => {
+                //                 return res
+                //             }, (err) => {
+                //                 console.log(err)
+                //             });
+                //         const getDDMVoltage =  await snmpFunctions.getSingleOID(host, OidLoader("eltex_oids", "eltex_DDM_mes14_mes24_mes_3708") + portIfList[i] + '.2.1', roCommunity)
+                //             .then((res) => {
+                //                 return res
+                //             }, (err) => {
+                //                 console.log(err)
+                //             });
+                //         if (getDDMLevelTX != "NULL" && getDDMLevelRX != "NULL" && getDDMTemperature != "0" && getDDMVoltage != "0") {
+                //             let DDMLevelRX = helperFunctions.mWtodBW(getDDMLevelRX)
+                //             let DDMLevelTX = mWtodBW(getDDMLevelTX)
+                            
+                //             results.push(`${portIfRange[i]} 🔺TX: ${DDMLevelTX.toString()} 🔻RX: ${DDMLevelRX.toString()} 🌡C:${getDDMTemperature} ⚡️V: ${getDDMVoltage}`)
+                //         }
+                //         // if (getDDMLevelTX != "0" && getDDMLevelRX != "0") {
+                //         //     results.push(`${portIfRange[i]} 🔺TX: ${getDDMLevelTX} 🔻RX: ${getDDMLevelRX} 🌡⚡️`)
+                //         // }
+                //     }
+                // } 
+                // else if (model.includes("Eltex MES23") || model.includes("Eltex MES33") || model.includes("Eltex MES35") || model.includes("Eltex  MES53")) {
+                //     for (let i = 0; i < DDMport; i++) {
+                //         const getDDMLevelRX =  await snmpFunctions.getSingleOID(host, OidLoader("eltex_oids", "eltex_DDM_mes23_mes33_mes35_mes53") + portIfList[i] + '.9', roCommunity)
+                //             .then((res) => {
+                //                 return res
+                //             }, (err) => {
+                //                 console.log(err)
+                //             });
+                //         const getDDMLevelTX =  await snmpFunctions.getSingleOID(host, OidLoader("eltex_oids", "eltex_DDM_mes23_mes33_mes35_mes53") + portIfList[i] + '.8', roCommunity)
+                //             .then((res) => {
+                //                 return res
+                //             }, (err) => {
+                //                 console.log(err)
+                //             });
+                //         const getDDMTemperature =  await snmpFunctions.getSingleOID(host, OidLoader("eltex_oids", "eltex_DDM_mes23_mes33_mes35_mes53") + portIfList[i] + '.5', roCommunity)
+                //             .then((res) => {
+                //                 return res
+                //             }, (err) => {
+                //                 console.log(err)
+                //             });
+                //         const getDDMVoltage =  await snmpFunctions.getSingleOID(host, OidLoader("eltex_oids", "eltex_DDM_mes23_mes33_mes35_mes53") + portIfList[i] + '.6', roCommunity)
+                //             .then((res) => {
+                //                 return res
+                //             }, (err) => {
+                //                 console.log(err)
+                //             });
+                //         if (getDDMLevelTX != "noSuchInstance" && getDDMLevelRX != "noSuchInstance") {
+                //             let DDMLevelRX = getDDMLevelRX.toString()
+                //             let DDMLevelTX = getDDMLevelTX.toString()
+                //             let DDMVoltage = parseFloat((getDDMVoltage / 1000000).toFixed(3))
+                //             if (DDMLevelRX.length == 3) {
+                //                 DDMLevelRX = '0,' + DDMLevelRX
+                //             } else if (DDMLevelRX.length == 5) {
+                //                 DDMLevelRX = DDMLevelRX.slice(0, 2) + ',' + DDMLevelRX.slice(3)
+                //             } else if (DDMLevelRX.length == 6) {
+                //                 DDMLevelRX = DDMLevelRX.slice(0, 3) + ',' + DDMLevelRX.slice(4)
+                //             }
+                //             if (DDMLevelTX.length == 3) {
+                //                 DDMLevelTX = '0,' + DDMLevelTX
+                //             } else if (DDMLevelTX.length == 5) {
+                //                 DDMLevelTX = DDMLevelTX.slice(0, 2) + ',' + DDMLevelTX.slice(3)
+                //             } else if (DDMLevelTX.length == 6) {
+                //                 DDMLevelTX = DDMLevelTX.slice(0, 3) + ',' + DDMLevelTX.slice(4)
+                //             }
+                //             results.push(`${portIfRange[i]} 🔺TX: ${DDMLevelTX} 🔻RX: ${DDMLevelRX} 🌡C:${getDDMTemperature} ⚡️V: ${DDMVoltage}`)
+                //         }
+                //     }
+                // } 
+                // else if (model.includes("DGS-3620") || model.includes("DES-3200") || model.includes("DGS-3000")) {
+                //     for (let i = noDDMport; i < DDMport; i++) {
+                //         const getDDMLevelRX =  await snmpFunctions.getSingleOID(host, OidLoader("dlink_oids", "dlink_dgs36xx_ses32xx_dgs_30xx_ddm_rx_power") + portIfList[i], roCommunity)
+                //             .then((res) => {
+                //                 return res
+                //             }, (err) => {
+                //                 console.log(err)
+                //             });
+                //         const getDDMLevelTX =  await snmpFunctions.getSingleOID(host, OidLoader("dlink_oids", "dlink_dgs36xx_ses32xx_dgs_30xx_ddm_tx_power") + portIfList[i], roCommunity)
+                //             .then((res) => {
+                //                 return res
+                //             }, (err) => {
+                //                 console.log(err)
+                //             });
+                //         const getDDMTemperature =  await snmpFunctions.getSingleOID(host, OidLoader("eltex_oids", "dlink_dgs36xx_ses32xx_dgs_30xx_ddm_temperatura") + portIfList[i], roCommunity)
+                //             .then((res) => {
+                //                 return res
+                //             }, (err) => {
+                //                 console.log(err)
+                //             });
+                //         const getDDMVoltage =  await snmpFunctions.getSingleOID(host, OidLoader("eltex_oids", "dlink_dgs36xx_ses32xx_dgs_30xx_ddm_voltage") + portIfList[i], roCommunity)
+                //             .then((res) => {
+                //                 return res
+                //             }, (err) => {
+                //                 console.log(err)
+                //             });
+                //         if (getDDMLevelTX != "-" && getDDMLevelRX != "-" && getDDMTemperature != "-" && getDDMVoltage != "-") {
+                //             results.push(`${portIfRange[i]} 🔺TX: ${getDDMLevelTX} 🔻RX: ${getDDMLevelRX} 🌡C:${getDDMTemperature} ⚡️V: ${getDDMVoltage}`)
+                //         }
+                //     }
+                // } 
+                // else if (model.includes("SG200-26")) {
+                //     for (let i = 0; i < DDMport; i++) {
+                //         const getDDMLevelRX =  await snmpFunctions.getSingleOID(host, OidLoader("cisco_oids", "cisco_DDM_S200") + portIfList[i] + '.9', roCommunity)
+                //             .then((res) => {
+                //                 return res
+                //             }, (err) => {
+                //                 console.log(err)
+                //             });
+                //         const getDDMLevelTX =  await snmpFunctions.getSingleOID(host, OidLoader("cisco_oids", "cisco_DDM_S200") + portIfList[i] + '.8', roCommunity)
+                //             .then((res) => {
+                //                 return res
+                //             }, (err) => {
+                //                 console.log(err)
+                //             });
+                //         const getDDMTemperature =  await snmpFunctions.getSingleOID(host, OidLoader("cisco_oids", "cisco_DDM_S200") + portIfList[i]+'.5', roCommunity)
+                //             .then((res) => {
+                //                 return res
+                //             }, (err) => {
+                //                 console.log(err)
+                //             });
+                //         const getDDMVoltage =  await snmpFunctions.getSingleOID(host, OidLoader("cisco_oids", "cisco_DDM_S200") + portIfList[i]+'.6', roCommunity)
+                //             .then((res) => {
+                //                 return res
+                //             }, (err) => {
+                //                 console.log(err)
+                //             });
+                //         if (getDDMLevelTX != "noSuchInstance" && getDDMLevelRX != "noSuchInstance") {
+
+                //             let DDMLevelRX = getDDMLevelRX.toString()
+                //             let DDMLevelTX = getDDMLevelTX.toString()
+                //             let DDMVoltage = parseFloat((getDDMVoltage / 1000000).toFixed(3))
+
+                //             if (DDMLevelRX.length == 3) {
+                //                 DDMLevelRX = '0,' + DDMLevelRX
+                //             } else if (DDMLevelRX.length == 5) {
+                //                 DDMLevelRX = DDMLevelRX.slice(0, 2) + ',' + DDMLevelRX.slice(3)
+                //             } else if (DDMLevelRX.length == 6) {
+                //                 DDMLevelRX = DDMLevelRX.slice(0, 3) + ',' + DDMLevelRX.slice(4)
+                //             }
+                //             if (DDMLevelTX.length == 3) {
+                //                 DDMLevelTX = '0,' + DDMLevelTX
+                //             } else if (DDMLevelTX.length == 5) {
+                //                 DDMLevelTX = DDMLevelTX.slice(0, 2) + ',' + DDMLevelTX.slice(3)
+                //             } else if (DDMLevelTX.length == 6) {
+                //                 DDMLevelTX = DDMLevelTX.slice(0, 3) + ',' + DDMLevelTX.slice(4)
+                //             }
+                //             results.push(`${portIfRange[i]} 🔺TX: ${DDMLevelTX} 🔻RX: ${DDMLevelRX} 🌡C:${getDDMTemperature} ⚡️V: ${DDMVoltage}`)
+                //         }
+                //     }
+                // } else {
+                //     results.push(`${symbols.WarnEmo} Функция  DDM не поддерживается или не реализована\n\n`)
+                // }
+
             }
     
             return results.join('\n');
