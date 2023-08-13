@@ -15,6 +15,7 @@ const snmpFunctions = {
          message += util.format('"%s":"%s", ',"host",host)
         return new Promise((resolve, reject) => {
             session.get({ oid: oid }, (error, varbinds) => {
+                console.log(oid)
                 if (!error) {
                     resolve(varbinds[0].value);
                 } else {
