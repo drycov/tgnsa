@@ -1,0 +1,68 @@
+[{
+  "_id": {
+    "$oid": "64d02b948118b42d534242ee"
+  },
+  "is_bot": false,
+  "tgId": 632646448,
+  "firstName": "Денис",
+  "lastName": "Рыков",
+  "companyPost": "Инженер сети",
+  "phoneNumber": "+77710515252",
+  "username": "Oritorius",
+  "isAdmin": false,
+  "userAllowed": true,
+  "verificationCode": "827393",
+  "email": "d.rykov@ttc.kz",
+  "userVerified": true,
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "64d0626e75e887a9a1351c90"
+  },
+  "is_bot": false,
+  "tgId": 5797663980,
+  "firstName": "Диас",
+  "lastName": "Каримов",
+  "companyPost": "Электромеханик",
+  "phoneNumber": "77771341135",
+  "username": "dkb20",
+  "isAdmin": false,
+  "userAllowed": true,
+  "verificationCode": "166517",
+  "email": "di.karimov@ttc.kz",
+  "userVerified": true,
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "64d06b4bd0b7e69d92578bb5"
+  },
+  "is_bot": false,
+  "tgId": 1447062587,
+  "firstName": "Байсултан",
+  "lastName": "Садибеков",
+  "companyPost": "Инженер сети",
+  "phoneNumber": "77472517931",
+  "isAdmin": false,
+  "userAllowed": true,
+  "verificationCode": "381679",
+  "email": "b.sadibekov@ttc.kz",
+  "userVerified": true,
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "64d07bf55d80d6535c4a80b1"
+  },
+  "is_bot": false,
+  "tgId": 170372790,
+  "firstName": "Нурбек",
+  "lastName": "Сулейманов",
+  "companyPost": "Руководитель АТС",
+  "phoneNumber": "+77016622334",
+  "username": "nfast",
+  "isAdmin": false,
+  "userAllowed": true,
+  "verificationCode": "324802",
+  "email": "n.suleimanov@ttc.kz",
+  "userVerified": true,
+  "__v": 0
+}]

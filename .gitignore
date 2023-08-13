@@ -6,7 +6,7 @@ package-lock.json
 .vscode/
 
 # Custom Sessions Directory
-sessions/
+sessions/*
 
 # Ignored files
 .DS_Store
