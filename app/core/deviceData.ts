@@ -551,12 +551,14 @@ const currentDate = helperFunctions.getHumanDate(new Date());
                         continue;
                     }
     
-                    console.log(`${joid}.${oidLoader}.${oidSuffix}.6`);
-                    const getDDMLevelRX = await snmpFunctions.getSingleOID(host, `${joid}.${oidLoader}.${oidSuffix}.9`, community);
-                    const getDDMLevelTX = await snmpFunctions.getSingleOID(host, `${joid}.${oidLoader}.${oidSuffix}.8`, community);
-                    const getDDMTemperature = await snmpFunctions.getSingleOID(host, `${joid}.${oidLoader}.${oidSuffix}.5`, community);
-                    const getDDMVoltage = await snmpFunctions.getSingleOID(host, `${joid}.${oidLoader}.${oidSuffix}.6`, community);
-                    console.log(`${joid}.${oidLoader}.${oidSuffix}.6`);
+                    
+                    const oidDDMString  = '${joid[oidLoader][oidSuffix]}'.toString;
+                    console.log(`${oidDDMString}.6`);
+                    const getDDMLevelRX = await snmpFunctions.getSingleOID(host, `${oidDDMString}.9`, community);
+                    const getDDMLevelTX = await snmpFunctions.getSingleOID(host, `${oidDDMString}.8`, community);
+                    const getDDMTemperature = await snmpFunctions.getSingleOID(host, `${oidDDMString}.5`, community);
+                    const getDDMVoltage = await snmpFunctions.getSingleOID(host, `${oidDDMString}.6`, community);                    
+                    console.log(`${oidDDMString}.6`);
     
                     if (getDDMLevelTX !== "noSuchInstance" && getDDMLevelRX !== "noSuchInstance") {
                         let DDMLevelRX = getDDMLevelRX.toString();

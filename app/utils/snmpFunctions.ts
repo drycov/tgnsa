@@ -5,7 +5,7 @@ import helperFunctions from './helperFunctions';
 import messagesFunctions from './messagesFunctions';
 const currentDate = helperFunctions.getHumanDate(new Date());
 const snmpFunctions = {
-    getSingleOID: async (host: string, oid: string, community: string): Promise<any> => {
+    getSingleOID: async (host: string, oid:any, community: string): Promise<any> => {
          let action = snmpFunctions.getSingleOID.name;
         let message = util.format('{"date":"%s", "action":"%s", ',currentDate,action)
         const session = new Session({
