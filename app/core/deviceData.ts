@@ -547,7 +547,7 @@ type OidLoaderType = {
                     }
                     const oidLoader: OidLoaderType = joid[oidLoaderKey];
 
-                    console.log(oidLoader.toString())
+                    console.log(JSON.stringify(oidLoader))
                     const oidSuffix = model.includes("SNR") ? `DDMRXPower` :
                         model.includes("Eltex MES14") || model.includes("Eltex MES24") || model.includes("Eltex MES3708") ?
                             `DDM_mes14_mes24_mes_3708` :
@@ -564,7 +564,7 @@ type OidLoaderType = {
                         continue;
                     }
 
-                    const oidValue = oidLoader[oidSuffix].toString;
+                    const oidValue = oidLoader[oidSuffix];
 
                     console.log(`val = ${oidValue}.${portIfList[i]}`)
                     const getDDMLevelRX = await snmpFunctions.getSingleOID(host, `${oidValue}.${portIfList[i]}.9`, community);
