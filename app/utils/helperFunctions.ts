@@ -145,10 +145,10 @@ const helperFunctions = {
             });
         });
     },
-    mWtodBW: (val:any) => {
-        let dBm = Math.log10(val);
-        dBm = dBm * 10;
-        const dBW = dBm - 30;
+    mWtodBW :(val: number) => {
+        const mW = val;
+        const dBm = Math.log10(mW);
+        const dBW = dBm * 10 - 30;
         return parseFloat(dBW.toFixed(2));
     }
     
