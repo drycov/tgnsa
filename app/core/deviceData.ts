@@ -547,7 +547,7 @@ type OidLoaderType = {
                     }
                     const oidLoader: OidLoaderType = joid[oidLoaderKey];
 
-                    console.log(JSON.stringify(oidLoader))
+                    // console.log(JSON.stringify(oidLoader))
                     const oidSuffix = model.includes("SNR") ? `DDMRXPower` :
                         model.includes("Eltex MES14") || model.includes("Eltex MES24") || model.includes("Eltex MES3708") ?
                             `DDM_mes14_mes24_mes_3708` :
