@@ -538,6 +538,7 @@ type OidLoaderType = {
                         model.includes("DGS") || model.includes("DES") ? "dlink_oids" :
                         model.includes("SG200-26") ? "cisco_oids" : "";
                     console.log(`oidLoader:${oidLoaderKey}`);
+
                     if (oidLoaderKey === "") {
                         results.push(`${symbols.WarnEmo} Функция DDM не поддерживается или не реализована\n\n`);
                         message += `"error":"ddm not supported"}`;
@@ -547,14 +548,14 @@ type OidLoaderType = {
                     const oidLoader: OidLoaderType = joid[oidLoaderKey];
 
     
-                    const oidSuffix = model.includes("SNR") ? `DDMRXPower${portIfList[i]}` :
+                    const oidSuffix = model.includes("SNR") ? `DDMRXPower` :
                         model.includes("Eltex MES14") || model.includes("Eltex MES24") || model.includes("Eltex MES3708") ?
-                            `DDM_mes14_mes24_mes_3708${portIfList[i]}` :
+                            `DDM_mes14_mes24_mes_3708` :
                             model.includes("Eltex MES23") || model.includes("Eltex MES33") || model.includes("Eltex MES35") || model.includes("Eltex MES53") ?
-                                `DDM_mes23_mes33_mes35_mes53${portIfList[i]}` :
+                                `DDM_mes23_mes33_mes35_mes53` :
                                 model.includes("DGS-3620") || model.includes("DES-3200") || model.includes("DGS-3000") ?
-                                    `dgs36xx_ses32xx_dgs_30xx_ddm_rx_power${portIfList[i]}` :
-                                    model.includes("SG200-26") ? `cisco_DDM_S200${portIfList[i]}` : "";
+                                    `dgs36xx_ses32xx_dgs_30xx_ddm_rx_power` :
+                                    model.includes("SG200-26") ? `cisco_DDM_S200` : "";
                                     console.log(util.format("oidSuffix:%s",oidSuffix));
                     if (!oidLoader.hasOwnProperty(oidSuffix)) {
                         results.push(`${symbols.WarnEmo} Функция DDM не поддерживается или не реализована\n\n`);
@@ -562,18 +563,12 @@ type OidLoaderType = {
                         console.error(message);
                         continue;
                     }
-                    // const oidLoaderKey = oidLoader as keyof JoidType;
-                    // const oidSuffixKey = oidSuffix as keyof JoidType[typeof oidLoaderKey];
-                    // const oidValue = joid[oidLoaderKey][oidSuffixKey];
-                    const oidValue = oidLoader[oidSuffix];
 
-                    // const oidDDMString  = `${joid[oidLoader][oidSuffix]}`;
-                    console.log(`${oidValue}.6`);
-                    const getDDMLevelRX = await snmpFunctions.getSingleOID(host, `${oidValue}.9`, community);
-                    const getDDMLevelTX = await snmpFunctions.getSingleOID(host, `${oidValue}.8`, community);
-                    const getDDMTemperature = await snmpFunctions.getSingleOID(host, `${oidValue}.5`, community);
-                    const getDDMVoltage = await snmpFunctions.getSingleOID(host, `${oidValue}.6`, community);                    
-                    console.log(`${oidValue}.6`);
+                    const oidValue = oidLoader[oidSuffix];
+                    const getDDMLevelRX = await snmpFunctions.getSingleOID(host, `${oidValue}.${portIfList[i]}.9`, community);
+                    const getDDMLevelTX = await snmpFunctions.getSingleOID(host, `${oidValue}.${portIfList[i]}.8`, community);
+                    const getDDMTemperature = await snmpFunctions.getSingleOID(host, `${oidValue}.${portIfList[i]}.5`, community);
+                    const getDDMVoltage = await snmpFunctions.getSingleOID(host, `${oidValue}.${portIfList[i]}.6`, community);                    
     
                     if (getDDMLevelTX !== "noSuchInstance" && getDDMLevelRX !== "noSuchInstance") {
                         let DDMLevelRX = getDDMLevelRX.toString();
