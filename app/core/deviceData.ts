@@ -11,6 +11,16 @@ import symbols from '../assets/symbols';
 import messagesFunctions from '../utils/messagesFunctions';
 const currentDate = helperFunctions.getHumanDate(new Date());
 
+type JoidType = {
+    [key: string | number]: {
+        [key: string]: string;
+    };
+};
+
+type OidLoaderType = {
+    [key: string]: string;
+};
+
  const devicData = {
     getBasicInfo: async (host: string, community: any): Promise<string | false> => {
         let action = devicData.getBasicInfo.name ;
@@ -523,17 +533,19 @@ const currentDate = helperFunctions.getHumanDate(new Date());
                 const DDMport = portIfList.length;
     
                 for (let i = noDDMport; i < DDMport; i++) {
-                    const oidLoader = model.includes("SNR") ? "snr_oids" :
+                    const oidLoaderKey = model.includes("SNR") ? "snr_oids" :
                         model.includes("Eltex") ? "eltex_oids" :
                         model.includes("DGS") || model.includes("DES") ? "dlink_oids" :
                         model.includes("SG200-26") ? "cisco_oids" : "";
-                    console.log(`oidLoader:${oidLoader}`);
-                    if (oidLoader === "") {
+                    console.log(`oidLoader:${oidLoaderKey}`);
+                    if (oidLoaderKey === "") {
                         results.push(`${symbols.WarnEmo} Функция DDM не поддерживается или не реализована\n\n`);
                         message += `"error":"ddm not supported"}`;
                         console.error(message);
                         continue;
                     }
+                    const oidLoader: OidLoaderType = joid[oidLoaderKey];
+
     
                     const oidSuffix = model.includes("SNR") ? `DDMRXPower${portIfList[i]}` :
                         model.includes("Eltex MES14") || model.includes("Eltex MES24") || model.includes("Eltex MES3708") ?
@@ -544,21 +556,24 @@ const currentDate = helperFunctions.getHumanDate(new Date());
                                     `dgs36xx_ses32xx_dgs_30xx_ddm_rx_power${portIfList[i]}` :
                                     model.includes("SG200-26") ? `cisco_DDM_S200${portIfList[i]}` : "";
                                     console.log(util.format("oidSuffix:%s",oidSuffix));
-                    if (oidSuffix === "") {
+                    if (!oidLoader.hasOwnProperty(oidSuffix)) {
                         results.push(`${symbols.WarnEmo} Функция DDM не поддерживается или не реализована\n\n`);
                         message += `"error":"ddm not supported"}`;
                         console.error(message);
                         continue;
                     }
-    
-                    
-                    const oidDDMString  = '${joid[oidLoader][oidSuffix]}';
-                    console.log(`${oidDDMString}.6`);
-                    const getDDMLevelRX = await snmpFunctions.getSingleOID(host, `${oidDDMString}.9`, community);
-                    const getDDMLevelTX = await snmpFunctions.getSingleOID(host, `${oidDDMString}.8`, community);
-                    const getDDMTemperature = await snmpFunctions.getSingleOID(host, `${oidDDMString}.5`, community);
-                    const getDDMVoltage = await snmpFunctions.getSingleOID(host, `${oidDDMString}.6`, community);                    
-                    console.log(`${oidDDMString}.6`);
+                    // const oidLoaderKey = oidLoader as keyof JoidType;
+                    // const oidSuffixKey = oidSuffix as keyof JoidType[typeof oidLoaderKey];
+                    // const oidValue = joid[oidLoaderKey][oidSuffixKey];
+                    const oidValue = oidLoader[oidSuffix];
+
+                    // const oidDDMString  = `${joid[oidLoader][oidSuffix]}`;
+                    console.log(`${oidValue}.6`);
+                    const getDDMLevelRX = await snmpFunctions.getSingleOID(host, `${oidValue}.9`, community);
+                    const getDDMLevelTX = await snmpFunctions.getSingleOID(host, `${oidValue}.8`, community);
+                    const getDDMTemperature = await snmpFunctions.getSingleOID(host, `${oidValue}.5`, community);
+                    const getDDMVoltage = await snmpFunctions.getSingleOID(host, `${oidValue}.6`, community);                    
+                    console.log(`${oidValue}.6`);
     
                     if (getDDMLevelTX !== "noSuchInstance" && getDDMLevelRX !== "noSuchInstance") {
                         let DDMLevelRX = getDDMLevelRX.toString();
