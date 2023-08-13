@@ -16,12 +16,12 @@ interface MyContext extends Context {
     session: { [key: string]: any }; // Change the type to match your session data structure
 }
 type MyConversation = Conversation<MyContext>;
+const currentDate = helperFunctions.getHumanDate(new Date());
 
 const deviceCommands = {
     check_device: async (conversation: MyConversation, ctx: MyContext) => {
-        const currentDate = helperFunctions.getHumanDate(new Date());
-        let action = "";
-        let message = util.format('{"date":"%s", "%s":%s", ',currentDate,action='userId',ctx.session.userId)
+        let action = deviceCommands.check_device.name;
+        let message = util.format('{"date":"%s", "%s":%s","%s":"%s", ',currentDate,"action",action,"userId",ctx.session.userId)
         ctx.session.currentCVid = "check_device";
         ctx.session.previosCVid = "main";
         

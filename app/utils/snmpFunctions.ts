@@ -3,11 +3,11 @@ import util from 'util';
 import joid from '../../src/oid.json';
 import helperFunctions from './helperFunctions';
 import messagesFunctions from './messagesFunctions';
+const currentDate = helperFunctions.getHumanDate(new Date());
 const snmpFunctions = {
     getSingleOID: async (host: string, oid: string, community: string): Promise<any> => {
-        const currentDate = helperFunctions.getHumanDate(new Date());
-        let action = "";
-        let message = util.format('{"date":"%s", "action":"%s", ',currentDate,action='getSingleOID')
+         let action = snmpFunctions.getSingleOID.name;
+        let message = util.format('{"date":"%s", "action":"%s", ',currentDate,action)
         const session = new Session({
             host: host,
             community: community
@@ -27,9 +27,8 @@ const snmpFunctions = {
     },
     checkSNMP: async (host: string, communities: any): Promise<any> => {
         return new Promise(async (resolve) => {
-            const currentDate = helperFunctions.getHumanDate(new Date());
-            let action = "";
-            let message = util.format('{"date":"%s", "action":"%s", ',currentDate,action='checkSNMP')
+                 let action = snmpFunctions.checkSNMP.name;
+            let message = util.format('{"date":"%s", "action":"%s", ',currentDate,action)
             message += util.format('"%s":"%s", ',"host",host)
             // Recursive function to try different communities
             async function tryCommunities(index: any) {
@@ -71,9 +70,8 @@ const snmpFunctions = {
         });
     },
     getMultiOID: (host: string, oid: string, community: string): Promise<any> => {
-        const currentDate = helperFunctions.getHumanDate(new Date());
-        let action = "";
-        let message = util.format('{"date":"%s", "action":"%s", ',currentDate,action='getMultiOID')
+        let action = snmpFunctions.getMultiOID.name;
+        let message = util.format('{"date":"%s", "action":"%s", ',currentDate,action)
         message += util.format('"%s":"%s", ',"host",host)
         const session = new Session({
             host: host,
