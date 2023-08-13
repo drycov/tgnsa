@@ -1,9 +1,6 @@
 # Node.js
-node_modules/
+node_modules/*
 package-lock.json
-
-# Visual Studio Code
-.vscode/
 
 # Custom Sessions Directory
 sessions/*
@@ -11,3 +8,9 @@ sessions/*
 # Ignored files
 .DS_Store
 # .env
+
+# Debug files
+*.log
+*.pid
+*.prof
+*.snap
