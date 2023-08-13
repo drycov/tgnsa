@@ -557,7 +557,7 @@ type OidLoaderType = {
                                     `dgs36xx_ses32xx_dgs_30xx_ddm_rx_power` :
                                     model.includes("SG200-26") ? `cisco_DDM_S200` : "";
                                     // console.log(util.format("oidSuffix:%s",oidSuffix));
-                    if (!oidLoader.hasOwnProperty(oidSuffix)) {
+                    if (!oidLoader.hasOwnProperty(oidSuffix)||oidSuffix==="") {
                         results.push(`${symbols.WarnEmo} Функция DDM не поддерживается или не реализована\n\n`);
                         message += `"error":"ddm not supported"}`;
                         console.error(message);
