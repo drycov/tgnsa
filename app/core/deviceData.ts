@@ -565,8 +565,8 @@ type OidLoaderType = {
                     }
 
                     const oidValue = oidLoader[oidSuffix].toString;
-                    
-                    console.log(`${oidValue}.${portIfList[i]}`)
+
+                    console.log(`val = ${oidValue}.${portIfList[i]}`)
                     const getDDMLevelRX = await snmpFunctions.getSingleOID(host, `${oidValue}.${portIfList[i]}.9`, community);
                     const getDDMLevelTX = await snmpFunctions.getSingleOID(host, `${oidValue}.${portIfList[i]}.8`, community);
                     const getDDMTemperature = await snmpFunctions.getSingleOID(host, `${oidValue}.${portIfList[i]}.5`, community);
