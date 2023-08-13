@@ -557,6 +557,7 @@ type OidLoaderType = {
                                     `dgs36xx_ses32xx_dgs_30xx_ddm_rx_power` :
                                     model.includes("SG200-26") ? `cisco_DDM_S200` : "";
                                     console.log(util.format("oidSuffix:%s",oidSuffix));
+                                    const oidValue = oidLoader['snr_oid_DDMRXPower']
                     if (!oidLoader.hasOwnProperty(oidSuffix)||oidSuffix==="") {
                         // if (oidSuffix==="") {
                         results.push(`${symbols.WarnEmo} Функция DDM не поддерживается или не реализована\n\n`);
@@ -566,7 +567,7 @@ type OidLoaderType = {
                     }
 
                     // const oidValue = oidLoader[oidSuffix];
-                    const oidValue = oidLoader['snr_oid_DDMRXPower']
+                    // const oidValue = oidLoader['snr_oid_DDMRXPower']
 
                     console.log(`val = ${oidValue}.${portIfList[i]}`)
                     const getDDMLevelRX = await snmpFunctions.getSingleOID(host, `${oidValue}.${portIfList[i]}.9`, community);
