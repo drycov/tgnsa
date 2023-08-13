@@ -558,10 +558,11 @@ type OidLoaderType = {
                                     model.includes("SG200-26") ? `cisco_DDM_S200` : "";
                                     console.log(util.format("oidSuffix:%s",oidSuffix));
                                     const oidValue = oidLoader['snr_oid_DDMRXPower']
+                                    console.log(`val = ${oidValue}.${portIfList[i]}`)
                     if (!oidLoader.hasOwnProperty(oidSuffix)||oidSuffix==="") {
                         // if (oidSuffix==="") {
                         results.push(`${symbols.WarnEmo} Функция DDM не поддерживается или не реализована\n\n`);
-                        message += `"error":"ddm not supported"}`;
+                        message = `"error":"ddm not supported"}`;
                         console.error(message);
                         continue;
                     }
