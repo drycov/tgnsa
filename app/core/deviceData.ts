@@ -32,17 +32,34 @@ type JoidType = {
         oidDDMVoltage: string,
         community: string,
         results: string[],
+        unstandart?:boolean,
         powerConverter?: (value: number) => number
+        
         )=>{
         for (let i = 0; i < portIfList.length; i++) {
-            const getDDMLevelRX = await snmpFunctions.getSingleOID(host, oidDDMRXPower + portIfList[i], community);
-            const getDDMLevelTX = await snmpFunctions.getSingleOID(host, oidDDMTXPower + portIfList[i], community);
-            const getDDMTemperature = await snmpFunctions.getSingleOID(host, oidDDMTemperature + portIfList[i], community);
-            const getDDMVoltage = await snmpFunctions.getSingleOID(host, oidDDMVoltage + portIfList[i], community);
-    
+            const getDDMLevelRX = await snmpFunctions.getSingleOID(
+                host,
+                oidDDMRXPower + (!unstandart ? portIfList[i] + '.9':portIfList[i]||powerConverter?portIfList[i] + '.5.1':portIfList[i]),
+                community
+            );
+            const getDDMLevelTX = await snmpFunctions.getSingleOID(
+                host,
+                oidDDMRXPower + (!unstandart ? portIfList[i] + '.8':portIfList[i]||powerConverter?portIfList[i] + '.4.1':portIfList[i]),
+                community
+            );
+            const getDDMTemperature = await snmpFunctions.getSingleOID(
+                host,
+                oidDDMRXPower + (!unstandart ? portIfList[i] + '.5':portIfList[i]||powerConverter?portIfList[i] + '.1.1':portIfList[i]),
+                community
+            );
+            const getDDMVoltage = await snmpFunctions.getSingleOID(
+                host,
+                oidDDMRXPower + (!unstandart ? portIfList[i] + '.6':portIfList[i]||powerConverter?portIfList[i] + '.2.1':portIfList[i]),
+                community
+            );
             if (getDDMLevelTX !== 'noSuchInstance' && getDDMLevelRX !== 'noSuchInstance') {
-                let DDMLevelRX = parseFloat(getDDMLevelRX);
-                let DDMLevelTX = parseFloat(getDDMLevelTX);
+                let DDMLevelRX = unstandart? parseFloat(getDDMLevelRX):parseFloat((getDDMLevelRX/ 1000).toFixed(3));
+                let DDMLevelTX = unstandart? parseFloat(getDDMLevelTX):parseFloat((getDDMLevelTX/ 1000).toFixed(3));
                 let DDMVoltage = parseFloat((getDDMVoltage / 1000000).toFixed(3));
             
                 if (powerConverter) {
@@ -58,9 +75,7 @@ type JoidType = {
     },
     getDDMInfo: async (host: string, community: string): Promise<string> => {
         const action = devicData.getDDMInfo.name;
-        const currentDate = new Date().toISOString();
         let message = `{"date":"${currentDate}", "action":"${action}", `;
-        
         try {
             const results: string[] = [];
             const dirty = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_model, community);
@@ -124,9 +139,24 @@ type JoidType = {
                         oidLoader['eltex_DDM_mes14_mes24_mes_3708'],
                         community,
                         results,
+                        false,
                         helperFunctions.mWtodBW
                     );
-                } else if (model.includes("DGS-3620") || model.includes("DES-3200") || model.includes("DGS-3000")){
+                } else if (model.includes('Eltex MES23') || model.includes('Eltex MES33') || model.includes('Eltex MES35')|| model.includes('Eltex  MES53')) {
+                    await devicData.processDDMInfo(
+                        host,
+                        portIfList,
+                        portIfRange,
+                        oidLoader['eltex_DDM_mes23_mes33_mes35_mes53'],
+                        oidLoader['eltex_DDM_mes23_mes33_mes35_mes53'],
+                        oidLoader['eltex_DDM_mes23_mes33_mes35_mes53'],
+                        oidLoader['eltex_DDM_mes23_mes33_mes35_mes53'],
+                        community,
+                        results,
+                        true
+                    );
+                }
+                else if (model.includes("DGS-3620") || model.includes("DES-3200") || model.includes("DGS-3000")){
                     await devicData.processDDMInfo(
                         host,
                         portIfList,
@@ -164,7 +194,6 @@ type JoidType = {
         // Add a final return statement to handle the case when no results are produced
         return '';
     },
-    
     
     getBasicInfo: async (host: string, community: any): Promise<string | false> => {
         let action = devicData.getBasicInfo.name ;
