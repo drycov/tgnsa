@@ -36,7 +36,6 @@ type JoidType = {
         eltex?:boolean,
         powerConverter?: (value: number) => number
     ) => {
-        console.log(baseOidDDMRXPower,'\n',baseOidDDMTXPower,'\n',baseOidDDMTemperature,'\n',baseOidDDMVoltage)
 
         for (let i = 0; i < portIfList.length; i++) {
             let oidDDMRXPower = baseOidDDMRXPower;
@@ -53,7 +52,6 @@ type JoidType = {
         oidDDMVoltage +=
             (unstandart !== undefined ? (unstandart ? portIfList[i] + '.6' : (eltex ? portIfList[i] + '.2.1' : portIfList[i])) :  + portIfList[i]);
 
-            console.log(oidDDMRXPower,'\n',oidDDMTXPower,'\n',oidDDMTemperature,'\n',oidDDMVoltage)
 
             const getDDMLevelRX = await snmpFunctions.getSingleOID(
                 host,oidDDMRXPower,
