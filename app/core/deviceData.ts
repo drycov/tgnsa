@@ -44,22 +44,22 @@ type JoidType = {
             );
             const getDDMLevelTX = await snmpFunctions.getSingleOID(
                 host,
-                oidDDMRXPower + (unstandart ? portIfList[i] + '.8':portIfList[i]||!powerConverter?portIfList[i] + '.4.1':portIfList[i]),
+                oidDDMTXPower + (unstandart ? portIfList[i] + '.8':portIfList[i]||!powerConverter?portIfList[i] + '.4.1':portIfList[i]),
                 community
             );
             const getDDMTemperature = await snmpFunctions.getSingleOID(
                 host,
-                oidDDMRXPower + (unstandart ? portIfList[i] + '.5':portIfList[i]||!powerConverter?portIfList[i] + '.1.1':portIfList[i]),
+                oidDDMTemperature + (unstandart ? portIfList[i] + '.5':portIfList[i]||!powerConverter?portIfList[i] + '.1.1':portIfList[i]),
                 community
             );
             const getDDMVoltage = await snmpFunctions.getSingleOID(
                 host,
-                oidDDMRXPower + (unstandart ? portIfList[i] + '.6':portIfList[i]||!powerConverter?portIfList[i] + '.2.1':portIfList[i]),
+                oidDDMVoltage + (unstandart ? portIfList[i] + '.6':portIfList[i]||!powerConverter?portIfList[i] + '.2.1':portIfList[i]),
                 community
             );
             if (getDDMLevelTX !== 'noSuchInstance' && getDDMLevelRX !== 'noSuchInstance') {
-                let DDMLevelRX = unstandart? parseFloat(getDDMLevelRX):parseFloat((getDDMLevelRX/ 1000).toFixed(3));
-                let DDMLevelTX = unstandart? parseFloat(getDDMLevelTX):parseFloat((getDDMLevelTX/ 1000).toFixed(3));
+                let DDMLevelRX = !unstandart? parseFloat(getDDMLevelRX):parseFloat((getDDMLevelRX/ 1000).toFixed(3));
+                let DDMLevelTX = !unstandart? parseFloat(getDDMLevelTX):parseFloat((getDDMLevelTX/ 1000).toFixed(3));
                 let DDMVoltage = parseFloat((getDDMVoltage / 1000000).toFixed(3));
             
                 if (powerConverter) {
