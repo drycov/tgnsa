@@ -32,47 +32,47 @@ type JoidType = {
         oidDDMVoltage: string,
         community: string,
         results: string[],
-        unstandart?:boolean,
+        unstandart?: boolean,
         powerConverter?: (value: number) => number
-        
-        )=>{
+    ) => {
         for (let i = 0; i < portIfList.length; i++) {
             const getDDMLevelRX = await snmpFunctions.getSingleOID(
                 host,
-                oidDDMRXPower + (unstandart ? portIfList[i] + '.9':portIfList[i]||!powerConverter?portIfList[i] + '.5.1':portIfList[i]),
+                oidDDMRXPower + (unstandart ? portIfList[i] + '.9' : (!powerConverter ? portIfList[i] + '.5.1' : portIfList[i])),
                 community
             );
             const getDDMLevelTX = await snmpFunctions.getSingleOID(
                 host,
-                oidDDMTXPower + (unstandart ? portIfList[i] + '.8':portIfList[i]||!powerConverter?portIfList[i] + '.4.1':portIfList[i]),
+                oidDDMTXPower + (unstandart ? portIfList[i] + '.8' : (!powerConverter ? portIfList[i] + '.4.1' : portIfList[i])),
                 community
             );
             const getDDMTemperature = await snmpFunctions.getSingleOID(
                 host,
-                oidDDMTemperature + (unstandart ? portIfList[i] + '.5':portIfList[i]||!powerConverter?portIfList[i] + '.1.1':portIfList[i]),
+                oidDDMTemperature + (unstandart ? portIfList[i] + '.5' : (!powerConverter ? portIfList[i] + '.1.1' : portIfList[i])),
                 community
             );
             const getDDMVoltage = await snmpFunctions.getSingleOID(
                 host,
-                oidDDMVoltage + (unstandart ? portIfList[i] + '.6':portIfList[i]||!powerConverter?portIfList[i] + '.2.1':portIfList[i]),
+                oidDDMVoltage + (unstandart ? portIfList[i] + '.6' : (!powerConverter ? portIfList[i] + '.2.1' : portIfList[i])),
                 community
             );
+    
             if (getDDMLevelTX !== 'noSuchInstance' && getDDMLevelRX !== 'noSuchInstance') {
-                let DDMLevelRX = !unstandart? parseFloat(getDDMLevelRX):parseFloat((getDDMLevelRX/ 1000).toFixed(3));
-                let DDMLevelTX = !unstandart? parseFloat(getDDMLevelTX):parseFloat((getDDMLevelTX/ 1000).toFixed(3));
-                let DDMVoltage = parseFloat((getDDMVoltage / 1000000).toFixed(3));
-            
+                let DDMLevelRX = !unstandart ? parseFloat(getDDMLevelRX) : parseFloat((parseFloat(getDDMLevelRX) / 1000).toFixed(3));
+                let DDMLevelTX = !unstandart ? parseFloat(getDDMLevelTX) : parseFloat((parseFloat(getDDMLevelTX) / 1000).toFixed(3));
+                let DDMVoltage = parseFloat((parseFloat(getDDMVoltage) / 1000000).toFixed(3));
+    
                 if (powerConverter) {
                     DDMLevelRX = powerConverter(DDMLevelRX);
                     DDMLevelTX = powerConverter(DDMLevelTX);
                 }
-            
+    
                 results.push(
                     `${portIfRange[i]} 🔺TX: ${DDMLevelTX} 🔻RX: ${DDMLevelRX} 🌡C:${getDDMTemperature} ⚡️V: ${DDMVoltage}`
                 );
             }
         }
-    },
+    },    
     getDDMInfo: async (host: string, community: string): Promise<string> => {
         const action = devicData.getDDMInfo.name;
         let message = `{"date":"${currentDate}", "action":"${action}", `;
