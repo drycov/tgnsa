@@ -39,22 +39,22 @@ type JoidType = {
         for (let i = 0; i < portIfList.length; i++) {
             const getDDMLevelRX = await snmpFunctions.getSingleOID(
                 host,
-                oidDDMRXPower + (!unstandart ? portIfList[i] + '.9':portIfList[i]||powerConverter?portIfList[i] + '.5.1':portIfList[i]),
+                oidDDMRXPower + (unstandart ? portIfList[i] + '.9':portIfList[i]||!powerConverter?portIfList[i] + '.5.1':portIfList[i]),
                 community
             );
             const getDDMLevelTX = await snmpFunctions.getSingleOID(
                 host,
-                oidDDMRXPower + (!unstandart ? portIfList[i] + '.8':portIfList[i]||powerConverter?portIfList[i] + '.4.1':portIfList[i]),
+                oidDDMRXPower + (unstandart ? portIfList[i] + '.8':portIfList[i]||!powerConverter?portIfList[i] + '.4.1':portIfList[i]),
                 community
             );
             const getDDMTemperature = await snmpFunctions.getSingleOID(
                 host,
-                oidDDMRXPower + (!unstandart ? portIfList[i] + '.5':portIfList[i]||powerConverter?portIfList[i] + '.1.1':portIfList[i]),
+                oidDDMRXPower + (unstandart ? portIfList[i] + '.5':portIfList[i]||!powerConverter?portIfList[i] + '.1.1':portIfList[i]),
                 community
             );
             const getDDMVoltage = await snmpFunctions.getSingleOID(
                 host,
-                oidDDMRXPower + (!unstandart ? portIfList[i] + '.6':portIfList[i]||powerConverter?portIfList[i] + '.2.1':portIfList[i]),
+                oidDDMRXPower + (unstandart ? portIfList[i] + '.6':portIfList[i]||!powerConverter?portIfList[i] + '.2.1':portIfList[i]),
                 community
             );
             if (getDDMLevelTX !== 'noSuchInstance' && getDDMLevelRX !== 'noSuchInstance') {
