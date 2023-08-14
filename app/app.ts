@@ -1,7 +1,7 @@
 import { ConversationFlavor, conversations, createConversation } from "@grammyjs/conversations";
 import { hydrateFiles } from '@grammyjs/files';
 import { FileAdapter } from '@grammyjs/storage-file';
-import { Bot, Context, session } from 'grammy';
+import { Bot, Context, GrammyError, HttpError, session } from 'grammy';
 import helperFunctions from './utils/helperFunctions';
 
 import mainComands from './commands/mainCommands'
@@ -170,4 +170,16 @@ bot.hears(labels.DDMInfoLabel, async (ctx) => {
 
     await ctx.conversation.enter("ddmInfo");
 })
+bot.catch((err:any) => {
+    const ctx = err.ctx;
+    console.error(`Error while handling update ${ctx.update.update_id}:`);
+    const e = err.error;
+    if (e instanceof GrammyError) {
+        console.error("Error in request:", e.description);
+    } else if (e instanceof HttpError) {
+        console.error("Could not contact Telegram:", e);
+    } else {
+        console.error("Unknown error:", e);
+    }
+});
 export default bot
