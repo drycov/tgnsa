@@ -5,8 +5,7 @@
   "main": "bot.ts",
   "scripts": {
     "start:prod": "cross-env APP_TYPE=PROD node --no-warnings --loader ts-node/esm bot.ts",
-    "start:prod_debug": "cross-env APP_TYPE=PROD node --inspect=0.0.0.0:9229 --no-warnings --loader ts-node/esm bot.ts",
-    "start:dev": "cross-env APP_TYPE=DEV node --inspect=0.0.0.0:9229 --no-warnings --loader ts-node/esm bot.ts",
+    "start:dev": "cross-env APP_TYPE=DEV node --no-warnings --loader ts-node/esm bot.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
