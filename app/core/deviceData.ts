@@ -73,7 +73,7 @@ type JoidType = {
                 community
             );
     
-            console.log('\n',getDDMVoltage)
+            console.log('\n',getDDMVoltage, typeof getDDMVoltage)
 
             if (getDDMLevelTX !== 'noSuchInstance' && getDDMLevelRX !== 'noSuchInstance'&&getDDMLevelTX !== 'NULL' && getDDMLevelRX !== 'NULL'&&(getDDMVoltage!=='0'||getDDMVoltage!==0)) {
                 let DDMLevelRX = !unstandart ? parseFloat(getDDMLevelRX) : parseFloat((parseFloat(getDDMLevelRX) / 1000).toFixed(3));
