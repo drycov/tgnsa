@@ -38,28 +38,34 @@ type JoidType = {
     ) => {
         for (let i = 0; i < portIfList.length; i++) {
             console.log(eltex,unstandart)
+            oidDDMRXPower = oidDDMRXPower +
+                    (unstandart !== undefined ? (unstandart ? portIfList[i] + '.9' : (!eltex ? portIfList[i] + '5.1' : portIfList[i])) : portIfList[i]);
+            oidDDMTXPower=oidDDMTXPower +
+                    (unstandart !== undefined ? (unstandart ? portIfList[i] + '.9' : (!eltex ? portIfList[i] + '4.1' : portIfList[i])) : portIfList[i]);
+            oidDDMTemperature=oidDDMTemperature + 
+                    (unstandart !== undefined ? (unstandart ? portIfList[i] + '.9' : (!eltex ? portIfList[i] + '1.1' : portIfList[i])) : portIfList[i]);
+            oidDDMVoltage=oidDDMVoltage +
+                    (unstandart !== undefined ? (unstandart ? portIfList[i] + '.9' : (!eltex ? portIfList[i] + '2.1' : portIfList[i])) : portIfList[i]);
+            
+            console.log(oidDDMRXPower,oidDDMTXPower,oidDDMTemperature,oidDDMVoltage)
+
             const getDDMLevelRX = await snmpFunctions.getSingleOID(
-                host,
-                oidDDMRXPower +
-                    (unstandart !== undefined ? (unstandart ? portIfList[i] + '.9' : (!eltex ? portIfList[i] + '5.1' : portIfList[i])) : portIfList[i]),
+                host,oidDDMRXPower,
                 community
             );
             const getDDMLevelTX = await snmpFunctions.getSingleOID(
                 host,
-                oidDDMTXPower +
-                    (unstandart !== undefined ? (unstandart ? portIfList[i] + '.9' : (!eltex ? portIfList[i] + '4.1' : portIfList[i])) : portIfList[i]),
+                oidDDMTXPower,
                 community
             );
             const getDDMTemperature = await snmpFunctions.getSingleOID(
                 host,
-                oidDDMTemperature + 
-                (unstandart !== undefined ? (unstandart ? portIfList[i] + '.9' : (!eltex ? portIfList[i] + '1.1' : portIfList[i])) : portIfList[i]),
+                oidDDMTemperature,
                 community
             );
             const getDDMVoltage = await snmpFunctions.getSingleOID(
-                host,
-                oidDDMVoltage +
-                (unstandart !== undefined ? (unstandart ? portIfList[i] + '.9' : (!eltex ? portIfList[i] + '2.1' : portIfList[i])) : portIfList[i]),
+                host,oidDDMVoltage
+                ,
                 community
             );
     
