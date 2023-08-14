@@ -36,7 +36,9 @@ type JoidType = {
         eltex?:boolean,
         powerConverter?: (value: number) => number
     ) => {
-
+        const action = devicData.processDDMInfo.name;
+        let message = `{"date":"${currentDate}", "action":"${action}", `;
+        message += util.format('"%s":"%s", ',"host",host)
         for (let i = 0; i < portIfList.length; i++) {
             let oidDDMRXPower = baseOidDDMRXPower;
             let oidDDMTXPower = baseOidDDMTXPower;
@@ -72,9 +74,6 @@ type JoidType = {
                 ,
                 community
             );
-    
-            console.log('\n',getDDMVoltage, typeof getDDMVoltage)
-
             if (getDDMLevelTX !== 'noSuchInstance' && getDDMLevelRX !== 'noSuchInstance'&&getDDMLevelTX !== 'NULL' && getDDMLevelRX !== 'NULL'&&(getDDMVoltage!=='0'&&getDDMVoltage!==0)) {
                 let DDMLevelRX = !unstandart ? parseFloat(getDDMLevelRX) : parseFloat((parseFloat(getDDMLevelRX) / 1000).toFixed(3));
                 let DDMLevelTX = !unstandart ? parseFloat(getDDMLevelTX) : parseFloat((parseFloat(getDDMLevelTX) / 1000).toFixed(3));
@@ -84,7 +83,8 @@ type JoidType = {
                     DDMLevelRX = powerConverter(DDMLevelRX);
                     DDMLevelTX = powerConverter(DDMLevelTX);
                 }
-    
+                message += `"status":"done"}`;
+                console.info(message);
                 results.push(
                     `${portIfRange[i]} 🔺TX: ${DDMLevelTX} 🔻RX: ${DDMLevelRX} 🌡C:${getDDMTemperature} ⚡️V: ${DDMVoltage}`
                 );
@@ -94,6 +94,8 @@ type JoidType = {
     getDDMInfo: async (host: string, community: string): Promise<string> => {
         const action = devicData.getDDMInfo.name;
         let message = `{"date":"${currentDate}", "action":"${action}", `;
+        message += util.format('"%s":"%s", ',"host",host)
+
         try {
             const results: string[] = [];
             const dirty = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_model, community);
@@ -199,9 +201,7 @@ type JoidType = {
                         community,
                         results,
                     );
-                }
-                // ... Repeat the above pattern for other cases
-    
+                }    
                 return results.join('\n');
             }
         } catch (error) {
@@ -209,14 +209,14 @@ type JoidType = {
             console.error(message);
             return `${symbols.SHORT} Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее`;
         }
-        
-        // Add a final return statement to handle the case when no results are produced
-        return '';
+        return `${symbols.SHORT} Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее`;
     },
     
     getBasicInfo: async (host: string, community: any): Promise<string | false> => {
         let action = devicData.getBasicInfo.name ;
         let message = util.format('{"date":"%s", "action":"%s", ',currentDate,action)
+        message += util.format('"%s":"%s", ',"host",host)
+
         const result = util.format("%s Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее", symbols.SHORT)
 
         try {
@@ -255,6 +255,8 @@ type JoidType = {
     getPortStatus: async (host: string, community: string): Promise<string> => {
         let action = devicData.getPortStatus.name ;
         let message = util.format('{"date":"%s", "action":"%s", ',currentDate,action)
+        message += util.format('"%s":"%s", ',"host",host)
+
         const result = util.format("%s Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее", symbols.SHORT)
         try {
             const results = []
@@ -470,6 +472,8 @@ type JoidType = {
     getVlanList: async (host: string, community: string) => {
         let action = devicData.getVlanList.name ;
         let message = util.format('{"date":"%s", "action":"%s", ',currentDate,action)
+        message += util.format('"%s":"%s", ',"host",host)
+
         let res: string[] = [];
         const result = util.format("%s Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее", symbols.SHORT)
         try {
