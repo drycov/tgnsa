@@ -33,28 +33,29 @@ type JoidType = {
         community: string,
         results: string[],
         unstandart?: boolean,
+        eltex?:boolean,
         powerConverter?: (value: number) => number
     ) => {
         for (let i = 0; i < portIfList.length; i++) {
-            console.log(powerConverter,unstandart)
+            console.log(eltex,unstandart)
             const getDDMLevelRX = await snmpFunctions.getSingleOID(
                 host,
-                oidDDMRXPower + (unstandart ? portIfList[i] + '.9' : (!powerConverter ? portIfList[i] + '.5.1' : portIfList[i])),
+                oidDDMRXPower + (unstandart ? portIfList[i] + '.9' : (!eltex ? portIfList[i] + '.5.1' : portIfList[i])),
                 community
             );
             const getDDMLevelTX = await snmpFunctions.getSingleOID(
                 host,
-                oidDDMTXPower + (unstandart ? portIfList[i] + '.8' : (!powerConverter ? portIfList[i] + '.4.1' : portIfList[i])),
+                oidDDMTXPower + (unstandart ? portIfList[i] + '.8' : (!eltex ? portIfList[i] + '.4.1' : portIfList[i])),
                 community
             );
             const getDDMTemperature = await snmpFunctions.getSingleOID(
                 host,
-                oidDDMTemperature + (unstandart ? portIfList[i] + '.5' : (!powerConverter ? portIfList[i] + '.1.1' : portIfList[i])),
+                oidDDMTemperature + (unstandart ? portIfList[i] + '.5' : (!eltex ? portIfList[i] + '.1.1' : portIfList[i])),
                 community
             );
             const getDDMVoltage = await snmpFunctions.getSingleOID(
                 host,
-                oidDDMVoltage + (unstandart ? portIfList[i] + '.6' : (!powerConverter ? portIfList[i] + '.2.1' : portIfList[i])),
+                oidDDMVoltage + (unstandart ? portIfList[i] + '.6' : (!eltex ? portIfList[i] + '.2.1' : portIfList[i])),
                 community
             );
     
@@ -141,6 +142,7 @@ type JoidType = {
                         community,
                         results,
                         false,
+                        true,
                         helperFunctions.mWtodBW
                     );
                 } else if (model.includes('Eltex MES23') || model.includes('Eltex MES33') || model.includes('Eltex MES35')|| model.includes('Eltex  MES53')) {
