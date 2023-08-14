@@ -36,6 +36,7 @@ type JoidType = {
         powerConverter?: (value: number) => number
     ) => {
         for (let i = 0; i < portIfList.length; i++) {
+            console.log(powerConverter,unstandart)
             const getDDMLevelRX = await snmpFunctions.getSingleOID(
                 host,
                 oidDDMRXPower + (unstandart ? portIfList[i] + '.9' : (!powerConverter ? portIfList[i] + '.5.1' : portIfList[i])),
