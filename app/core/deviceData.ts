@@ -75,7 +75,7 @@ type JoidType = {
     
             console.log('\n',getDDMVoltage)
 
-            if (getDDMLevelTX !== 'noSuchInstance' && getDDMLevelRX !== 'noSuchInstance'&&(getDDMVoltage!=='0'||getDDMVoltage!==0)) {
+            if (getDDMLevelTX !== 'noSuchInstance' && getDDMLevelRX !== 'noSuchInstance'&&getDDMLevelTX !== 'NULL' && getDDMLevelRX !== 'NULL'&&(getDDMVoltage!=='0'||getDDMVoltage!==0)) {
                 let DDMLevelRX = !unstandart ? parseFloat(getDDMLevelRX) : parseFloat((parseFloat(getDDMLevelRX) / 1000).toFixed(3));
                 let DDMLevelTX = !unstandart ? parseFloat(getDDMLevelTX) : parseFloat((parseFloat(getDDMLevelTX) / 1000).toFixed(3));
                 let DDMVoltage = parseFloat((parseFloat(getDDMVoltage) / 1000000).toFixed(3));
