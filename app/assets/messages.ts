@@ -1,4 +1,3 @@
-import util from "util"
 import labelsData from "./labels"
 import symbolsData from "./symbols"
 export default {
@@ -26,9 +25,8 @@ export default {
     ErrorNoAclMessage: `${symbolsData.WarnEmo} Нет прав`,
     ErrorActionMessage: "Нет прав для доступа в меню:",
     ErrorNoAclRuleMessage: "Нет прав для ",
-    ErroMessage: util.format("<b>%s Произошла ошибка попробуйте позднее!!!</b>", symbolsData.CritEmo),
-    ErrorSNMPMessage: util.format(`<b>%s Устройство не на связи или при выполнении задачи произошла ошибка!</b>\n<i>Попробуйте позднее.</i>\n<code>Возможно у сервиса нет прав на опрос оборудования или значение SNMP readonly Community не равно public.\nПроверьте логи и настройку на оборудовании и исправьте согласно рекомендации!</code>`,
-        symbolsData.SHORT),
+    ErroMessage: `<b>${symbolsData.CritEmo} Произошла ошибка, попробуйте позднее!!!</b>`,
+    ErrorSNMPMessage: `<b>${symbolsData.SHORT} Устройство не на связи или при выполнении задачи произошла ошибка!</b>\n<i>Попробуйте позднее.</i>\n<code>Возможно у сервиса нет прав на опрос оборудования или значение SNMP readonly Community не равно public.\nПроверьте логи и настройку на оборудовании и исправьте согласно рекомендации!</code>`,
     //port
     PortLegendMessage: "Включен:" + symbolsData.UpEmo + " Отключен:" + symbolsData.DownEmo + " Выключен:" + symbolsData.ShootDown + " Не опр.: " + symbolsData.UnknEmo,
 

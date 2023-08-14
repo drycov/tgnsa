@@ -1,11 +1,11 @@
-import netmask from "netmask";
+import {Netmask} from "netmask";
 import { platform } from 'os';
 import ping from 'ping';
 
 import fs from "fs";
 import util from "util";
 import config from '../config';
-const Netmask = netmask.Netmask
+// const Netmask = netmask.Netmask
 
 
 export = {
