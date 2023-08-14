@@ -1,14 +1,14 @@
 import { GrammyError, HttpError } from 'grammy';
-import bot from './app/bot'
+import app from './app/app'
 
 import { run } from "@grammyjs/runner";
 import database from "./app/utils/database";
 
-const runner = run(bot);
+const runner = run(app);
 database();
 
 
-bot.catch((err: any) => {
+app.catch((err:any) => {
     const ctx = err.ctx;
     console.error(`Error while handling update ${ctx.update.update_id}:`);
     const e = err.error;
@@ -23,7 +23,7 @@ bot.catch((err: any) => {
 
 const stopRunner = () => {
     if (runner.isRunning()) {
-        console.log(`${bot.botInfo.username} Stopped`);
+        console.log(`${app.botInfo.username} Stopped`);
         runner.stop();
     }
 };

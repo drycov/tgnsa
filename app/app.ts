@@ -20,6 +20,7 @@ interface MainContext extends Context {
 }
 
 const bot = new Bot<MainContext & ConversationFlavor>(token);
+
 bot.api.config.use(hydrateFiles(bot.token));
 bot.use(
     session({
