@@ -26,28 +26,32 @@ type JoidType = {
         host: string,
         portIfList: string[],
         portIfRange: string[],
-        oidDDMRXPower: string,
-        oidDDMTXPower: string,
-        oidDDMTemperature: string,
-        oidDDMVoltage: string,
+        baseOidDDMRXPower: string,
+        baseOidDDMTXPower: string,
+        baseOidDDMTemperature: string,
+        baseOidDDMVoltage: string,
         community: string,
         results: string[],
         unstandart?: boolean,
         eltex?:boolean,
         powerConverter?: (value: number) => number
     ) => {
-        console.log(oidDDMRXPower,'\n',oidDDMTXPower,'\n',oidDDMTemperature,'\n',oidDDMVoltage)
+        console.log(baseOidDDMRXPower,'\n',baseOidDDMTXPower,'\n',baseOidDDMTemperature,'\n',baseOidDDMVoltage)
 
         for (let i = 0; i < portIfList.length; i++) {
-            // console.log(eltex,unstandart)
-            oidDDMRXPower = oidDDMRXPower +
-    (unstandart !== undefined ? (unstandart ? portIfList[i] + '.9' : (!eltex ? portIfList[i] + '.5.1' : portIfList[i])) : '.' + portIfList[i]);
-oidDDMTXPower = oidDDMTXPower +
-    (unstandart !== undefined ? (unstandart ? portIfList[i] + '.8' : (!eltex ? portIfList[i] + '.4.1' : portIfList[i])) : '.' + portIfList[i]);
-oidDDMTemperature = oidDDMTemperature +
-    (unstandart !== undefined ? (unstandart ? portIfList[i] + '.5' : (!eltex ? portIfList[i] + '.1.1' : portIfList[i])) : '.' + portIfList[i]);
-oidDDMVoltage = oidDDMVoltage +
-    (unstandart !== undefined ? (unstandart ? portIfList[i] + '.6' : (!eltex ? portIfList[i] + '.2.1' : portIfList[i])) : '.' + portIfList[i]);
+            let oidDDMRXPower = baseOidDDMRXPower;
+            let oidDDMTXPower = baseOidDDMTXPower;
+            let oidDDMTemperature = baseOidDDMTemperature;
+            let oidDDMVoltage = baseOidDDMVoltage;
+
+            oidDDMRXPower +=
+            (unstandart !== undefined ? (unstandart ? portIfList[i] + '.9' : (!eltex ? portIfList[i] + '.5.1' : portIfList[i])) : '.' + portIfList[i]);
+        oidDDMTXPower +=
+            (unstandart !== undefined ? (unstandart ? portIfList[i] + '.8' : (!eltex ? portIfList[i] + '.4.1' : portIfList[i])) : '.' + portIfList[i]);
+        oidDDMTemperature +=
+            (unstandart !== undefined ? (unstandart ? portIfList[i] + '.5' : (!eltex ? portIfList[i] + '.1.1' : portIfList[i])) : '.' + portIfList[i]);
+        oidDDMVoltage +=
+            (unstandart !== undefined ? (unstandart ? portIfList[i] + '.6' : (!eltex ? portIfList[i] + '.2.1' : portIfList[i])) : '.' + portIfList[i]);
 
             console.log(oidDDMRXPower,'\n',oidDDMTXPower,'\n',oidDDMTemperature,'\n',oidDDMVoltage)
 
