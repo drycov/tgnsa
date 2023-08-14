@@ -36,6 +36,8 @@ type JoidType = {
         eltex?:boolean,
         powerConverter?: (value: number) => number
     ) => {
+        console.log(oidDDMRXPower,'\n',oidDDMTXPower,'\n',oidDDMTemperature,'\n',oidDDMVoltage)
+
         for (let i = 0; i < portIfList.length; i++) {
             // console.log(eltex,unstandart)
             oidDDMRXPower = oidDDMRXPower +
