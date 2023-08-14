@@ -39,14 +39,14 @@ type JoidType = {
         for (let i = 0; i < portIfList.length; i++) {
             // console.log(eltex,unstandart)
             oidDDMRXPower = oidDDMRXPower +
-                    (unstandart !== undefined ? (unstandart ? portIfList[i] + '.9' : (!eltex ? portIfList[i] + '5.1' : portIfList[i])) : portIfList[i]);
-            oidDDMTXPower=oidDDMTXPower +
-                    (unstandart !== undefined ? (unstandart ? portIfList[i] + '.9' : (!eltex ? portIfList[i] + '4.1' : portIfList[i])) : portIfList[i]);
-            oidDDMTemperature=oidDDMTemperature + 
-                    (unstandart !== undefined ? (unstandart ? portIfList[i] + '.9' : (!eltex ? portIfList[i] + '1.1' : portIfList[i])) : portIfList[i]);
-            oidDDMVoltage=oidDDMVoltage +
-                    (unstandart !== undefined ? (unstandart ? portIfList[i] + '.9' : (!eltex ? portIfList[i] + '2.1' : portIfList[i])) : portIfList[i]);
-            
+    (unstandart !== undefined ? (unstandart ? portIfList[i] + '.9' : (!eltex ? portIfList[i] + '.5.1' : portIfList[i])) : '.' + portIfList[i]);
+oidDDMTXPower = oidDDMTXPower +
+    (unstandart !== undefined ? (unstandart ? portIfList[i] + '.8' : (!eltex ? portIfList[i] + '.4.1' : portIfList[i])) : '.' + portIfList[i]);
+oidDDMTemperature = oidDDMTemperature +
+    (unstandart !== undefined ? (unstandart ? portIfList[i] + '.5' : (!eltex ? portIfList[i] + '.1.1' : portIfList[i])) : '.' + portIfList[i]);
+oidDDMVoltage = oidDDMVoltage +
+    (unstandart !== undefined ? (unstandart ? portIfList[i] + '.6' : (!eltex ? portIfList[i] + '.2.1' : portIfList[i])) : '.' + portIfList[i]);
+
             console.log(oidDDMRXPower,'\n',oidDDMTXPower,'\n',oidDDMTemperature,'\n',oidDDMVoltage)
 
             const getDDMLevelRX = await snmpFunctions.getSingleOID(
