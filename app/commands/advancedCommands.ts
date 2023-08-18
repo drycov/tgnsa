@@ -21,7 +21,7 @@ interface MyContext extends Context {
 type MyConversation = Conversation<MyContext>;
 
 
-export = {
+export default {
     additional: async (conversation: MyConversation, ctx: MyContext) => {
         ctx.session.currentCVid = "additional"
         ctx.session.previosCVid = "main"

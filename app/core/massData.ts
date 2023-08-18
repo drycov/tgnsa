@@ -1,4 +1,6 @@
 import MassIncidientModel from '../models/MassIncidient';
+import helperFunctions from '../utils/helperFunctions';
+const currentDate = helperFunctions.getHumanDate(new Date());
 
 
 // Function to generate the next available ID in the format "mi_00"
@@ -69,4 +71,4 @@ async function generateNextMiId(): Promise<string> {
 
 // Call the function to insert a new document with the generated mi_id
 // insertNewDocument();
-export = { generateNextMiId }
+export default { generateNextMiId }

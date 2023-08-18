@@ -1,0 +1,14 @@
+[Unit]
+Description=TTC Network Support Asistant Service
+After=network.target
+
+[Service]
+User=nobody
+Group=nogroup
+WorkingDirectory=/opt/ttcNSA
+Environment="APP_TYPE=PROD"
+ExecStart=/usr/bin/node --no-warnings --loader ts-node/esm bot.ts
+Restart=always
+
+[Install]
+WantedBy=default.target

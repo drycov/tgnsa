@@ -1,6 +1,6 @@
 import baseUtil from "./baseUtil"
 
-export = {
+export default {
     FilterDeviceModel: (dirtyData: string) => {
         // console.log(dirtyData)
         var swModel

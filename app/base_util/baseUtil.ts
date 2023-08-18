@@ -8,7 +8,7 @@ import config from '../config';
 // const Netmask = netmask.Netmask
 
 
-export = {
+export default  {
     subnetCalculate: (host: any) => {
         // if (SubnetRegexp().test(host)) {
         let sc;

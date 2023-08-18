@@ -5,7 +5,7 @@ import {
 import { InlineKeyboard, Keyboard } from "grammy";
 import labels from "../assets/labels";
 
-export = {
+export default {
     admin: new Keyboard([[Button.text(labels.CheckDeviceLabel),
     Button.text(labels.AdvancedMenuLabel)],
     [Button.webApp(labels.AdminLabel,"https://webadmin.vercel.app/")],

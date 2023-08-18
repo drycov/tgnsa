@@ -1,6 +1,6 @@
 import UserModel from '../models/User';
 
-export = {
+export default {
     saveUser: (userData: any): Promise<any> => {
         return new Promise(async (resolve, reject) => {
             try {

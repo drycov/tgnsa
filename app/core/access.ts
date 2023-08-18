@@ -1,6 +1,6 @@
 import userData from "../data/userData";
 
-export = {
+export default {
     UserExist: async (id: any) => {
         let user = await userData.getUserDataByTgId(id).then((res) => { return res });
         if (user) {

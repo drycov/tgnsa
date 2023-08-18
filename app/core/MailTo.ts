@@ -32,4 +32,4 @@ const sendEmailWithTemplate = async (renderedHtml: string, to: string, subject: 
     }
     // return info.messageId
 }
-export = { sendEmailWithTemplate }
+export default { sendEmailWithTemplate }
