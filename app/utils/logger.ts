@@ -6,8 +6,8 @@ const logger = winston.createLogger({
   level: 'info', // Минимальный уровень логов для вывода
   format: winston.format.combine(
     winston.format.timestamp(),
-    winston.format.printf(({ timestamp, level, message }) => {
-      return `${timestamp} - ${level}: ${message}`;
+    winston.format.printf(({ message }) => {
+      return `${message}`;
     })
   ),
   transports: [
