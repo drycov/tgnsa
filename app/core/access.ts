@@ -1,7 +1,8 @@
 import userData from "../data/userData";
 
-export default {
+const access = {
     UserExist: async (id: any) => {
+
         let user = await userData.getUserDataByTgId(id).then((res) => { return res });
         if (user) {
             return true
@@ -32,3 +33,4 @@ export default {
         return false
     }
 }
+export default access

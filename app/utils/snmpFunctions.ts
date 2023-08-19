@@ -3,10 +3,11 @@ import util from 'util';
 import joid from '../../src/oid.json';
 import helperFunctions from './helperFunctions';
 import messagesFunctions from './messagesFunctions';
+import logger from './logger';
 const currentDate = helperFunctions.getHumanDate(new Date());
 const snmpFunctions = {
     getSingleOID: async (host: string, oid:any, community: string): Promise<any> => {
-         let action = snmpFunctions.getSingleOID.name;
+        let action = snmpFunctions.getSingleOID.name;
         let message = util.format('{"date":"%s", "action":"%s", ',currentDate,action)
         const session = new Session({
             host: host,
@@ -19,7 +20,7 @@ const snmpFunctions = {
                     resolve(varbinds[0].value);
                 } else {
                     message += util.format('"%s":"%s"}',"error",error)
-                    console.error(message);
+                    logger.error(message);
                     reject(false);
                 }
             });
@@ -44,7 +45,7 @@ const snmpFunctions = {
 
                     if (session) {
                         message += util.format('"%s":"%s"}',"status",true)
-                        console.info(message);
+                        logger.info(message);
                         resolve(community);
                     } else {
                         // Try the next community
@@ -53,7 +54,7 @@ const snmpFunctions = {
                 } catch (error) {
                     // Handle the error here, if needed
                     message += util.format('"%s":"%s"}',"error",error)
-                    console.error(message);
+                    logger.error(message);
                     
                     // Try the next community
                     tryCommunities(index + 1);
@@ -64,7 +65,7 @@ const snmpFunctions = {
             } catch (error) {
                 messagesFunctions.msgSNMPError(host)
                 message += util.format('"%s":"%s"}',"error",error)
-                console.error(message);
+                logger.error(message);
                 // Handle the error here, if needed
             }
         });
@@ -86,7 +87,7 @@ const snmpFunctions = {
             }, (error, varbinds) => {
                 if (error) {
                     message += util.format('"%s":"%s"}',"error",error)
-                    console.error(message);
+                    logger.error(message);
                     reject(true)
                 } else {
                     varbinds.forEach((vb) => {

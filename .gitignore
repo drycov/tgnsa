@@ -4,6 +4,7 @@ package-lock.json
 
 # Custom Sessions Directory
 sessions/*
+logs/*
 
 # Ignored files
 .DS_Store

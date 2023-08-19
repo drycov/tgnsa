@@ -11,6 +11,7 @@ import baseMenu from "../keyboards/baseMenu";
 import deviceMenu from "../keyboards/deviceMenu";
 import helperFunctions from "../utils/helperFunctions";
 import snmpFunctions from "../utils/snmpFunctions";
+import logger from "../utils/logger";
 
 interface MyContext extends Context {
     session: { [key: string]: any }; // Change the type to match your session data structure
@@ -35,13 +36,11 @@ const deviceCommands = {
         if (host) {
             const ifTru = IpCheck(host)
             message +=  util.format('%s: "%s", ',action='Ip_check',ifTru)
-            // console.log(message)
             if (ifTru) {
                 const isAlive = await helperFunctions.isAlive(host).then((res) => {
                     return (res)
                 })
                 message += util.format('"%s": "%s"}',action='isAlive',isAlive)
-                // console.log(message)
                 if (isAlive) {
                     const community = await snmpFunctions.checkSNMP(host, config.snmp.community
                     ).then(res => res)
@@ -58,14 +57,14 @@ const deviceCommands = {
                                 parse_mode: "HTML",
                             }
                         ).catch(helperFunctions.noop);
-                        console.log(message)
+                        logger.info(message)
                         return
                     } else {
                         ctx.reply(messages.ErroMessage + "\n" + messages.ErrorSNMPMessage, {
                             parse_mode: "HTML",
                         }).catch(helperFunctions.noop);
                         message += util.format('}')
-                        console.log(message)
+                        logger.info(message)
                         return
                     }
                 }
@@ -80,10 +79,10 @@ const deviceCommands = {
                 }
             ).catch(helperFunctions.noop);
             message += util.format('}')
-            console.log(message)
+            logger.info(message)
             return
         }
-        console.log(message)
+        logger.info(message)
         return
     },
     portInfo: async (conversation: MyConversation, ctx: MyContext) => {

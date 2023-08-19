@@ -16,12 +16,10 @@ let message = util.format('{"date":"%s", "%s":"%s",',currentDate,"action",action
         const status = runner.isRunning()
         await app.init()
         message += util.format('"%s":"%s"}',"status",status?`${app.botInfo.username} Running`:`${app.botInfo.username} Not Running`)
-        console.info(message);
         logger.info(message)
     } catch (error) {
         console.error('Error during initialization:', error);
         message += util.format('"%s":"%s"}',"error",error)
-        console.error(message);
         logger.error(message)
     }
 };
@@ -35,7 +33,6 @@ const stopRunner = () => {
     let message = util.format('{"date":"%s", "%s":"%s",',currentDate,"action",action)
     if (runner.isRunning()) {
         message += util.format('"%s":"%s"}',"status",`${app.botInfo.username} Stopped`)
-        console.info(message);
         logger.info(message)
         runner.stop();
     }

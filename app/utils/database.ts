@@ -3,6 +3,7 @@ import util from "util";
 
 import config from '../config';
 import helperFunctions from './helperFunctions';
+import logger from './logger';
 const currentDate = helperFunctions.getHumanDate(new Date());
 
 const connectToDatabase = () => {
@@ -11,12 +12,12 @@ const connectToDatabase = () => {
     try {
         mongoose.connect(config.mongoURI, config.mongoOptions);
         message += util.format('"%s":"%s"}',"status","DB connect")
-        console.info(message);
-        return mongoose;
+        logger.info(message)
+                return mongoose;
     } catch (error) {
         // console.error('Failed to connect to MongoDB', error);
         message += util.format('"%s":"%s"}',"error",error)
-        console.error(message);
+        logger.error(message)
         throw error;
     }
 };

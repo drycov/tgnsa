@@ -9,6 +9,7 @@ import snmpFunctions from '../utils/snmpFunctions';
 import helperFunctions from '../utils/helperFunctions';
 import symbols from '../assets/symbols';
 import messagesFunctions from '../utils/messagesFunctions';
+import logger from '../utils/logger';
 const currentDate = helperFunctions.getHumanDate(new Date());
 type OidLoaderType = {
     [key: string]: string;
@@ -84,7 +85,7 @@ type JoidType = {
                     DDMLevelTX = powerConverter(DDMLevelTX);
                 }
                 message += `"status":"done"}`;
-                console.info(message);
+                logger.info(message);
                 results.push(
                     `${portIfRange[i]} 🔺TX: ${DDMLevelTX} 🔻RX: ${DDMLevelRX} 🌡C:${getDDMTemperature} ⚡️V: ${DDMVoltage}`
                 );
@@ -111,7 +112,7 @@ type JoidType = {
             if (ddm && fibers === 0) {
                 results.push(`${symbols.WarnEmo} Функция DDM не поддерживается или не реализована`);
                 message += `"error":"ddm not supported"}`;
-                console.error(message);
+                logger.error(message);
             } else {
                 const noDDMport = portIfList.length - fibers;
                 const DDMport = portIfList.length;
@@ -130,7 +131,7 @@ type JoidType = {
                 if (oidLoaderKey === '') {
                     results.push(`${symbols.WarnEmo} Функция DDM не поддерживается или не реализована\n\n`);
                     message += `"error":"ddm not supported"}`;
-                    console.error(message);
+                    logger.error(message);
                 }
                 const oidLoader: OidLoaderType = (joid as JoidType)[oidLoaderKey];
 
@@ -206,7 +207,7 @@ type JoidType = {
             }
         } catch (error) {
             message += `"error":"${error}"}`;
-            console.error(message);
+            logger.error(message);
             return `${symbols.SHORT} Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее`;
         }
         return `${symbols.SHORT} Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее`;
@@ -244,10 +245,7 @@ type JoidType = {
             );
         } catch (error) {
             message += util.format('"%s":"%s"}',"error",error)
-                    console.error(message);
-            // const error = `${error})`
-            // console.log(error);
-            // logger.info(error);
+                    logger.error(message);
             return result;
         }
 
@@ -265,7 +263,7 @@ type JoidType = {
                     return res;
                 }).catch((error) => {
                     message += util.format('"%s":"%s"}',"error",error)
-                    console.error(message);
+                    logger.error(message);
                     return error;
                 });
             const model = deviceArr.FilterDeviceModel(dirty);
@@ -277,52 +275,49 @@ type JoidType = {
             const portIfList = aiflist.interfaceList
             const portIfRange = aiflist.interfaceRange
             if (portIfList == "Server" && portIfRange == "Server") {
-                // console.log("portIfList: ", portIfList)
-                // console.log("portIfRange: ", portIfRange)
                 const intRange = await snmpFunctions.getMultiOID(host, joid.linux_server.oid_ifName, community)
                     .then((res) => {
                         return res
                     }, (error) => {
                         message += util.format('"%s":"%s"}',"error",error)
-                    console.error(message);
+                    logger.error(message);
                     });
                 const intList = await snmpFunctions.getMultiOID(host, joid.linux_server.oid_ifIndex, community)
                     .then((res) => {
                         return res
                     }, (error) => {
                         message += util.format('"%s":"%s"}',"error",error)
-                    console.error(message);
+                    logger.error(message);
                     });
-                // console.log(intRange)
-                // console.log(zip(intList, intRange))
+
                 for (let ifId in zip(intList, intRange)) {
                     const intDescr = await snmpFunctions.getSingleOID(host, joid.linux_server.oid_ifDescr + intList[ifId], community)
                         .then((res) => {
                             return res
                         }, (error) => {
                             message += util.format('"%s":"%s"}',"error",error)
-                    console.error(message);
+                    logger.error(message);
                         });
                     const portOperStatus = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_oper_ports + intList[ifId], community)
                         .then((res) => {
                             return res
                         }, (error) => {
                             message += util.format('"%s":"%s"}',"error",error)
-                    console.error(message);
+                    logger.error(message);
                         });
                     const portAdminStatus = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_admin_ports + intList[ifId], community)
                         .then((res) => {
                             return res
                         }, (error) => {
                             message += util.format('"%s":"%s"}',"error",error)
-                    console.error(message);
+                    logger.error(message);
                         });
                     const get_inerrors = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_inerrors + intList[ifId], community)
                         .then((res) => {
                             return res
                         }, (error) => {
                             message += util.format('"%s":"%s"}',"error",error)
-                    console.error(message);
+                    logger.error(message);
                         });
                     // get_inerrors = parseInt(get_inerrors)
                     let operStatus
@@ -344,52 +339,49 @@ type JoidType = {
                         }
                 }
             } else if (portIfList == "auto" && portIfRange == "auto") {
-                // console.log("portIfList: ", portIfList)
-                // console.log("portIfRange: ", portIfRange)
                 const intRange = await snmpFunctions.getMultiOID(host, joid.linux_server.oid_ifName, community)
                     .then((res) => {
                         return res
                     }, (error) => {
                         message += util.format('"%s":"%s"}',"error",error)
-                console.error(message);
+                logger.error(message);
                     });
                 const intList = await snmpFunctions.getMultiOID(host, joid.linux_server.oid_ifIndex, community)
                     .then((res) => {
                         return res
                     }, (error) => {
                         message += util.format('"%s":"%s"}',"error",error)
-                console.error(message);
+                logger.error(message);
                     });
-                // console.log(intRange)
-                // console.log(zip(intList, intRange))
+
                 for (let ifId in zip(intList, intRange)) {
                     const intDescr = await snmpFunctions.getSingleOID(host, joid.linux_server.oid_ifDescr + intList[ifId], community)
                         .then((res) => {
                             return res
                         }, (error) => {
                             message += util.format('"%s":"%s"}',"error",error)
-                    console.error(message);
+                    logger.error(message);
                         });
                     const portOperStatus = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_oper_ports + intList[ifId], community)
                         .then((res) => {
                             return res
                         }, (error) => {
                             message += util.format('"%s":"%s"}',"error",error)
-                    console.error(message);
+                    logger.error(message);
                         });
                     const portAdminStatus = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_admin_ports + intList[ifId], community)
                         .then((res) => {
                             return res
                         }, (error) => {
                             message += util.format('"%s":"%s"}',"error",error)
-                    console.error(message);
+                    logger.error(message);
                         });
                     const get_inerrors = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_inerrors + intList[ifId], community)
                         .then((res) => {
                             return res
                         }, (error) => {
                             message += util.format('"%s":"%s"}',"error",error)
-                    console.error(message);
+                    logger.error(message);
                         });
                     // get_inerrors = parseInt(get_inerrors)
                     let operStatus
@@ -417,28 +409,28 @@ type JoidType = {
                             return res
                         }, (error) => {
                             message += util.format('"%s":"%s"}',"error",error)
-                    console.error(message);
+                    logger.error(message);
                         });
                     const portOperStatus = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_oper_ports + portIfList[ifId], community)
                         .then((res) => {
                             return res
                         }, (error) => {
                             message += util.format('"%s":"%s"}',"error",error)
-                    console.error(message);
+                    logger.error(message);
                         });
                     const portAdminStatus = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_admin_ports + portIfList[ifId], community)
                         .then((res) => {
                             return res
                         }, (error) => {
                             message += util.format('"%s":"%s"}',"error",error)
-                    console.error(message);
+                    logger.error(message);
                         });
                     const get_inerrors = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_inerrors + portIfList[ifId], community)
                         .then((res) => {
                             return res
                         }, (error) => {
                             message += util.format('"%s":"%s"}',"error",error)
-                    console.error(message);
+                    logger.error(message);
                         });
                     // get_inerrors = parseInt(get_inerrors)
                     let operStatus
@@ -464,7 +456,7 @@ type JoidType = {
             return (`${results.join('\n')}\n\nP.S. Состояния: ${symbols.OK_UP} - Линк есть, ${symbols.SHORT} - Линка нет, ${symbols.NOCABLE} - Порт выключен, ${symbols.UNKNOWN} - Неизвестно \n`)
         } catch (e) {
                 message += util.format('"%s":"%s"}',"error",e)
-        console.error(message);
+        logger.error(message);
             return result
 
         }
@@ -482,7 +474,7 @@ type JoidType = {
                     return res;
                 }).catch((err) => {
                     message += util.format('"%s":"%s"}',"error",err)
-        console.error(message);
+        logger.error(message);
                     return err;
                 });
             const vlanId = await snmpFunctions.getMultiOID(host, joid.basic_oids.oid_vlan_id, community)
@@ -490,7 +482,7 @@ type JoidType = {
                     return res;
                 }).catch((err) => {
                     message += util.format('"%s":"%s"}',"error",err)
-        console.error(message);
+        logger.error(message);
                     return err;
                 });
             if (!vlanName || !vlanId) {
@@ -502,7 +494,7 @@ type JoidType = {
             return res.join('\n');
         } catch (e) {
             message += util.format('"%s":"%s"}',"error",e)
-            console.error(message);
+            logger.error(message);
             return result;
         }
     },
@@ -515,7 +507,7 @@ type JoidType = {
 
         return new Promise((resolve, reject) => {
             PythonShell.runString('ps.py', options).then(messages => {
-                console.log(messages);
+                logger.info(messages);
             });
         })
     }
