@@ -36,7 +36,6 @@
     "@types/snmp-native": "^1.2.2",
     "@types/underscore": "^1.11.6",
     "@types/winston": "^2.4.4",
-    "chart.js": "^4.3.3",
     "child_process": "^1.0.2",
     "cross-env": "^7.0.3",
     "dotenv": "^16.3.1",

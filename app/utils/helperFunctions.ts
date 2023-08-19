@@ -6,12 +6,19 @@ import ping from 'ping';
 
 import MailTo from '../core/MailTo';
 
+
 dotenv.config();
 // type MyContext = Context & ConversationFlavor;
 interface MyContext extends Context {
     session: { [key: string]: any }; // Change the type to match your session data structure
 }
 
+const statusMapping: { [key: string]: string } = {
+    '0': 'NO',
+    '1': 'YES',
+    '3': 'VACATION',
+    'да': 'YES'
+};
 const helperFunctions = {
     delay: (ms: any) => { new Promise(resolve => setTimeout(resolve, ms)) },
     noop: () => { },
@@ -150,7 +157,7 @@ const helperFunctions = {
         const dBm = Math.log10(mW);
         const dBW = dBm * 10 - 30;
         return parseFloat(dBW.toFixed(2));
-    }
+    },
     
 
 }
