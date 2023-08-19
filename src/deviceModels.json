@@ -1,0 +1,130 @@
+{
+    "deviceModels": [
+      {
+        "keywords": ["S2350"],
+        "model": "Huawei S2350-28TP-EI-AC"
+      },
+      {
+        "keywords": ["S2700"],
+        "model": "Huawei S2700-18TP-SI-AC"
+      },
+      {
+        "keywords": ["S2320"],
+        "model": "Huawei S2320-28TP-EI-AC"
+      },
+      {
+        "keywords": ["S5320"],
+        "model": "Huawei S5320-28P-LI-AC"
+      },
+      {
+        "keywords": ["S6320"],
+        "model": "Huawei S6320-54C-EI-48S-AC"
+      },
+      {
+        "keywords": ["DGS-3420-28SC"],
+        "model": "Dlink DGS-3420-28SC"
+      },
+            {
+        "keywords": ["DGS-3620-28SC"],
+        "model": "Dlink DGS-3620-28SC"
+      },
+      {
+        "keywords": ["DES-3200-10"],
+        "model": "D-Link DES-3200-10"
+      },
+      {
+        "keywords": ["DES-3200-26"],
+        "model": "D-Link DES-3200-26"
+      },
+      {
+        "keywords": ["DES-3200-28"],
+        "model": "D-Link DES-3200-28"
+      },
+      {
+        "keywords": ["DES-1228/ME"],
+        "model": "D-Link DES-1228/ME"
+      },
+      {
+        "keywords": ["DES-1210-28/ME/B2"],
+        "model": "D-Link DES-1210-28/ME/B2"
+      },
+      {
+        "keywords": ["DES-1210-28"],
+        "model": "D-Link DES-1210-28/ME/B3"
+      },
+      {
+        "keywords": ["DGS-3000-10TC"],
+        "model": "D-Link DGS-3000-10T"
+      },      
+      {
+        "keywords": ["DGS-3000-26TC"],
+        "model": "D-Link DGS-3000-26TC"
+      },
+      {
+        "keywords": ["ZXR10 2928"],
+        "model": "ZTE 2928E"
+      },      
+      {
+        "keywords": ["MES2324FB"],
+        "model": "Eltex MES2324FB"
+      },
+      {
+        "keywords": ["MES2324P"],
+        "model": "Eltex MES2324P"
+      },
+      {
+        "keywords": ["MES2428"],
+        "model": "Eltex MES2428"
+      },
+      {
+        "keywords": ["MES3308F"],
+        "model": "Eltex MES3308F"
+      },
+      {
+        "keywords": ["MES3316F"],
+        "model": "Eltex MES3316F"
+      },{
+        "keywords": ["MES3324F"],
+        "model": "Eltex MES3324F"
+      },
+      {
+        "keywords": ["MES3108F"],
+        "model": "Eltex MES3108F"
+      },{
+        "keywords": ["MES3116F"],
+        "model": "Eltex MES3116F"
+      },
+      {
+        "keywords": ["MES3124F"],
+        "model": "Eltex MES3124F"
+      },{
+        "keywords": ["RB760iGS"],
+        "model": "Mikrotik RB760iGS "
+      },
+      {
+        "keywords": ["RB2011LS"],
+        "model": "Mikrotik RB2011LS"
+      },
+      {
+        "keywords": ["CRS112-8P-4S"],
+        "model": "Mikrotik CRS112-8P-4S"
+      },
+      {
+        "keywords": ["CRS109-8G-1S-2HnD"],
+        "model": "Mikrotik CRS109-8G-1S-2HnD"
+      },
+      {
+        "keywords": ["CSS326-24G-2S+"],
+        "model": "Mikrotik CSS326-24G-2S+"
+      },
+      {
+        "keywords":["CRS226-24G-2S+"],
+        "model":"Mikrotik CRS226-24G-2S+"
+      },
+      {
+        "keywords": ["Linux"],
+        "model": "Linux Server"
+      }
+    ]
+  }
+  

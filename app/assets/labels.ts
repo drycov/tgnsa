@@ -7,6 +7,7 @@ export default {
     P2PCalcLabel: symbols.P2PEmo + " Рассчитать P2P-пару",
     CIDRCalcLabel: symbols.NetworkEmo + " Расчет сети",
     DOFLabel: symbols.ShieldEmo + " Дежурный сотрудник",
+    DSLabel: symbols.Group1 + " График дежурств",
     RequestLabel: symbols.MoyaiEmo + " Запрос на обслуживание",
     SubnetCalcLabel: symbols.PcEmo + " Калькулятор подсети",
     MIAllertLabel: symbols.MagicEmo + " Массовый инцидент",
