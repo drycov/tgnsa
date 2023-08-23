@@ -132,13 +132,13 @@ const deviceCommands = {
         const host = ctx.session.deviceHost
         const community = ctx.session.snmpCommunity
 
-        await ctx.reply('Уровень оптического сигнала на устройстве: ' + host, {
+        await ctx.reply('Вывод уровня оптического сигнала на устройстве: ' + host, {
             reply_markup: {
                 remove_keyboard: true
             },
         })
         const DDMInfo = await deviceData.getDDMInfo(host, community).then((res) => res)
-        await ctx.reply(DDMInfo + `\n\n<i>Выполнено:  <code>${new Date().toLocaleString()}</code></i>`, {
+        await ctx.reply(`DDM to: <code>${host}</code> \n <pre>${DDMInfo}</pre>` + `\n\n<i>Выполнено:  <code>${new Date().toLocaleString()}</code></i>`, {
             reply_markup: deviceMenu.checkDevice,
             parse_mode: "HTML"
         })

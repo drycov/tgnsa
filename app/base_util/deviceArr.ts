@@ -235,6 +235,13 @@ export default {
                     ddm: true,
                     fibers: 16
                 })
+            case "Eltex MES3324F":
+                return JSON.stringify({
+                    interfaceRange: baseUtil.InterfaceLoader("mes3324_interfaces", "interfaceRange"),
+                    interfaceList: baseUtil.InterfaceLoader("eltex3324_list", "interfaceList"),
+                    ddm: true,
+                    fibers: 28
+                })
             case "D-Link DES-1210-28":
                 return JSON.stringify({
                     interfaceRange: baseUtil.InterfaceLoader("tplink_interfaces2c", "interfaceRange"),
