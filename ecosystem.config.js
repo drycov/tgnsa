@@ -2,7 +2,7 @@ module.exports = {
   apps: [{
     name: "TTC_NSA",
     cwd: "/opt/ttcNSA/",
-    script: "npm run start",
+    script: "npm start",
     watch: true,
     autorestart: true,
     max_restarts: 10,
