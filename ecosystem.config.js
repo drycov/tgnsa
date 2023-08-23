@@ -2,9 +2,7 @@ module.exports = {
   apps: [{
     name: "TTC_NSA",
     cwd: "/opt/ttcNSA/",
-    interpreter:"/root/.nvm/versions/node/v18.17.0/bin/node",
-    interpreter_args:'--loader ts-node/esm',
-    script: "./bot.ts",
+    script: "npm run start",
     // args: "./bot.ts",
     watch: true,
     autorestart:true,
