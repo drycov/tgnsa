@@ -68,29 +68,29 @@ if (uptimeInSeconds < notificationInterval) {
     // Время работы процесса менее 5 минут, отправить уведомление админу
     const adminUserId = config.defaultAdmin; // Замените на ID администратора бота
     // Информация о процессе
-    const userIsBot = bot.api.getMe;
+    const userIsBot = bot.api.getMe().then((res) => { return res.username });
     const processInfo = {
         pid: process.pid,
-        name: userIsBot.name,
+        name: userIsBot,
         startTime: new Date(Date.now() - uptimeInSeconds * 1000).toLocaleString(),
         user: os.userInfo().username,
-      };
-      const data = [
+    };
+    const data = [
         ['PID', 'Name', 'Started', 'User'],
         [processInfo.pid, processInfo.name, processInfo.startTime, processInfo.user],
-      ];
-    
-      const tabConfig = {
+    ];
+
+    const tabConfig = {
         columnDefault: {
             paddingLeft: 0,
             paddingRight: 0,
         },
         border: getBorderCharacters(`ramac`)
-      };
-    
-      const tab = table(data, tabConfig);
-    
-      // Ваша логика для отправки сообщения с таблицей
+    };
+
+    const tab = table(data, tabConfig);
+
+    // Ваша логика для отправки сообщения с таблицей
     //   ctx.reply(`<pre>Процесс запущен, но время работы менее 5 минут.\n<code>${tab}</code></pre>`, { parse_mode: "HTML" });
 
     // Текст уведомления
