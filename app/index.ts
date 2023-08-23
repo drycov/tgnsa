@@ -64,41 +64,36 @@ bot.command(["start", "st", "run"], async (ctx) => {
     await ctx.conversation.enter("start")
 });
 
-if (uptimeInSeconds < notificationInterval) {
-    // Время работы процесса менее 5 минут, отправить уведомление админу
-    const adminUserId = config.defaultAdmin; // Замените на ID администратора бота
-    // Информация о процессе
-    const userIsBot = bot.api.getMe().then((res) => { return res.username });
-    const processInfo = {
-        pid: process.pid,
-        name: userIsBot,
-        startTime: new Date(Date.now() - uptimeInSeconds * 1000).toLocaleString(),
-        user: os.userInfo().username,
-    };
-    const data = [
-        ['PID', 'Name', 'Started', 'User'],
-        [processInfo.pid, processInfo.name, processInfo.startTime, processInfo.user],
-    ];
+const lov5Min = async () => {
+    if (uptimeInSeconds < notificationInterval) {
+        const adminUserId = config.defaultAdmin; 
+        const userIsBot = await bot.api.getMe().then((res) => { return res.username });
+        const processInfo = {
+            pid: process.pid,
+            name: userIsBot,
+            startTime: new Date(Date.now() - uptimeInSeconds * 1000).toLocaleString(),
+            user: os.userInfo().username,
+        };
+        const data = [
+            ['PID', 'Name', 'Started', 'User'],
+            [processInfo.pid, processInfo.name, processInfo.startTime, processInfo.user],
+        ];
 
-    const tabConfig = {
-        columnDefault: {
-            paddingLeft: 0,
-            paddingRight: 0,
-        },
-        border: getBorderCharacters(`ramac`)
-    };
+        const tabConfig = {
+            columnDefault: {
+                paddingLeft: 0,
+                paddingRight: 0,
+            },
+            border: getBorderCharacters(`ramac`)
+        };
 
-    const tab = table(data, tabConfig);
-
-    // Ваша логика для отправки сообщения с таблицей
-    //   ctx.reply(`<pre>Процесс запущен, но время работы менее 5 минут.\n<code>${tab}</code></pre>`, { parse_mode: "HTML" });
-
-    // Текст уведомления
-    const notificationText = `<pre>Процесс запущен, но время работы менее 5 минут.\n<code>${tab}</code></pre>`;
-
-    // Ваша логика для отправки уведомления админу
-    bot.api.sendMessage(adminUserId, notificationText, { parse_mode: "HTML" });
+        const tab = table(data, tabConfig);
+        const notificationText = `<pre>Процесс запущен, но время работы менее 5 минут.\n<code>${tab}</code></pre>`;
+        bot.api.sendMessage(adminUserId, notificationText, { parse_mode: "HTML" });
+    }
 }
+lov5Min();
+
 // bot.command("test", async (ctx) => {
 //     const options: Options = {
 //         mode: 'text',
