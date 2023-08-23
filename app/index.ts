@@ -67,7 +67,7 @@ bot.command(["start", "st", "run"], async (ctx) => {
 if (uptimeInSeconds < notificationInterval) {
     // Время работы процесса менее 5 минут, отправить уведомление админу
     const adminUserId = config.defaultAdmin; // Замените на ID администратора бота
-
+    bot.init()
     // Информация о процессе
     const processInfo = {
         pid: process.pid,
