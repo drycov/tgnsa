@@ -9,6 +9,7 @@ module.exports = {
     watch: true,
     autorestart:true,
     max_restarts: 10,
+    gnore_watch: ["logs", "node_modules"],
     env_production: {
       NODE_ENV: "production",
       APP_TYPE: "PROD"
