@@ -21,6 +21,7 @@ interface MyContext extends Context {
 }
 type MyConversation = Conversation<MyContext>;
 
+const currentDate = new Date().toLocaleString('ru-RU');
 
 export default {
     additional: async (conversation: MyConversation, ctx: MyContext) => {
@@ -51,7 +52,7 @@ export default {
         }
 
         const cidrData = baseUtil.subnetCalculate(subnet);
-        await ctx.reply(`${cidrData}\n\n<i>Выполнено:  <code>${new Date().toLocaleString()}</code></i>`, {
+        await ctx.reply(`${cidrData}\n\n<i>Выполнено:  <code>${currentDate}</code></i>`, {
             reply_markup: baseMenu.inBack,
             parse_mode: "HTML"
         });
@@ -76,7 +77,7 @@ export default {
         }
 
         const cidrData = baseUtil.p2pCalculate(subnet);
-        await ctx.reply(`${cidrData}\n\n<i>Выполнено:  <code>${new Date().toLocaleString()}</code></i>`, {
+        await ctx.reply(`${cidrData}\n\n<i>Выполнено:  <code>${currentDate}</code></i>`, {
             reply_markup: baseMenu.inBack,
             parse_mode: "HTML",
         });
@@ -102,7 +103,7 @@ export default {
         const pingLog = await baseUtil.pingDeviceLog(host).then((res) => res.output).catch(() => null);
         if (pingLog) {
             await ctx.reply(util.format("%s\n<code>%s</code>\n\n<i>Выполнено:  <code>%s</code></i>",
-                labels.PingDeviceLabel, pingLog.toString(), new Date().toLocaleString()), {
+                labels.PingDeviceLabel, pingLog.toString(), currentDate), {
                 reply_markup: baseMenu.inBack,
                 parse_mode: "HTML",
             })
@@ -178,7 +179,7 @@ export default {
         // const miData = MailTo.msgToSupport(JSON.stringify(massInc, null, '\t'));
 
         await ctx.reply(
-            "Запрос на массовый инцидент подан\n\n\n" + "miData" + `\n\n<i>Выполнено:  <code>${new Date().toLocaleString()}</code></i>`,
+            "Запрос на массовый инцидент подан\n\n\n" + "miData" + `\n\n<i>Выполнено:  <code>${currentDate}</code></i>`,
             { reply_markup: baseMenu.inBack, parse_mode: "HTML" }
         );
     },

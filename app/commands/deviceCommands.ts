@@ -51,7 +51,7 @@ const deviceCommands = {
                     const devInfo = await deviceData.getBasicInfo(host, community);
                     if (devInfo !== "false") {
                         await ctx.reply(
-                            devInfo + `\n\n<i>Выполнено:  <code>${new Date().toLocaleString()}</code></i>`,
+                            devInfo + `\n\n<i>Выполнено:  <code>${currentDate}</code></i>`,
                             {
                                 reply_markup: deviceMenu.checkDevice,
                                 parse_mode: "HTML",
@@ -100,7 +100,7 @@ const deviceCommands = {
         const portStatus = await deviceData.getPortStatus(host, community).then(status => {
             return status;
         });
-        await ctx.reply(portStatus + `\n\n<i>Выполнено:  <code>${new Date().toLocaleString()}</code></i>`, {
+        await ctx.reply(portStatus + `\n\n<i>Выполнено:  <code>${currentDate}</code></i>`, {
             reply_markup: deviceMenu.checkDevice,
             parse_mode: "HTML"
         })
@@ -120,7 +120,7 @@ const deviceCommands = {
         const vlanListResult = await deviceData.getVlanList(host, community).then(status => {
             return status;
         });
-        let mes = `VLAN to: <code>${host}</code> \n <pre>${vlanListResult}</pre>` + `\n\n<i>Выполнено:  <code>${new Date().toLocaleString()}</code></i>`
+        let mes = `VLAN to: <code>${host}</code> \n <pre>${vlanListResult}</pre>` + `\n\n<i>Выполнено:  <code>${currentDate}</code></i>`
         logger.info(vlanListResult.length)
         logger.info(mes.length)
        
@@ -141,7 +141,7 @@ const deviceCommands = {
             },
         })
         const DDMInfo = await deviceData.getDDMInfo(host, community).then((res) => res)
-        await ctx.reply(`DDM to: <code>${host}</code>\n<pre>${DDMInfo}</pre>` + `\n<i>Выполнено:  <code>${new Date().toLocaleString()}</code></i>`, {
+        await ctx.reply(`DDM to: <code>${host}</code>\n<pre>${DDMInfo}</pre>` + `\n<i>Выполнено:  <code>${currentDate}</code></i>`, {
             reply_markup: deviceMenu.checkDevice,
             parse_mode: "HTML"
         })
