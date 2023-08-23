@@ -22,6 +22,5 @@ module.exports = {
       path: "/opt/ttcNSA",
       "post-deploy": "npm install && pm2 reload ecosystem.config.js --env production"
     },
-    // You can add more deployment configurations for different environments if needed
   }
 };
