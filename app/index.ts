@@ -71,13 +71,12 @@ if (uptimeInSeconds < notificationInterval) {
     // Информация о процессе
     const processInfo = {
         pid: process.pid,
-        name: process.title,
+        name: bot.botInfo.username,
         startTime: new Date(Date.now() - uptimeInSeconds * 1000).toLocaleString(),
         user: os.userInfo().username,
       };
       const data = [
         ['PID', 'Name', 'Started', 'User'],
-        ['-----', '-----', '-----', '-----'],
         [processInfo.pid, processInfo.name, processInfo.startTime, processInfo.user],
       ];
     
