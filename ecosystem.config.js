@@ -2,8 +2,13 @@ module.exports = {
   apps: [{
     name: "TTC_NSA",
     cwd: "/opt/ttcNSA/",
-    script: "node_modules/.bin/ts-node",
-    args: "./bot.ts",
+    interpreter:"/root/.nvm/versions/node/v18.17.0/bin/node",
+    interpreter_args:'node --loader ts-node/esm',
+    script: "./bot.ts",
+    // args: "./bot.ts",
+    watch: true,
+    autorestart:true,
+    max_restarts: 10,
     env_production: {
       NODE_ENV: "production",
       APP_TYPE: "PROD"
