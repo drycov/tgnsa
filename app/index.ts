@@ -72,15 +72,14 @@ const lov5Min = async () => {
         const processInfo = {
             pid: process.pid,
             name: botUserName,
-            startTime: new Date(Date.now() - uptimeInSeconds * 1000).toLocaleString(),
+            startTime: new Date(Date.now() - uptimeInSeconds * 1000),
             user: os.userInfo().username,
         };
         const data = [
-            ['Информация о процессе', ''],
-            ['PID', processInfo.pid],
-            ['Имя процесса', processInfo.name],
-            ['Время запуска', processInfo.startTime],
-            ['От кого запущен', processInfo.user],
+            ['PID', processInfo.pid.toString()],
+            ['PID Name', processInfo.name.toString()],
+            ['Start time', `${processInfo.startTime.toLocaleDateString('ru-RU')} ${processInfo.startTime.toLocaleTimeString('ru-RU')}`],
+            ['PID User', processInfo.user.toString()],
           ];
         // const data = [
         //     ['PID', 'Name', 'Started', 'User'],
@@ -90,13 +89,14 @@ const lov5Min = async () => {
         const tabConfig = {
             columnDefault: {
                 paddingLeft: 0,
-                paddingRight: 0,
+                paddingRight: 1,
+                // width: 25,
             },
-            border: getBorderCharacters(`void`)
+            border: getBorderCharacters(`ramac`)
         };
 
         const tab = table(data, tabConfig);
-        const notificationText = `<pre>Процесс запущен, но время работы менее 5 минут.\n<code>${tab}</code></pre>`;
+        const notificationText = `<pre>Процесс запущен, но время работы менее 5 минут.\n<code>Process Info\n${tab}</code></pre>`;
         bot.api.sendMessage(adminUserId, notificationText, { parse_mode: "HTML" });
     }
 }
