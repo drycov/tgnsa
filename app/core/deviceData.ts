@@ -414,13 +414,18 @@ const devicData = {
                     });
 
                 for (let ifId in zip(intList, intRange)) {
-                    const intDescr = await snmpFunctions.getSingleOID(host, joid.linux_server.oid_ifDescr + intList[ifId], community)
+                    let intDescr = await snmpFunctions.getSingleOID(host, joid.linux_server.oid_ifDescr + intList[ifId], community)
                         .then((res) => {
                             return res
                         }, (error) => {
                             message += util.format('"%s":"%s"}', "error", error)
                             logger.error(message);
                         });
+                    if (intDescr !== 'noSuchInstance' && intDescr !== 'noSuchObject') {
+                        intDescr = 'NaN'
+                    } else {
+                        intDescr = intDescr
+                    }
                     const portOperStatus = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_oper_ports + intList[ifId], community)
                         .then((res) => {
                             return res
@@ -478,13 +483,18 @@ const devicData = {
                     });
 
                 for (let ifId in zip(intList, intRange)) {
-                    const intDescr = await snmpFunctions.getSingleOID(host, joid.linux_server.oid_ifDescr + intList[ifId], community)
+                    let intDescr = await snmpFunctions.getSingleOID(host, joid.linux_server.oid_ifDescr + intList[ifId], community)
                         .then((res) => {
                             return res
                         }, (error) => {
                             message += util.format('"%s":"%s"}', "error", error)
                             logger.error(message);
                         });
+                    if (intDescr !== 'noSuchInstance' && intDescr !== 'noSuchObject') {
+                        intDescr = 'NaN'
+                    } else {
+                        intDescr = intDescr
+                    }
                     const portOperStatus = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_oper_ports + intList[ifId], community)
                         .then((res) => {
                             return res
@@ -527,13 +537,18 @@ const devicData = {
                 }
             } else {
                 for (let ifId in zip(portIfList, portIfRange)) {
-                    const intDescr = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_descr_ports + portIfList[ifId], community)
+                    let intDescr = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_descr_ports + portIfList[ifId], community)
                         .then((res) => {
                             return res
                         }, (error) => {
                             message += util.format('"%s":"%s"}', "error", error)
                             logger.error(message);
                         });
+                    if (intDescr !== 'noSuchInstance' && intDescr !== 'noSuchObject') {
+                        intDescr = 'NaN'
+                    } else {
+                        intDescr = intDescr
+                    }
                     const portOperStatus = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_oper_ports + portIfList[ifId], community)
                         .then((res) => {
                             return res
