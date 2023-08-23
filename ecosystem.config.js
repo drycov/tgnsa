@@ -6,7 +6,7 @@ module.exports = {
     watch: true,
     autorestart: true,
     max_restarts: 10,
-    ignore_watch: ["logs", "node_modules"],
+    ignore_watch: ["logs", "node_modules", "sessions",".vscode"],
     env_production: {
       NODE_ENV: "production",
       APP_TYPE: "PROD"
