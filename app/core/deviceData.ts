@@ -13,7 +13,7 @@ import logger from '../utils/logger';
 
 import { table, getBorderCharacters, TableUserConfig, BaseUserConfig, ColumnUserConfig, Indexable } from "table";
 
-const currentDate = helperFunctions.getHumanDate(new Date());
+const currentDate = new Date().toLocaleString('ru-RU');
 type OidLoaderType = {
     [key: string]: string;
 };
@@ -185,7 +185,7 @@ const devicData = {
             const portIfRange = aiflist.interfaceRange;
             const ddm = aiflist.ddm;
             const fibers = aiflist.fibers;
-            const columnConfig:Indexable<ColumnUserConfig>  = [
+            const columnConfig: Indexable<ColumnUserConfig> = [
                 { width: 8, alignment: 'center' }, // IF
                 { width: 6, alignment: 'center' },  // 🔺Tx
                 { width: 6, alignment: 'center' },  // 🔻RX
@@ -193,7 +193,7 @@ const devicData = {
                 { width: 4, alignment: 'center' },  // ⚡️V
             ];
 
-            const config:BaseUserConfig  = {
+            const config: BaseUserConfig = {
                 columns: columnConfig,
                 columnDefault: {
                     paddingLeft: 0,
@@ -589,9 +589,28 @@ const devicData = {
         let message = util.format('{"date":"%s", "action":"%s", ', currentDate, action)
         message += util.format('"%s":"%s", ', "host", host)
 
-        let res: string[] = [];
+        let res: any[] = [];
+        const columnConfig: Indexable<ColumnUserConfig> = [
+            { width: 8, alignment: 'center' }, // IF
+            { width: 6, alignment: 'center' },  // 🔺Tx
+            { width: 6, alignment: 'center' },  // 🔻RX
+            { width: 5, alignment: 'center' },  // 🌡C
+            { width: 4, alignment: 'center' },  // ⚡️V
+        ];
+
+        const config: BaseUserConfig = {
+            columnDefault: {
+                paddingLeft: 0,
+                paddingRight: 0,
+                // width: 10,
+            },
+            border: getBorderCharacters(`ramac`)
+
+        }
         const result = util.format("%s Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее", symbols.SHORT)
         try {
+            // res.push(['VlanName', 'VlanId'],)
+
             const vlanName = await snmpFunctions.getMultiOID(host, joid.basic_oids.oid_vlan_list, community)
                 .then((res) => {
                     return res;
@@ -608,22 +627,18 @@ const devicData = {
                     logger.error(message);
                     return err;
                 });
-            logger.debug(vlanId)
-            logger.debug(vlanName)
-
             if (!vlanName || !vlanId) {
                 throw new Error(messagesFunctions.msgSNMPError(host));
             }
             for (let l in vlanName) {
                 res.push(`VlanId: ${vlanId[l]} VlanName: ${vlanName[l]} `);
-                logger.debug(res)
+                // res.push([vlanName[l], vlanId[l]])
             }
-            logger.debug(res)
             return res.join('\n');
         } catch (e) {
             message += util.format('"%s":"%s"}', "error", e)
             logger.error(message);
-            return result;
+            return `${symbols.SHORT} Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее`;
         }
     },
     runNetmikoScript: (): Promise<string> => {

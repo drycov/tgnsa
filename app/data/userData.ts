@@ -3,7 +3,7 @@ import helperFunctions from "../utils/helperFunctions";
 import util from "util";
 import logger from '../utils/logger';
 
-const currentDate = helperFunctions.getHumanDate(new Date());
+const currentDate = new Date().toLocaleString('ru-RU');
 
 const userData = {
 

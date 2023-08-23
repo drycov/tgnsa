@@ -4,7 +4,7 @@ import util from "util";
 import config from '../config';
 import helperFunctions from './helperFunctions';
 import logger from './logger';
-const currentDate = helperFunctions.getHumanDate(new Date());
+const currentDate = new Date().toLocaleString('ru-RU');
 
 const connectToDatabase = () => {
     let action = connectToDatabase.name;

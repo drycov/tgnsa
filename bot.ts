@@ -4,7 +4,7 @@ import util from "util";
 import database from "./app/utils/database";
 import helperFunctions from './app/utils/helperFunctions';
 import logger from './app/utils/logger';
-const currentDate = helperFunctions.getHumanDate(new Date());
+const currentDate = new Date().toLocaleString('ru-RU');
 
 const runner = run(app);
 

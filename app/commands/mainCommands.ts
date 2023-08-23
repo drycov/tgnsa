@@ -19,7 +19,7 @@ interface MyContext extends Context {
 }
 
 type MyConversation = Conversation<MyContext>;
-const currentDate = helperFunctions.getHumanDate(new Date());
+const currentDate = new Date().toLocaleString('ru-RU');
 
 const mainCommands = {
     start: async (conversation: MyConversation, ctx: MyContext) => {

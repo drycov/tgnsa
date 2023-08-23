@@ -4,7 +4,7 @@ import joid from '../../src/oid.json';
 import helperFunctions from './helperFunctions';
 import messagesFunctions from './messagesFunctions';
 import logger from './logger';
-const currentDate = helperFunctions.getHumanDate(new Date());
+const currentDate = new Date().toLocaleString('ru-RU');
 const snmpFunctions = {
     getSingleOID: async (host: string, oid:any, community: string): Promise<any> => {
         let action = snmpFunctions.getSingleOID.name;

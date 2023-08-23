@@ -17,7 +17,7 @@ interface MyContext extends Context {
     session: { [key: string]: any }; // Change the type to match your session data structure
 }
 type MyConversation = Conversation<MyContext>;
-const currentDate = helperFunctions.getHumanDate(new Date());
+const currentDate = new Date().toLocaleString('ru-RU');
 
 const deviceCommands = {
     check_device: async (conversation: MyConversation, ctx: MyContext) => {
@@ -111,7 +111,7 @@ const deviceCommands = {
         const host = ctx.session.deviceHost
         const community = ctx.session.snmpCommunity
 
-        await ctx.reply('Список VLAN на устройстве: ' + host, {
+        await ctx.reply('Вывод списка VLAN на устройстве: ' + host, {
             reply_markup: {
                 remove_keyboard: true
             },
@@ -120,8 +120,11 @@ const deviceCommands = {
         const vlanListResult = await deviceData.getVlanList(host, community).then(status => {
             return status;
         });
-
-        await ctx.reply(vlanListResult + `\n\n<i>Выполнено:  <code>${new Date().toLocaleString()}</code></i>`, {
+        let mes = `VLAN to: <code>${host}</code> \n <pre>${vlanListResult}</pre>` + `\n\n<i>Выполнено:  <code>${new Date().toLocaleString()}</code></i>`
+        logger.info(vlanListResult.length)
+        logger.info(mes.length)
+       
+        await ctx.reply(mes, {
             reply_markup: deviceMenu.checkDevice,
             parse_mode: "HTML"
         });
@@ -138,7 +141,7 @@ const deviceCommands = {
             },
         })
         const DDMInfo = await deviceData.getDDMInfo(host, community).then((res) => res)
-        await ctx.reply(`DDM to: <code>${host}</code> \n <pre>${DDMInfo}</pre>` + `\n\n<i>Выполнено:  <code>${new Date().toLocaleString()}</code></i>`, {
+        await ctx.reply(`DDM to: <code>${host}</code>\n<pre>${DDMInfo}</pre>` + `\n<i>Выполнено:  <code>${new Date().toLocaleString()}</code></i>`, {
             reply_markup: deviceMenu.checkDevice,
             parse_mode: "HTML"
         })
