@@ -1,9 +1,9 @@
 import winston from 'winston';
-// import { Syslog } from 'winston-syslog';
 
+const logLevel = process.env.APP_TYPE === 'DEV' ? 'debug' : 'info';
 
 const logger = winston.createLogger({
-  level: 'info', // Минимальный уровень логов для вывода
+  level: logLevel, // Используем logLevel в зависимости от значения process.env.APP_TYPE
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.printf(({ message }) => {
@@ -11,7 +11,7 @@ const logger = winston.createLogger({
     })
   ),
   transports: [
-    new winston.transports.Console(), // Вывод в консоль
+    new winston.transports.Console(),
     new winston.transports.File({ filename: './logs/logs.log', level: 'info' })
   ]
 });

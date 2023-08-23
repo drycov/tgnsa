@@ -5,7 +5,7 @@
   "main": "bot.ts",
   "scripts": {
     "start:prod": "cross-env APP_TYPE=PROD node --no-warnings --loader ts-node/esm bot.ts",
-    "start:dev": "cross-env APP_TYPE=DEV node --no-warnings --loader ts-node/esm bot.ts",
+    "start:dev": "cross-env APP_TYPE=DEV node --loader ts-node/esm bot.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -49,6 +49,7 @@
     "python-shell": "^5.0.0",
     "reflect-metadata": "^0.1.13",
     "snmp-native": "^1.2.0",
+    "table": "^6.8.1",
     "underscore": "^1.13.6",
     "util": "^0.12.5",
     "winston": "^3.10.0",

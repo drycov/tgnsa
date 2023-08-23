@@ -13,6 +13,7 @@ import baseMenu from "./keyboards/baseMenu";
 import deviceCommands from "./commands/deviceCommands";
 import { Options, PythonShell } from 'python-shell';
 import deviceData from "./core/deviceData";
+import {table,getBorderCharacters } from "table";
 
 const token = helperFunctions.apptype() || "";
 interface MainContext extends Context {
@@ -59,14 +60,54 @@ bot.command(["start", "st", "run"], async (ctx) => {
     await ctx.conversation.enter("start")
 });
 
+// bot.command("test", async (ctx) => {
+//     const options: Options = {
+//         mode: 'text',
+//         pythonOptions: ['-u'], // unbuffered output
+//         scriptPath: '.', // путь к файлу netmiko_script.py
+//     };
+//     const res = await PythonShell.run('ps.py', options).then(res => { return res });
+//     await ctx.reply(res.toString());
+// });
+// Gi1/0/1 🔺TX: -7.273 🔻RX: -9.447 🌡C:41 ⚡️V: 3.323
+// Gi1/0/2 🔺TX: -7.049 🔻RX: -11.966 🌡C:40 ⚡️V: 3.324
+// Gi1/0/5 🔺TX: -6.023 🔻RX: -7.706 🌡C:50 ⚡️V: 3.249
+// Gi1/0/6 🔺TX: -4.506 🔻RX: -1.359 🌡C:27 ⚡️V: 3.3
+// Te1/0/1 🔺TX: -7.078 🔻RX: -6.904 🌡C:39 ⚡️V: 3.318
+// Te1/0/2 🔺TX: -6.026 🔻RX: -3.894 🌡C:39 ⚡️V: 3.345
+// Te1/0/3 🔺TX: -7.043 🔻RX: -8.384 🌡C:44 ⚡️V: 3.329
+// Te1/0/4 🔺TX: -5.966 🔻RX: -5.837 🌡C:36 ⚡️V: 3.356
+
+// Выполнено:  23.08.2023, 12:51:27
+
+
 bot.command("test", async (ctx) => {
-    const options: Options = {
-        mode: 'text',
-        pythonOptions: ['-u'], // unbuffered output
-        scriptPath: '.', // путь к файлу netmiko_script.py
-    };
-    const res = await PythonShell.run('ps.py', options).then(res => { return res });
-    await ctx.reply(res.toString());
+    const data = [
+        ['IF', '🔺Tx', '🔻RX', '🌡C', '⚡️V'],
+        ['3', '-7.27', '-9.44','41','3.32'],
+        ['2', '-7.27', '-9.44','41','3.32'],
+        ['20', '-7.27', '-9.44','41','3.32'],
+        ['25', '-7.27', '-9.44','41','3.32'],
+        ['26', '-7.27', '-9.44','41','3.32']
+
+    ];
+
+    const config = {
+        columnDefault: {
+            paddingLeft: 0,
+            paddingRight: 0,
+            width: 5,
+          },
+          border: getBorderCharacters(`ramac`)
+
+    }
+    const tab = table(data,config)
+    // const oid = joid.basic_oids.oid_model.toString()
+    // console.log(oid, typeof oid)
+
+    // const session = await snmpFunctions.getSingleOID('192.168.0.1', ".1.3.6.1.4.1", 'public')
+    // console.log(session)
+    ctx.reply(`<pre><code>${tab}</code></pre>`, { parse_mode: "HTML" })
 });
 bot.callbackQuery("back", async (ctx) => {
     await ctx.conversation.exit();

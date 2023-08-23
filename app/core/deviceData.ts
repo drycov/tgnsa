@@ -89,6 +89,7 @@ type JoidType = {
                 results.push(
                     `${portIfRange[i]} 🔺TX: ${DDMLevelTX} 🔻RX: ${DDMLevelRX} 🌡C:${getDDMTemperature} ⚡️V: ${DDMVoltage}`
                 );
+                logger.debug(results)
             }
         }
     },    
@@ -485,12 +486,17 @@ type JoidType = {
         logger.error(message);
                     return err;
                 });
+                logger.debug(vlanId)
+                logger.debug(vlanName)
+
             if (!vlanName || !vlanId) {
                 throw new Error(messagesFunctions.msgSNMPError(host));
             }
             for (let l in vlanName) {
                 res.push(`VlanId: ${vlanId[l]} VlanName: ${vlanName[l]} `);
+                logger.debug(res)
             }
+            logger.debug(res)
             return res.join('\n');
         } catch (e) {
             message += util.format('"%s":"%s"}',"error",e)
