@@ -381,6 +381,7 @@ const devicData = {
         const result = util.format("%s Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее", symbols.SHORT)
         try {
             const results = []
+            let fixIntDescr ='';
             const dirty = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_model, community)
                 .then((res) => {
                     return res;
@@ -422,9 +423,9 @@ const devicData = {
                             logger.error(message);
                         });
                     if (intDescr == 'noSuchInstance' && intDescr == 'noSuchObject') {
-                        intDescr = 'NaN'
+                        fixIntDescr = 'NaN'
                     } else {
-                        intDescr = intDescr
+                        fixIntDescr = intDescr
                     }
                     const portOperStatus = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_oper_ports + intList[ifId], community)
                         .then((res) => {
@@ -460,10 +461,10 @@ const devicData = {
                         operStatus = util.format('%s', symbols.NOCABLE)
                     }
                     if (parseInt(get_inerrors) == 0) {
-                        results.push(util.format("<code>%s</code> %s | %s", intRange[ifId], operStatus, intDescr))
+                        results.push(util.format("<code>%s</code> %s | %s", intRange[ifId], operStatus, fixIntDescr))
                     } else
                         if (parseInt(get_inerrors) > 0) {
-                            results.push(util.format("<code>%s</code> %s | %s | <i>Ошибки: %s</i> | %s |", intRange[ifId], operStatus, intDescr, get_inerrors, symbols.WarnEmo))
+                            results.push(util.format("<code>%s</code> %s | %s | <i>Ошибки: %s</i> | %s |", intRange[ifId], operStatus, fixIntDescr, get_inerrors, symbols.WarnEmo))
                         }
                 }
             } else if (portIfList == "auto" && portIfRange == "auto") {
@@ -491,9 +492,9 @@ const devicData = {
                             logger.error(message);
                         });
                     if (intDescr == 'noSuchInstance' && intDescr == 'noSuchObject') {
-                        intDescr = 'NaN'
+                        fixIntDescr = 'NaN'
                     } else {
-                        intDescr = intDescr
+                        fixIntDescr = intDescr
                     }
                     const portOperStatus = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_oper_ports + intList[ifId], community)
                         .then((res) => {
@@ -529,15 +530,15 @@ const devicData = {
                         operStatus = util.format('%s', symbols.NOCABLE)
                     }
                     if (parseInt(get_inerrors) == 0) {
-                        results.push(util.format("<code>%s</code> %s | %s", intRange[ifId], operStatus, intDescr))
+                        results.push(util.format("<code>%s</code> %s | %s", intRange[ifId], operStatus, fixIntDescr))
                     } else
                         if (parseInt(get_inerrors) > 0) {
-                            results.push(util.format("<code>%s</code> %s | %s | <i>Ошибки: %s</i> | %s |", intRange[ifId], operStatus, intDescr, get_inerrors, symbols.WarnEmo))
+                            results.push(util.format("<code>%s</code> %s | %s | <i>Ошибки: %s</i> | %s |", intRange[ifId], operStatus, fixIntDescr, get_inerrors, symbols.WarnEmo))
                         }
                 }
             } else {
                 for (let ifId in zip(portIfList, portIfRange)) {
-                    let intDescr = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_descr_ports + portIfList[ifId], community)
+                    const intDescr = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_descr_ports + portIfList[ifId], community)
                         .then((res) => {
                             return res
                         }, (error) => {
@@ -545,9 +546,9 @@ const devicData = {
                             logger.error(message);
                         });
                     if (intDescr == 'noSuchInstance' && intDescr == 'noSuchObject') {
-                        intDescr = 'NaN'
+                        fixIntDescr = 'NaN'
                     } else {
-                        intDescr = intDescr
+                        fixIntDescr = intDescr
                     }
                     const portOperStatus = await snmpFunctions.getSingleOID(host, joid.basic_oids.oid_oper_ports + portIfList[ifId], community)
                         .then((res) => {
@@ -583,10 +584,10 @@ const devicData = {
                         operStatus = util.format('%s', symbols.NOCABLE)
                     }
                     if (parseInt(get_inerrors) == 0) {
-                        results.push(util.format("<code>%s</code> %s | %s", portIfRange[ifId], operStatus, intDescr))
+                        results.push(util.format("<code>%s</code> %s | %s", portIfRange[ifId], operStatus, fixIntDescr))
                     } else
                         if (parseInt(get_inerrors) > 0) {
-                            results.push(util.format("<code>%s</code> %s | %s | <i>Ошибки: %s</i> | %s |", portIfRange[ifId], operStatus, intDescr, get_inerrors, symbols.WarnEmo))
+                            results.push(util.format("<code>%s</code> %s | %s | <i>Ошибки: %s</i> | %s |", portIfRange[ifId], operStatus, fixIntDescr, get_inerrors, symbols.WarnEmo))
                         }
                 }
             }
