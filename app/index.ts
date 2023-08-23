@@ -13,9 +13,9 @@ import baseMenu from "./keyboards/baseMenu";
 import deviceCommands from "./commands/deviceCommands";
 import { Options, PythonShell } from 'python-shell';
 import deviceData from "./core/deviceData";
-import {table,getBorderCharacters } from "table";
+import { table, getBorderCharacters } from "table";
 import config from "./config";
-
+import os from "os"
 const token = helperFunctions.apptype() || "";
 interface MainContext extends Context {
     session: { [key: string]: any }; // Change the type to match your session data structure
@@ -63,29 +63,43 @@ bot.command(["start", "st", "run"], async (ctx) => {
     await ctx.conversation.exit();
     await ctx.conversation.enter("start")
 });
+
 if (uptimeInSeconds < notificationInterval) {
     // Время работы процесса менее 5 минут, отправить уведомление админу
     const adminUserId = config.defaultAdmin; // Замените на ID администратора бота
-  
+
     // Информация о процессе
     const processInfo = {
-      pid: process.pid,
-      name: "TTC_NSA", // Замените на имя вашего процесса
-      startTime: new Date(Date.now() - uptimeInSeconds * 1000).toLocaleString(),
-    };
-  
+        pid: process.pid,
+        name: process.title,
+        startTime: new Date(Date.now() - uptimeInSeconds * 1000).toLocaleString(),
+        user: os.userInfo().username,
+      };
+      const data = [
+        ['PID', 'Name', 'Started', 'User'],
+        ['-----', '-----', '-----', '-----'],
+        [processInfo.pid, processInfo.name, processInfo.startTime, processInfo.user],
+      ];
+    
+      const tabConfig = {
+        columnDefault: {
+            paddingLeft: 0,
+            paddingRight: 0,
+        },
+        border: getBorderCharacters(`ramac`)
+      };
+    
+      const tab = table(data, tabConfig);
+    
+      // Ваша логика для отправки сообщения с таблицей
+    //   ctx.reply(`<pre>Процесс запущен, но время работы менее 5 минут.\n<code>${tab}</code></pre>`, { parse_mode: "HTML" });
+
     // Текст уведомления
-    const notificationText = `
-      Процесс запущен, но время работы менее 5 минут.
-      Информация о процессе:
-      - PID: ${processInfo.pid}
-      - Имя процесса: ${processInfo.name}
-      - Время запуска: ${processInfo.startTime}
-    `;
-  
+    const notificationText = `<pre>Процесс запущен, но время работы менее 5 минут.\n<code>${tab}</code></pre>`;
+
     // Ваша логика для отправки уведомления админу
-    bot.api.sendMessage(adminUserId, notificationText);
-  }
+    bot.api.sendMessage(adminUserId, notificationText, { parse_mode: "HTML" });
+}
 // bot.command("test", async (ctx) => {
 //     const options: Options = {
 //         mode: 'text',
@@ -110,11 +124,11 @@ if (uptimeInSeconds < notificationInterval) {
 bot.command("test", async (ctx) => {
     const data = [
         ['IF', '🔺Tx', '🔻RX', '🌡C', '⚡️V'],
-        ['3', '-7.27', '-9.44','41','3.32'],
-        ['2', '-7.27', '-9.44','41','3.32'],
-        ['20', '-7.27', '-9.44','41','3.32'],
-        ['25', '-7.27', '-9.44','41','3.32'],
-        ['26', '-7.27', '-9.44','41','3.32']
+        ['3', '-7.27', '-9.44', '41', '3.32'],
+        ['2', '-7.27', '-9.44', '41', '3.32'],
+        ['20', '-7.27', '-9.44', '41', '3.32'],
+        ['25', '-7.27', '-9.44', '41', '3.32'],
+        ['26', '-7.27', '-9.44', '41', '3.32']
 
     ];
 
@@ -123,11 +137,11 @@ bot.command("test", async (ctx) => {
             paddingLeft: 0,
             paddingRight: 0,
             width: 5,
-          },
-          border: getBorderCharacters(`ramac`)
+        },
+        border: getBorderCharacters(`ramac`)
 
     }
-    const tab = table(data,config)
+    const tab = table(data, config)
     // const oid = joid.basic_oids.oid_model.toString()
     // console.log(oid, typeof oid)
 
@@ -237,7 +251,7 @@ bot.hears(labels.DDMInfoLabel, async (ctx) => {
 
     await ctx.conversation.enter("ddmInfo");
 })
-bot.catch((err:any) => {
+bot.catch((err: any) => {
     const ctx = err.ctx;
     console.error(`Error while handling update ${ctx.update.update_id}:`);
     const e = err.error;
