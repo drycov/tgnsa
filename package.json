@@ -37,6 +37,7 @@
     "@types/underscore": "^1.11.6",
     "@types/winston": "^2.4.4",
     "child_process": "^1.0.2",
+    "cli-table": "^0.3.11",
     "dotenv": "^16.3.1",
     "ejs": "^3.1.9",
     "grammy": "^1.17.2",

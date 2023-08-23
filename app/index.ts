@@ -67,24 +67,32 @@ bot.command(["start", "st", "run"], async (ctx) => {
 const lov5Min = async () => {
     if (uptimeInSeconds < notificationInterval) {
         const adminUserId = config.defaultAdmin; 
-        const userIsBot = await bot.api.getMe().then((res) => { return res.username });
+        const userIsBot = await bot.api.getMe();
+        const botUserName = userIsBot.username;
         const processInfo = {
             pid: process.pid,
-            name: userIsBot,
+            name: botUserName,
             startTime: new Date(Date.now() - uptimeInSeconds * 1000).toLocaleString(),
             user: os.userInfo().username,
         };
         const data = [
-            ['PID', 'Name', 'Started', 'User'],
-            [processInfo.pid, processInfo.name, processInfo.startTime, processInfo.user],
-        ];
+            ['Информация о процессе', ''],
+            ['PID', processInfo.pid],
+            ['Имя процесса', processInfo.name],
+            ['Время запуска', processInfo.startTime],
+            ['От кого запущен', processInfo.user],
+          ];
+        // const data = [
+        //     ['PID', 'Name', 'Started', 'User'],
+        //     [processInfo.pid, processInfo.name, processInfo.startTime, processInfo.user],
+        // ];
 
         const tabConfig = {
             columnDefault: {
                 paddingLeft: 0,
                 paddingRight: 0,
             },
-            border: getBorderCharacters(`ramac`)
+            border: getBorderCharacters(`void`)
         };
 
         const tab = table(data, tabConfig);
