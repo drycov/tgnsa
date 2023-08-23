@@ -12,15 +12,17 @@ module.exports = {
       NODE_ENV: "development",
       APP_TYPE: "DEV"
     }
-  }], 
+  }],
   deploy: {
     production: {
-      host:'localhost',
-      user:"root",
+      host: 'localhost',
+      user: "root",
       ref: "origin/main", // Change to your default branch name
       repo: "https://github.com/drykov-ttc/ttcNSA.git", // HTTPS URL of your GitHub repo
       path: "/opt/ttcNSA",
-      "post-deploy": "npm install && npm i -g typescript ts-node && pm2 reload ecosystem.config.js --env production"
+      "post-deploy": "npm install && npm i -g typescript ts-node && pm2 reload ecosystem.config.js --env production",
+      "watch": true,
+      "ignore_watch": ["logs", "node_modules"]
     },
   }
 };
