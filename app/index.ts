@@ -96,7 +96,7 @@ const lov5Min = async () => {
         };
 
         const tab = table(data, tabConfig);
-        const notificationText = `<pre>Процесс запущен, но время работы менее 5 минут.\n<code>Process Info\n${tab}</code></pre>`;
+        const notificationText = `<pre>Процесс запущен, но время работы менее 5 минут.\n\n<code>${tab}</code></pre>`;
         bot.api.sendMessage(adminUserId, notificationText, { parse_mode: "HTML" });
     }
 }
