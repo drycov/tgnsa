@@ -3,10 +3,11 @@ export default {
     // sesionKey: 'Zero0One1Two2Three3Four4',
     defaultAdmin: 632646448,
     botTgID: 5493974365,
-    mongoURI: 'mongodb://127.0.0.1:27017',
+    // mongoURI: 'mongodb://127.0.0.1:27017',
+    mongoURI: "mongodb+srv://ttc-ttcnsa:GJWPwBmlUJvc9S2S@cluster0.c48ewsz.mongodb.net",
     // defaultLanguage: "en",
     mongoOptions: {
-        dbName: "hmapttc",
+        dbName: "ttcNSA",
     },
     vendor_info: {
         botVendor: "Denis Rykov",
