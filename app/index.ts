@@ -14,11 +14,15 @@ import deviceCommands from "./commands/deviceCommands";
 import { Options, PythonShell } from 'python-shell';
 import deviceData from "./core/deviceData";
 import {table,getBorderCharacters } from "table";
+import config from "./config";
 
 const token = helperFunctions.apptype() || "";
 interface MainContext extends Context {
     session: { [key: string]: any }; // Change the type to match your session data structure
 }
+const uptimeInSeconds = process.uptime();
+const notificationInterval = 5 * 60; // 5 минут в секундах
+
 
 const bot = new Bot<MainContext & ConversationFlavor>(token);
 
@@ -59,7 +63,29 @@ bot.command(["start", "st", "run"], async (ctx) => {
     await ctx.conversation.exit();
     await ctx.conversation.enter("start")
 });
-
+if (uptimeInSeconds < notificationInterval) {
+    // Время работы процесса менее 5 минут, отправить уведомление админу
+    const adminUserId = config.defaultAdmin; // Замените на ID администратора бота
+  
+    // Информация о процессе
+    const processInfo = {
+      pid: process.pid,
+      name: "TTC_NSA", // Замените на имя вашего процесса
+      startTime: new Date(Date.now() - uptimeInSeconds * 1000).toLocaleString(),
+    };
+  
+    // Текст уведомления
+    const notificationText = `
+      Процесс запущен, но время работы менее 5 минут.
+      Информация о процессе:
+      - PID: ${processInfo.pid}
+      - Имя процесса: ${processInfo.name}
+      - Время запуска: ${processInfo.startTime}
+    `;
+  
+    // Ваша логика для отправки уведомления админу
+    bot.api.sendMessage(adminUserId, notificationText);
+  }
 // bot.command("test", async (ctx) => {
 //     const options: Options = {
 //         mode: 'text',
