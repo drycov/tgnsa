@@ -421,7 +421,7 @@ const devicData = {
                             message += util.format('"%s":"%s"}', "error", error)
                             logger.error(message);
                         });
-                    if (intDescr !== 'noSuchInstance' && intDescr !== 'noSuchObject') {
+                    if (intDescr == 'noSuchInstance' && intDescr == 'noSuchObject') {
                         intDescr = 'NaN'
                     } else {
                         intDescr = intDescr
@@ -490,7 +490,7 @@ const devicData = {
                             message += util.format('"%s":"%s"}', "error", error)
                             logger.error(message);
                         });
-                    if (intDescr !== 'noSuchInstance' && intDescr !== 'noSuchObject') {
+                    if (intDescr == 'noSuchInstance' && intDescr == 'noSuchObject') {
                         intDescr = 'NaN'
                     } else {
                         intDescr = intDescr
@@ -544,7 +544,7 @@ const devicData = {
                             message += util.format('"%s":"%s"}', "error", error)
                             logger.error(message);
                         });
-                    if (intDescr !== 'noSuchInstance' && intDescr !== 'noSuchObject') {
+                    if (intDescr == 'noSuchInstance' && intDescr == 'noSuchObject') {
                         intDescr = 'NaN'
                     } else {
                         intDescr = intDescr
