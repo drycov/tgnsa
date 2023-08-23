@@ -452,7 +452,7 @@ const devicData = {
                         operStatus = symbols.UNKNOWN
                     }
                     if (portAdminStatus == "2") {
-                        operStatus = util.format('%s Выключен', symbols.NOCABLE)
+                        operStatus = util.format('%s', symbols.NOCABLE)
                     }
                     if (parseInt(get_inerrors) == 0) {
                         results.push(util.format("<code>%s</code> %s | %s", intRange[ifId], operStatus, intDescr))
@@ -516,7 +516,7 @@ const devicData = {
                         operStatus = symbols.UNKNOWN
                     }
                     if (portAdminStatus == "2") {
-                        operStatus = util.format('%s Выключен', symbols.NOCABLE)
+                        operStatus = util.format('%s', symbols.NOCABLE)
                     }
                     if (parseInt(get_inerrors) == 0) {
                         results.push(util.format("<code>%s</code> %s | %s", intRange[ifId], operStatus, intDescr))
@@ -565,7 +565,7 @@ const devicData = {
                         operStatus = symbols.UNKNOWN
                     }
                     if (portAdminStatus == "2") {
-                        operStatus = util.format('%s Выключен', symbols.NOCABLE)
+                        operStatus = util.format('%s', symbols.NOCABLE)
                     }
                     if (parseInt(get_inerrors) == 0) {
                         results.push(util.format("<code>%s</code> %s | %s", portIfRange[ifId], operStatus, intDescr))
