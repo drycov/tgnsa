@@ -3,7 +3,7 @@ module.exports = {
     name: "TTC_NSA",
     cwd: "/opt/ttcNSA/",
     interpreter:"/root/.nvm/versions/node/v18.17.0/bin/node",
-    interpreter_args:'node --loader ts-node/esm',
+    interpreter_args:'--loader ts-node/esm',
     script: "./bot.ts",
     // args: "./bot.ts",
     watch: true,
