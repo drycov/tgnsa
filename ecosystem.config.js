@@ -3,11 +3,10 @@ module.exports = {
     name: "TTC_NSA",
     cwd: "/opt/ttcNSA/",
     script: "npm run start",
-    // args: "./bot.ts",
     watch: true,
-    autorestart:true,
+    autorestart: true,
     max_restarts: 10,
-    gnore_watch: ["logs", "node_modules"],
+    ignore_watch: ["logs", "node_modules"],
     env_production: {
       NODE_ENV: "production",
       APP_TYPE: "PROD"
@@ -25,8 +24,6 @@ module.exports = {
       repo: "https://github.com/drykov-ttc/ttcNSA.git", // HTTPS URL of your GitHub repo
       path: "/opt/ttcNSA",
       "post-deploy": "npm install && npm i -g typescript ts-node && pm2 reload ecosystem.config.js --env production",
-      "watch": true,
-      "ignore_watch": ["logs", "node_modules"]
     },
   }
 };
