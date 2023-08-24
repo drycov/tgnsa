@@ -4,8 +4,6 @@ import fs from "fs";
 import { Context } from "grammy";
 import ping from "ping";
 
-import archiver from "archiver";
-import axios from "axios";
 import MailTo from "../core/MailTo";
 
 dotenv.config();
@@ -172,25 +170,6 @@ const helperFunctions = {
     const dBm = Math.log10(mW);
     const dBW = dBm * 10 - 30;
     return parseFloat(dBW.toFixed(2));
-  },
-  createAndSendArchive: async (
-    photosDir: string,
-    archivePath: fs.PathLike,
-  ) => {
-    const archive = archiver("zip", { zlib: { level: 9 } });
-    const output = fs.createWriteStream(archivePath);
-
-    archive.pipe(output);
-    archive.directory(photosDir, false);
-    await archive.finalize();
-  },
-  downloadAndSaveFile: async (
-    url: any,
-    targetPath: fs.PathOrFileDescriptor
-  ) => {
-    const response = await axios.get(url, { responseType: "arraybuffer" });
-    const buffer = Buffer.from(response.data);
-    fs.writeFileSync(targetPath, buffer);
   },
 };
 
