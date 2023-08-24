@@ -77,7 +77,7 @@ const sendUptimeNotification = async () => {
       user: os.userInfo().username,
     };
     const appName = util.format(
-      "PID Name: %s\nStart time: %s\n PID User:%s",
+      "PID Name: %s\nStart time: %s\nPID User:%s",
       processInfo.name.toString(),
       `${processInfo.startTime.toLocaleDateString(
         "ru-RU"
