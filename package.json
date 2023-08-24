@@ -15,7 +15,9 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/archiver": "^5.3.2",
     "@types/bunyan": "^1.8.8",
+    "@types/fs-extra": "^11.0.1",
     "@types/node": "^20.5.0",
     "cross-env": "^7.0.3",
     "ts-node": "^10.9.1",
@@ -36,10 +38,13 @@
     "@types/snmp-native": "^1.2.2",
     "@types/underscore": "^1.11.6",
     "@types/winston": "^2.4.4",
+    "archiver": "^6.0.0",
+    "axios": "^1.4.0",
     "child_process": "^1.0.2",
     "cli-table": "^0.3.11",
     "dotenv": "^16.3.1",
     "ejs": "^3.1.9",
+      
     "grammy": "^1.17.2",
     "moment": "^2.29.4",
     "mongodb": "^5.7.0",

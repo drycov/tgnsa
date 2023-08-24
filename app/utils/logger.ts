@@ -1,6 +1,6 @@
-import winston from 'winston';
+import winston from "winston";
 
-const logLevel = process.env.APP_TYPE === 'DEV' ? 'debug' : 'info';
+const logLevel = process.env.APP_TYPE === "DEV" ? "debug" : "info";
 
 const logger = winston.createLogger({
   level: logLevel, // Используем logLevel в зависимости от значения process.env.APP_TYPE
@@ -12,8 +12,8 @@ const logger = winston.createLogger({
   ),
   transports: [
     new winston.transports.Console(),
-    new winston.transports.File({ filename: './logs/logs.log', level: 'info' })
-  ]
+    new winston.transports.File({ filename: "./logs/logs.log", level: "info" }),
+  ],
 });
 
 export default logger;

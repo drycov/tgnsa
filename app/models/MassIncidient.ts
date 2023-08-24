@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document } from "mongoose";
 
 // Define the MassIncidient schema
 interface MassIncidient {
@@ -28,6 +28,9 @@ const massIncidientSchema = new Schema<MassIncidient>({
 });
 
 // Create the MassIncidient model
-const MassIncidient = mongoose.model<MassIncidient & Document>('MassIncidient', massIncidientSchema);
+const MassIncidient = mongoose.model<MassIncidient & Document>(
+  "MassIncidient",
+  massIncidientSchema
+);
 
 export default MassIncidient;
