@@ -510,7 +510,7 @@ export default {
       case "Mikrotik CRS326":
         return JSON.stringify({
           interfaceRange: baseUtil.InterfaceLoader(
-            "Mikrotik_CRS326_26p",
+            "mikrotic_CRS326_26p",
             "interfaceRange"
           ),
           interfaceList: baseUtil.InterfaceLoader(

@@ -714,6 +714,8 @@ const devicData = {
 
       const { interfaceList: portIfList, interfaceRange: portIfRange } =
         aiflist;
+
+        console.log(aiflist)
       const intRange = await walkOidValue(joid.linux_server.oid_ifName);
       const intList = await walkOidValue(joid.linux_server.oid_ifIndex);
 
@@ -787,7 +789,7 @@ const devicData = {
       return resultMessage;
     } catch (e) {
       message += util.format('"%s":"%s"}', "error", e);
-      logger.error(message);
+      logger.error(e);
       return util.format(
         "%s Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее",
         symbols.SHORT
