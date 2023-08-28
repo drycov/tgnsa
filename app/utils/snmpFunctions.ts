@@ -3,6 +3,7 @@ import util from "util";
 import joid from "../../src/oid.json";
 import logger from "./logger";
 import messagesFunctions from "./messagesFunctions";
+import config from "../config";
 const currentDate = new Date().toLocaleString("ru-RU");
 const snmpFunctions = {
   getSingleOID: async (
@@ -32,6 +33,32 @@ const snmpFunctions = {
         }
       });
     });
+  },
+  getSyncSingleOID: (host: string, oid: any, community: string): any => {
+    let action = snmpFunctions.getSingleOID.name;
+    let message = util.format(
+      '{"date":"%s", "action":"%s", ',
+      currentDate,
+      action
+    );
+    const session = new Session({
+      host: host,
+      community: community,
+    });
+    message += util.format('"%s":"%s", ', "host", host);
+    try {
+      session.get({ oid: oid }, (error, varbinds) => {
+        if (!error) {
+          return varbinds[0].value;
+        } else {
+          message += util.format('"%s":"%s"}', "error", error);
+          logger.error(message);
+        }
+      });
+    } catch (error) {
+      message += util.format('"%s":"%s"}', "error", error);
+      logger.error(message);
+    }
   },
   checkSNMP: async (host: string, communities: any): Promise<any> => {
     return new Promise(async (resolve) => {
@@ -119,6 +146,36 @@ const snmpFunctions = {
         }
       );
     });
+  },
+  setSnmpOID: (
+    host: string,
+    // community: string,
+    oid: string,
+    value: string | number
+  ): boolean => {
+    let action = snmpFunctions.setSnmpOID.name;
+    let message = util.format(
+      '{"date":"%s", "action":"%s", ',
+      currentDate,
+      action
+    );
+    const community = config.snmp.rw_community[0];
+    const session = new Session({
+      host: host,
+      community: community,
+    });
+    message += util.format('"%s":"%s", ', "host", host);
+    try {
+      session.set({ oid, type: 2, value });
+      console.log("SNMP SET successful");
+
+      return true;
+    } catch (error) {
+      console.error("SNMP SET error:", error);
+      return false;
+    } finally {
+      session.close();
+    }
   },
 };
 export default snmpFunctions;

@@ -843,6 +843,218 @@ const devicData = {
       return `${symbols.SHORT} Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее`;
     }
   },
+  // getCableLength: async (host: string, community: string) => {
+  //   const action = devicData.getCableLength.name;
+  //   let message = util.format(
+  //     '{"date":"%s", "action":"%s", ',
+  //     currentDate,
+  //     action
+  //   );
+  //   message += util.format('"%s":"%s", ', "host", host);
+
+  //   try {
+  //     const results: string[] = [];
+  //     const getOidValue = async (oid: string) => {
+  //       try {
+  //         return await snmpFunctions.getSingleOID(host, oid, community);
+  //       } catch (error) {
+  //         logger.error(error);
+  //         return error;
+  //       }
+  //     };
+
+  //     const walkOidValue = async (oid: string) => {
+  //       try {
+  //         return await snmpFunctions.getMultiOID(host, oid, community);
+  //       } catch (error) {
+  //         logger.error(error);
+  //         return error;
+  //       }
+  //     };
+
+  //     const modelValue = await getOidValue(joid.basic_oids.oid_model);
+  //     const model = deviceArr.FilterDeviceModel(modelValue);
+  //     const JSON_aiflist = await deviceArr.ArrayInterfaceModel(model);
+
+  //     const aiflist = JSON.parse(JSON_aiflist);
+  //     const { interfaceList: portIfList, interfaceRange: portIfRange } =
+  //       aiflist;
+
+  //     const intRange = await walkOidValue(joid.linux_server.oid_ifName);
+  //     const intList = await walkOidValue(joid.linux_server.oid_ifIndex);
+
+  //     const list =
+  //       portIfList === "auto" || portIfList === "server" ? intList : portIfList;
+  //     const range =
+  //       portIfRange === "auto" || portIfRange === "server"
+  //         ? intRange
+  //         : portIfRange;
+  //     let vct;
+  //     if (model && model.includes("SNR")) {
+  //       vct = joid.snr_oids.snr_oid_vct;
+  //       for (let ifId = 0; ifId < list.length; ifId++) {
+  //         const portOperStatus = await getOidValue(
+  //           joid.basic_oids.oid_oper_ports + list[ifId]
+  //         );
+  //         const portAdminStatus = await getOidValue(
+  //           joid.basic_oids.oid_admin_ports + list[ifId]
+  //         );
+  //         if (
+  //           portOperStatus == "2" ||
+  //           (portOperStatus == "2" && portAdminStatus == "2")
+  //         ) {
+  //           const set = await snmpFunctions
+  //             .setSnmpOID(host, vct, 1)
+  //             .then((res) => {
+  //               return res;
+  //             });
+  //           let length;
+  //           if (set) {
+  //             length = await getOidValue(
+  //               joid.snr_oids.snr_oid_vct_res + list[ifId]
+  //             );
+  //           }
+  //           let vtc_r;
+  //           let vtc_res = [];
+  //           if (length) {
+  //             vtc_r = helperFunctions.parseReport(length);
+  //             for (let i = 0; i < vtc_r.length; i++) {
+  //               vtc_res.push(
+  //                 util.format(
+  //                   "%s = %s(%s)",
+  //                   vtc_r[i].cablePair,
+  //                   vtc_r[i].cableLength,
+  //                   vtc_r[i].cableStatus
+  //                 )
+  //               );
+  //             }
+  //           }
+  //           logger.info(
+  //             util.format(
+  //               "%s %s %s %s",
+  //               range[ifId],
+  //               portOperStatus,
+  //               portAdminStatus,
+  //               vtc_res.join("\n")
+  //             )
+  //           );
+  //           results.push(
+  //             util.format(
+  //               "<code>%s</code>\n%s",
+  //               range[ifId],
+  //               vtc_res.join("\n")
+  //             )
+  //           );
+  //         }
+  //       }
+  //       // const stateInfo = `P.S. Состояния: ${symbols.OK_UP} - Линк есть, ${symbols.SHORT} - Линка нет, ${symbols.NOCABLE} - Порт выключен, ${symbols.UNKNOWN} - Неизвестно`;
+  //       const resultMessage = `${results.join("\n")}\n\n`;
+  //       return resultMessage;
+  //     } else {
+  //       const resultMessage = `nКоммутатор не поддерживает кабельную диагностику`;
+  //       return resultMessage;
+  //     }
+  //   } catch (error) {
+  //     const errorMessage = util.format(
+  //       "%s Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее",
+  //       symbols.SHORT
+  //     );
+  //     logger.error(errorMessage);
+  //     return errorMessage;
+  //   }
+  // },
+  getCableLength: async (host: string, community: string) => {
+    try {
+      const results: string[] = [];
+      const modelValue = await snmpFunctions.getSingleOID(
+        host,
+        joid.basic_oids.oid_model,
+        community
+      );
+      const model = deviceArr.FilterDeviceModel(modelValue);
+
+      if (model && model.includes("SNR")) {
+        const aiflist = JSON.parse(await deviceArr.ArrayInterfaceModel(model));
+        const { interfaceList: portIfList } = aiflist;
+
+        for (let ifId = 0; ifId < portIfList.length; ifId++) {
+          const portOperStatus = await snmpFunctions.getSingleOID(
+            host,
+            joid.basic_oids.oid_oper_ports + portIfList[ifId],
+            community
+          );
+          const portAdminStatus = await snmpFunctions.getSingleOID(
+            host,
+            joid.basic_oids.oid_admin_ports + portIfList[ifId],
+            community
+          );
+
+          if (
+            portOperStatus == "2" ||
+            (portOperStatus == "2" && portAdminStatus == "2")
+          ) {
+            const set = snmpFunctions.setSnmpOID(
+              host,
+              joid.snr_oids.snr_oid_vct + portIfList[ifId],
+              1
+            );
+            let vtc_res = [];
+            let vtc_r;
+            if (set) {
+              const length = await snmpFunctions.getSingleOID(
+                host,
+                joid.snr_oids.snr_oid_vct_res + portIfList[ifId],
+                community
+              );
+              vtc_r = helperFunctions.parseReport(length);
+              if (length) {
+                for (let i = 0; i < vtc_r.length; i++) {
+                  vtc_res.push(
+                    util.format(
+                      "%s = %s(%s)",
+                      vtc_r[i].cablePair,
+                      vtc_r[i].cableLength,
+                      vtc_r[i].cableStatus
+                    )
+                  );
+                }
+              }
+            }
+
+            logger.info(
+              util.format(
+                "%s %s %s %s",
+                portIfList[ifId],
+                portOperStatus,
+                portAdminStatus,
+                vtc_res
+              )
+            );
+            results.push(
+              util.format(
+                "<code>%s</code>\n%s",
+                portIfList[ifId],
+                JSON.stringify(vtc_res.join("\n"))
+              )
+            );
+          }
+        }
+        const resultMessage = `${results.join("\n")}\n\n`;
+        return resultMessage;
+      } else {
+        const resultMessage = `Коммутатор не поддерживает кабельную диагностику`;
+        return resultMessage;
+      }
+    } catch (error) {
+      const errorMessage = util.format(
+        "%s Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее",
+        symbols.SHORT
+      );
+      logger.error(error);
+      return errorMessage;
+    }
+  },
+
   runNetmikoScript: (): Promise<string> => {
     const options: Options = {
       mode: "json",

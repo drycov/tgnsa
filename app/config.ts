@@ -34,5 +34,6 @@ export default {
   },
   snmp: {
     community: ["public", "atbu+1", "chinaPublic", "ChinaPublic", "public+"],
+    rw_community: ["private"],
   },
 };

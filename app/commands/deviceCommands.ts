@@ -8,8 +8,8 @@ import deviceData from "../core/deviceData";
 import baseMenu from "../keyboards/baseMenu";
 import deviceMenu from "../keyboards/deviceMenu";
 import helperFunctions from "../utils/helperFunctions";
-import snmpFunctions from "../utils/snmpFunctions";
 import logger from "../utils/logger";
+import snmpFunctions from "../utils/snmpFunctions";
 
 interface MyContext extends Context {
   session: { [key: string]: any }; // Change the type to match your session data structure
@@ -164,6 +164,24 @@ const deviceCommands = {
     await ctx.reply(
       `DDM to: <code>${host}</code>\n<pre>${DDMInfo}</pre>` +
         `\n<i>Выполнено:  <code>${currentDate}</code></i>`,
+      {
+        reply_markup: deviceMenu.checkDevice,
+        parse_mode: "HTML",
+      }
+    );
+  },
+  cableMetr: async (_conversation: MyConversation, ctx: MyContext) => {
+    ctx.session.currentCVid = "cableMetr";
+    ctx.session.previosCVid = "main";
+    const host = ctx.session.deviceHost;
+    const community = ctx.session.snmpCommunity;
+    const portStatus = await deviceData
+      .getCableLength(host, community)
+      .then((status) => {
+        return status;
+      });
+    await ctx.reply(
+      portStatus + `\n\n<i>Выполнено:  <code>${currentDate}</code></i>`,
       {
         reply_markup: deviceMenu.checkDevice,
         parse_mode: "HTML",

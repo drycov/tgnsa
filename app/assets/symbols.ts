@@ -61,4 +61,5 @@ export default {
   SandTimeEmo: "⏳",
   RuporEmo: "📢",
   ShareEmo: "📤",
+  LinerEMO: "📏",
 };

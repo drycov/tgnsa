@@ -171,6 +171,49 @@ const helperFunctions = {
     const dBW = dBm * 10 - 30;
     return parseFloat(dBW.toFixed(2));
   },
+  parseReport: (report: string): any[] => {
+    const regex = /\((\d+), (\d+)\)\s+(\w+)\s+(\d+)/g;
+    const extractedValues: any[] = [];
+    let match: RegExpExecArray | null;
+
+    while ((match = regex.exec(report)) !== null) {
+      const cablePair = `${match[1]}, ${match[2]}`;
+      const cableStatus = match[3];
+      const cableLength = parseInt(match[4]);
+
+      extractedValues.push({
+        cablePair,
+        cableStatus,
+        cableLength,
+      });
+    }
+
+    return extractedValues;
+  },
+  parseCableLengthReport: (report: string) => {
+    const lines = report.split("\n");
+
+    const interfaceName = lines[0].trim();
+    const cablePairs: string[] = [];
+    const cableStatus: string[] = [];
+    const cableLengths: number[] = [];
+    for (let i = 3; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (line) {
+        const [pair, status, length] = line.split(/\s+/);
+        cablePairs.push(pair);
+        cableStatus.push(status);
+        cableLengths.push(parseInt(length));
+      }
+    }
+
+    return {
+      interfaceName,
+      cablePairs,
+      cableStatus,
+      cableLengths,
+    };
+  },
 };
 
 export default helperFunctions;

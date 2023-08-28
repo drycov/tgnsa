@@ -31,7 +31,7 @@ export default {
   DDMInfoLabel: symbols.DDMEmo + " DDM информация",
   VlanListLabel: symbols.VlanEmo + " Список VLAN",
   PortInfoLabel: symbols.TestTubeEmo + " Состояние портов",
-  CabelLengthLabel: " Замер длинны кабеля",
+  CabelLengthLabel: symbols.LinerEMO + " Замер длинны кабеля",
   TrafficGraphLabel: symbols.Group1 + " Трафик на устройстве",
   MMPriorityHigh: symbols.RedCircleEmo + " Высокий!",
   MMPriorityAverage: symbols.YellovCircleEmo + " Средний!",

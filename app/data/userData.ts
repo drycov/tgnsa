@@ -5,7 +5,7 @@ import logger from "../utils/logger";
 const currentDate = new Date().toLocaleString("ru-RU");
 
 const userData = {
-  saveUser: (userData: any): Promise<any> => {
+  saveUser: (data: any): Promise<any> => {
     let action = userData.saveUser.name;
     let message = util.format(
       '{"date":"%s", "%s":%s","%s":"%s", ',
@@ -20,7 +20,7 @@ const userData = {
         // const db = await helper.connectMongo();
 
         // Parse the userData JSON string to an object
-        const userDataObj = JSON.parse(userData);
+        const userDataObj = JSON.parse(data);
         console.log(userData);
 
         // Access the Mongoose model for the specified collection

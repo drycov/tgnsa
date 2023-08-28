@@ -9,7 +9,6 @@ import { Bot, Context, GrammyError, HttpError, session } from "grammy";
 import helperFunctions from "./utils/helperFunctions";
 
 import os from "os";
-import { getBorderCharacters, table } from "table";
 import util from "util";
 import labels from "./assets/labels";
 import messages from "./assets/messages";
@@ -38,6 +37,7 @@ bot.use(
   })
 );
 
+/**App Conversations Error handler*/
 bot.errorBoundary(
   (err) => console.error("Conversation threw an error!", err),
   conversations(),
@@ -51,21 +51,12 @@ bot.errorBoundary(
   createConversation(deviceCommands.check_device),
   createConversation(deviceCommands.portInfo),
   createConversation(deviceCommands.vlanList),
-  createConversation(deviceCommands.ddmInfo)
+  createConversation(deviceCommands.ddmInfo),
+  createConversation(deviceCommands.cableMetr)
 );
 
-bot.command(["start", "st", "run"], async (ctx) => {
-  helperFunctions.setSessionData(ctx);
-  const userInfo = JSON.stringify(ctx.message?.from, null, "\t");
-  await ctx.reply(messagesFunctions.msgWelcome(userInfo));
-  helperFunctions.delay(1000);
-  ctx.deleteMessage();
-
-  await ctx.conversation.exit();
-  await ctx.conversation.enter("start");
-});
-
-const sendUptimeNotification = async () => {
+/**App Start Notification */
+async function sendUptimeNotification() {
   if (uptimeInSeconds < notificationInterval) {
     const adminUserId = config.defaultAdmin;
     const userIsBot = await bot.api.getMe();
@@ -94,35 +85,29 @@ const sendUptimeNotification = async () => {
       { parse_mode: "HTML" }
     );
   }
-};
-sendUptimeNotification();
+}
+if (process.env.APP_TYPE != "DEV") {
+  sendUptimeNotification();
+}
 
-bot.command("test", async (ctx) => {
-  const data = [
-    ["IF", "🔺Tx", "🔻RX", "🌡C", "⚡️V"],
-    ["3", "-7.27", "-9.44", "41", "3.32"],
-    ["2", "-7.27", "-9.44", "41", "3.32"],
-    ["20", "-7.27", "-9.44", "41", "3.32"],
-    ["25", "-7.27", "-9.44", "41", "3.32"],
-    ["26", "-7.27", "-9.44", "41", "3.32"],
-  ];
+/**App commands */
+bot.command(["start", "st", "run"], async (ctx) => {
+  helperFunctions.setSessionData(ctx);
+  const userInfo = JSON.stringify(ctx.message?.from, null, "\t");
+  await ctx.reply(messagesFunctions.msgWelcome(userInfo));
+  helperFunctions.delay(1000);
+  ctx.deleteMessage();
 
-  const config = {
-    columnDefault: {
-      paddingLeft: 0,
-      paddingRight: 0,
-      width: 5,
-    },
-    border: getBorderCharacters(`ramac`),
-  };
-  const tab = table(data, config);
-  // const oid = joid.basic_oids.oid_model.toString()
-  // console.log(oid, typeof oid)
-
-  // const session = await snmpFunctions.getSingleOID('192.168.0.1', ".1.3.6.1.4.1", 'public')
-  // console.log(session)
-  ctx.reply(`<pre><code>${tab}</code></pre>`, { parse_mode: "HTML" });
+  await ctx.conversation.exit();
+  await ctx.conversation.enter("start");
 });
+bot.command("test", async (ctx) => {
+  ctx.deleteMessage();
+  helperFunctions.setSessionData(ctx);
+  await ctx.conversation.enter("cableMetr");
+});
+
+/**App callbackQuery */
 bot.callbackQuery("back", async (ctx) => {
   await ctx.conversation.exit();
   await ctx.conversation.enter(ctx.session.previosCVid);
@@ -135,12 +120,22 @@ bot.callbackQuery("inContinue", async (ctx) => {
   await ctx.conversation.exit();
   await ctx.conversation.enter("main");
 });
+// bot.callbackQuery(/\d+/, async (ctx) => {
+//   // Изменено регулярное выражение для чисел
+//   const optionValue = parseInt(ctx.callbackQuery.data);
+//   // Преобразование строки в число
+//   // Выполните нужные действия на основе значения опции (optionValue)
+//   ctx.reply(`Выбрана проверка порта с идексом ${optionValue}`);
+//   await ctx.answerCallbackQuery(
+//     `Выбрана проверка порта с идексом ${optionValue}`
+//   );
+// });
+/**App command hears */
 bot.hears(labels.EnterLabel, async (ctx) => {
   ctx.deleteMessage();
   helperFunctions.setSessionData(ctx);
   await ctx.conversation.enter("main");
 });
-
 bot.hears(labels.ExitLabel, async (ctx) => {
   ctx.deleteMessage();
   await ctx.reply(messages.GoodbayMessage, {
@@ -225,7 +220,15 @@ bot.hears(labels.DDMInfoLabel, async (ctx) => {
 
   await ctx.conversation.enter("ddmInfo");
 });
+bot.hears(labels.CabelLengthLabel, async (ctx) => {
+  ctx.deleteMessage();
+  // helper.setSessionData(ctx)
+  await ctx.conversation.exit();
 
+  await ctx.conversation.enter("cableMetr");
+});
+
+/**Error Handler */
 bot.catch((err: any) => {
   const ctx = err.ctx;
   console.error(`Error while handling update ${ctx.update.update_id}:`);
@@ -238,4 +241,5 @@ bot.catch((err: any) => {
     console.error("Unknown error:", e);
   }
 });
+
 export default bot;
