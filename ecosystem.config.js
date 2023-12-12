@@ -3,7 +3,7 @@ module.exports = {
     {
       name: "TTC_NSA",
       cwd: "/opt/ttcNSA/",
-      script: "npm run build && npm run start:two",
+      script: "npm run start:two",
       watch: true,
       autorestart: true,
       max_restarts: 10,
