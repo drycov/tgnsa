@@ -2,7 +2,8 @@ import { Netmask } from "netmask";
 import { platform } from "os";
 import ping from "ping";
 
-import fs from "fs";
+import * as path from 'path';
+import * as fs from 'fs';
 import util from "util";
 import config from "../config";
 // const Netmask = netmask.Netmask
@@ -56,9 +57,10 @@ export default {
       });
   },
   InterfaceLoader: (val: string, filename: string) => {
-    const srcPach = "./src";
+    // const srcPach = "./src";
+    const filePath = path.join(__dirname, '../', 'src');
 
-    let rawdata: any = fs.readFileSync(`${srcPach}/${filename}.json`);
+    let rawdata: any = fs.readFileSync(`${filePath}/${filename}.json`);
     let json = JSON.parse(rawdata);
     const result: any[] = [];
     Object.keys(json).forEach((key) => {

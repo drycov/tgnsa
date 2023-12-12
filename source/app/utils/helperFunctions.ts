@@ -1,6 +1,7 @@
 import * as dotenv from "dotenv";
+import * as path from 'path';
+import * as fs from 'fs';
 import ejs from "ejs";
-import fs from "fs";
 import { Context } from "grammy";
 import ping from "ping";
 
@@ -11,6 +12,7 @@ dotenv.config();
 interface MyContext extends Context {
   session: { [key: string]: any }; // Change the type to match your session data structure
 }
+
 
 // const statusMapping: { [key: string]: string } = {
 //   "0": "NO",
@@ -76,8 +78,10 @@ const helperFunctions = {
       .padStart(2, "0")} минут ${seconds.toString().padStart(2, "0")} секунд`;
   },
   generateEmailTemplate: async (mailData: string, template: string) => {
+    const filePath = path.join(__dirname, '../', 'src', `${template}.ejs`);
+
     // Read the HTML template file
-    const htmlTemplate = fs.readFileSync("./src/" + template + ".ejs", "utf-8");
+    const htmlTemplate = fs.readFileSync(filePath, "utf-8");
 
     // Compile the template with EJS
     const compiledTemplate = ejs.compile(htmlTemplate);
