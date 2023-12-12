@@ -1,7 +1,7 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, Model } from "mongoose";
 
-// Define the MassIncidient schema
-interface MassIncidient {
+// Определение интерфейса для объекта MassIncidient
+interface MassIncidient extends Document {
   mi_id: string;
   station: string;
   city: string;
@@ -14,6 +14,7 @@ interface MassIncidient {
   priority: string;
 }
 
+// Создание схемы для объекта MassIncidient
 const massIncidientSchema = new Schema<MassIncidient>({
   mi_id: { type: String, required: true },
   station: { type: String, required: true },
@@ -27,8 +28,8 @@ const massIncidientSchema = new Schema<MassIncidient>({
   priority: { type: String, required: true },
 });
 
-// Create the MassIncidient model
-const MassIncidient = mongoose.model<MassIncidient & Document>(
+// Создание модели MassIncidient
+const MassIncidient: Model<MassIncidient> = mongoose.model<MassIncidient>(
   "MassIncidient",
   massIncidientSchema
 );

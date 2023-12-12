@@ -1,4 +1,5 @@
 import MassIncidientModel from "../models/MassIncidient";
+
 // const currentDate = new Date().toLocaleString("ru-RU");
 
 // Function to generate the next available ID in the format "mi_00"
@@ -9,9 +10,12 @@ async function generateNextMiId(): Promise<string> {
         {},
         { _id: 1 }
       ).sort({ _id: -1 });
+
+      // Проверяем, есть ли highestIdDocument и что _id является строкой
       const highestId = highestIdDocument
-        ? parseInt(highestIdDocument._id.slice(3))
+        ? parseInt(String(highestIdDocument._id).slice(3)) // Преобразуем _id к строке и используем slice
         : 0;
+
       const nextIdNumber = highestId + 1;
       const paddedNextId = nextIdNumber.toString().padStart(6, "0");
       const miId = `${paddedNextId}`;
@@ -22,7 +26,6 @@ async function generateNextMiId(): Promise<string> {
     }
   });
 }
-
 // async function insertNewDocument(newDocument: MassIncidient): Promise<MassIncidient> {
 //     try {
 //         // Connect to MongoDB using the connectMongo function
