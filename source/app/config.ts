@@ -2,6 +2,7 @@ export default {
   // port: 443,
   // sesionKey: 'Zero0One1Two2Three3Four4',
   defaultAdmin: 632646448,
+  BotChatAdmin: -4080080528,
   botTgID: 5493974365,
   // mongoURI: 'mongodb://127.0.0.1:27017',
   mongoURI:

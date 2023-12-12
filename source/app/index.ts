@@ -58,7 +58,7 @@ bot.errorBoundary(
 /**App Start Notification */
 async function sendUptimeNotification() {
   if (uptimeInSeconds < notificationInterval) {
-    const adminUserId = config.defaultAdmin;
+    const adminUserId = config.BotChatAdmin;
     const userIsBot = await bot.api.getMe();
     const botUserName = userIsBot.username;
     const processInfo = {
