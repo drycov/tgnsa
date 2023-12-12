@@ -26,7 +26,7 @@ module.exports = {
       repo: "https://github.com/drykov-ttc/ttcNSA.git", // HTTPS URL of your GitHub repo
       path: "/opt/ttcNSA",
       "post-deploy":
-        "npm install && npm install --include dev && npm i -g typescript ts-node rimraf pre-commit nodemon copyfiles && npm run build && pm2 reload ecosystem.config.js --env production",
+        "npm install && npm install --include dev && npm i -g typescript ts-node rimraf pre-commit nodemon copyfiles && npm run build && pm2 reload ecosystem.config.js --env production --trace",
     },
   },
 };
