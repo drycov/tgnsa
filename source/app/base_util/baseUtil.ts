@@ -58,7 +58,7 @@ export default {
   },
   InterfaceLoader: (val: string, filename: string) => {
     // const srcPach = "./src";
-    const filePath = path.join(__dirname, '../', 'src');
+    const filePath = path.join(__dirname, '../../', 'src');
 
     let rawdata: any = fs.readFileSync(`${filePath}/${filename}.json`);
     let json = JSON.parse(rawdata);
