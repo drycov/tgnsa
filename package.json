@@ -4,10 +4,10 @@
   "description": "Support bot for TTC",
   "main": "bot.ts",
   "scripts": {
-    "start:prod": "cross-env APP_TYPE=PROD node --no-warnings --loader ts-node/esm bot.ts",
-    "start": "nodemon src/bot.ts",
+    "start:prod": "cross-env APP_TYPE=PROD node --no-warnings --loader ts-node/esm ./target/bot.ts",
+    "start": "nodemon ./target/bot.ts",
     "start:two": "node --no-warnings --loader ts-node/esm ./target/bot.js",
-    "start:dev": "cross-env APP_TYPE=DEV node --trace-warnings --loader ts-node/esm bot.ts",
+    "start:dev": "cross-env APP_TYPE=DEV node --trace-warnings --loader ts-node/esm ./target/bot.ts",
     "build": "rimraf target && tsc && npm run copy",
     "ts.check": "tsc --project tsconfig.json",
     "add-build": "git add target",
