@@ -11,7 +11,7 @@
     "build": "rimraf target && tsc && npm run copy",
     "ts.check": "tsc --project tsconfig.json",
     "add-build": "git add target",
-    "copy": "cp -r source/src/* target/src/ && copyfiles -u 1 source/package.json target/",
+    "copy": "cp -rf source/src/* target/src/ && copyfiles -u 1 source/package.json target/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "pre-commit": [
