@@ -78,7 +78,7 @@ const helperFunctions = {
       .padStart(2, "0")} минут ${seconds.toString().padStart(2, "0")} секунд`;
   },
   generateEmailTemplate: async (mailData: string, template: string) => {
-    const filePath = path.join(__dirname, '../', 'src', `${template}.ejs`);
+    const filePath = path.join(__dirname, '../../', 'src', `${template}.ejs`);
 
     // Read the HTML template file
     const htmlTemplate = fs.readFileSync(filePath, "utf-8");
