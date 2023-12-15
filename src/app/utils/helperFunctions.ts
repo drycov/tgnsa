@@ -1,9 +1,11 @@
 import * as dotenv from "dotenv";
 import * as path from 'path';
 import * as fs from 'fs';
+import { createCanvas, loadImage } from 'canvas';
 import ejs from "ejs";
 import { Context } from "grammy";
 import ping from "ping";
+
 
 import MailTo from "../core/MailTo";
 
@@ -24,7 +26,61 @@ const helperFunctions = {
   delay: (ms: any) => {
     new Promise((resolve) => setTimeout(resolve, ms));
   },
-  noop: () => {},
+  getTextDimensions: (text: any, font: any) => {
+    const canvas = createCanvas(800, 600); // Начальные размеры canvas для измерения текста
+    const ctx = canvas.getContext('2d');
+    ctx.font = font; // Установка шрифта
+
+    return ctx.measureText(text);
+  },
+
+
+  textToPNG: async (inputFilePath: any, outputFilePath: any) => {
+    try {
+      const textContent = fs.readFileSync(inputFilePath, 'utf-8');
+
+      const lines = textContent.split('\n');
+      const font = '12px Arial'; // Размер шрифта 12 пикселей
+      const lineHeight = 20; // Высота строки в пикселях
+
+      // Найти максимальную ширину текста
+      let maxWidth = 0;
+      lines.forEach(line => {
+          const dimensions = helperFunctions.getTextDimensions(line, font);
+          maxWidth = Math.max(maxWidth, dimensions.width);
+      });
+
+      // Создание canvas на основе ширины текста и количества строк
+      const canvas = createCanvas(maxWidth + 20, (lines.length - 4) * lineHeight + 20); // Используемые размеры +20 для отступов
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#ffffff'; // Белый фон
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#000000'; // Черный цвет текста
+      ctx.font = font; // Установка шрифта
+
+      let yPos = lineHeight;
+      lines.forEach(line => {
+          if (!line.includes('|--------|---------|---------|---------|----------|')) {
+              ctx.fillText(line, 10, yPos);
+              yPos += lineHeight;
+          }
+      });
+
+      // Обрезать canvas под фактический размер текста
+      const trimmedCanvas = createCanvas(maxWidth + 20, yPos);
+      const trimmedCtx = trimmedCanvas.getContext('2d');
+      trimmedCtx.drawImage(canvas, 0, 0, trimmedCanvas.width, trimmedCanvas.height, 0, 0, trimmedCanvas.width, trimmedCanvas.height);
+
+      const buffer = trimmedCanvas.toBuffer('image/png');
+      fs.writeFileSync(outputFilePath, buffer);
+
+      console.log('Изображение успешно сохранено:', outputFilePath);
+  } catch (error) {
+      console.error('Произошла ошибка:', error);
+  }
+  },
+  noop: () => { },
 
   apptype: () => {
     let token;
@@ -74,8 +130,8 @@ const helperFunctions = {
     return `${days.toString().padStart(2, "0")} дней ${hours
       .toString()
       .padStart(2, "0")} часов ${minutes
-      .toString()
-      .padStart(2, "0")} минут ${seconds.toString().padStart(2, "0")} секунд`;
+        .toString()
+        .padStart(2, "0")} минут ${seconds.toString().padStart(2, "0")} секунд`;
   },
   generateEmailTemplate: async (mailData: string, template: string) => {
     const filePath = path.join(__dirname, '../../', 'src', `${template}.ejs`);
@@ -219,5 +275,6 @@ const helperFunctions = {
     };
   },
 };
+
 
 export default helperFunctions;

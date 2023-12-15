@@ -3,7 +3,6 @@ import util from "util";
 import app from "./app/index";
 import database from "./app/utils/database";
 import logger from "./app/utils/logger";
-import * as io from "@pm2/io";
 const currentDate = new Date().toLocaleString("ru-RU");
 
 const runner = run(app);
@@ -18,14 +17,6 @@ const startApplication = async () => {
   );
   try {
     await database();
-    io.init({
-      catchExceptions: true,
-      tracing: true,
-      metrics: {
-        http: true
-      }
-      // will enable metrics about the http server (optional)
-    });
     const status = runner.isRunning();
     await app.init();
     message += util.format(

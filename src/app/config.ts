@@ -2,7 +2,7 @@ export default {
   // port: 443,
   // sesionKey: 'Zero0One1Two2Three3Four4',
   defaultAdmin: 632646448,
-  BotChatAdmin: -4080080528,
+  BotChatAdmin: -1002077406333,
   botTgID: 5493974365,
   // mongoURI: 'mongodb://127.0.0.1:27017',
   mongoURI:
@@ -37,4 +37,6 @@ export default {
     community: ["public", "atbu+1", "chinaPublic", "ChinaPublic", "public+"],
     rw_community: ["private"],
   },
+  excludedSubstrings: ["Vl", "vl", "Loop", "Lo", "null", "Nu", "me","loop","tunne","oob","stack-port"],
+
 };

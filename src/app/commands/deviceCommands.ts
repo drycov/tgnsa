@@ -1,6 +1,7 @@
 import { type Conversation } from "@grammyjs/conversations";
-import { Context } from "grammy";
+import { Context, InputFile } from "grammy";
 import util from "util";
+import * as fs from "fs";
 import messages from "../assets/messages";
 import { IpCheck } from "../assets/regexp";
 import config from "../config";
@@ -10,6 +11,7 @@ import deviceMenu from "../keyboards/deviceMenu";
 import helperFunctions from "../utils/helperFunctions";
 import logger from "../utils/logger";
 import snmpFunctions from "../utils/snmpFunctions";
+import path from "path";
 
 interface MyContext extends Context {
   session: { [key: string]: any }; // Change the type to match your session data structure
@@ -152,8 +154,10 @@ const deviceCommands = {
     ctx.session.previosCVid = "main";
     const host = ctx.session.deviceHost;
     const community = ctx.session.snmpCommunity;
+    const action = deviceCommands.ddmInfo.name;
 
-    await ctx.reply("Вывод уровня оптического сигнала на устройстве: " + host, {
+
+    await ctx.reply("Вывод уровня оптического сигнала/ADSL на устройстве: " + host, {
       reply_markup: {
         remove_keyboard: true,
       },
@@ -161,14 +165,36 @@ const deviceCommands = {
     const DDMInfo = await deviceData
       .getDDMInfo(host, community)
       .then((res) => res);
-    await ctx.reply(
-      `DDM to: <code>${host}</code>\n<pre>${DDMInfo}</pre>` +
-        `\n<i>Выполнено:  <code>${currentDate}</code></i>`,
-      {
-        reply_markup: deviceMenu.checkDevice,
-        parse_mode: "HTML",
+    if (DDMInfo.length > 4096) {
+      try {
+        const tempFilePath = path.join('./', 'sessions', 'tempFile.txt');
+        const tempFilePNGPath = path.join('./', 'sessions', `${action}_${host}.png`);
+        fs.writeFileSync(tempFilePath, `Уровень оптического сигнала/ADSL на устройстве: ${host}\n${DDMInfo}` +
+          `\nВыполнено:  ${currentDate}`);
+        // const fileStream = fs.createReadStream(tempFilePath);
+        helperFunctions.textToPNG(tempFilePath, tempFilePNGPath)
+
+        await ctx.replyWithDocument(
+          new InputFile(tempFilePNGPath), {
+          caption: `Уровень оптического сигнала/ADSL на устройстве: <code>${host}</code>\n` + `\n<i>Выполнено:  <code>${currentDate}</code></i>`, reply_markup: deviceMenu.checkDevice,
+          parse_mode: "HTML",
+        });
+        fs.unlinkSync(tempFilePNGPath);
+        fs.unlinkSync(tempFilePath);
+
+      } catch (error) {
+        console.error('Ошибка отправки файла:', error);
       }
-    );
+    } else {
+      await ctx.reply(
+        `Уровень оптического сигнала/ADSL на устройстве: <code>${host}</code>\n<pre>${DDMInfo}</pre>` +
+        `\n<i>Выполнено:  <code>${currentDate}</code></i>`,
+        {
+          reply_markup: deviceMenu.checkDevice,
+          parse_mode: "HTML",
+        }
+      );
+    }
   },
   cableMetr: async (_conversation: MyConversation, ctx: MyContext) => {
     ctx.session.currentCVid = "cableMetr";

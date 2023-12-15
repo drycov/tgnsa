@@ -1,3 +1,4 @@
+import { includes } from "underscore";
 import baseUtil from "./baseUtil";
 
 export default {
@@ -16,6 +17,8 @@ export default {
       swModel = "Huawei S5320-28P-LI-AC";
     } else if (dirtyData.includes("S6320-54C-EI-48S-AC")) {
       swModel = "Huawei S6320-54C-EI-48S-AC";
+    } else if (dirtyData.includes("Huawei Integrated Access Software")) {
+      swModel = "Huawei MA5616";
     } else if (dirtyData.includes("DGS-3420-28SC")) {
       swModel = "Dlink DGS-3420-28SC";
     } else if (dirtyData.includes("DGS-3620-28SC")) {
@@ -106,6 +109,18 @@ export default {
       swModel = "ZyXEL SAM1008";
     } else if (dirtyData.includes("SG200-26")) {
       swModel = "Cisco SG200-26";
+    } else if (dirtyData.includes("8-port 10/100 Switch with CLI and WebView")) {
+      swModel = "LinkSys SPS 208G";
+    } else if (dirtyData.includes("Cisco")) {
+      if (dirtyData.includes("ME360x_t")) {
+        swModel = "Cisco ME3600";
+      } else if (dirtyData.includes("ASR901")) {
+        swModel = "Cisco ASR901";
+      } else if (dirtyData.includes("ASR9K")) {
+        swModel = "Cisco ASR9001";
+      } else if (dirtyData.includes("C2960")) {
+        swModel = "Cisco C2960";
+      }
     } else if (dirtyData.includes("Linux")) {
       swModel = "Linux Server";
     } else {
@@ -128,6 +143,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 28,
         });
       case "Huawei S5320-36C-EI-28S-AC":
@@ -141,6 +157,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 0,
         });
       case "Huawei S2350-28TP-EI-AC":
@@ -154,6 +171,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 0,
         });
       case "Huawei S2320-28TP-EI-AC":
@@ -167,6 +185,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 0,
         });
       case "Huawei S5320-28TP-LI-AC":
@@ -180,6 +199,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 0,
         });
       case "Huawei S5320-28P-LI-AC":
@@ -193,6 +213,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 0,
         });
       case "Huawei S2700-18TP-SI-AC":
@@ -206,6 +227,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 2,
         });
       case "Tp-Link TL-1600G-52PS":
@@ -219,6 +241,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 0,
         });
       case "Tp-Link T2600G-28TS":
@@ -232,6 +255,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 0,
         });
       case "Tp-Link T2700G-28TQ":
@@ -245,6 +269,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 0,
         });
       case "Tp-Link TL-SL2428":
@@ -258,6 +283,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 2,
         });
       case "Eltex MES2324FB":
@@ -271,6 +297,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 28,
         });
       case "Eltex MES2324P":
@@ -284,6 +311,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 4,
         });
       case "Eltex MES2324F":
@@ -297,6 +325,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 28,
         });
       case "Eltex MES2324":
@@ -310,6 +339,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 28,
         });
       case "Eltex MES2428":
@@ -323,6 +353,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 4,
         });
       case "Eltex MES3308F":
@@ -336,6 +367,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 12,
         });
       case "Eltex MES3316F":
@@ -349,6 +381,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 16,
         });
       case "Eltex MES3324F":
@@ -362,6 +395,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 28,
         });
       case "D-Link DES-1210-28":
@@ -375,6 +409,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 2,
         });
       case "Dlink DGS-3620-28SC":
@@ -388,6 +423,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 28,
         });
       case "D-Link DES-3200-26":
@@ -401,6 +437,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 2,
         });
       case "D-Link DES-3200-10":
@@ -414,6 +451,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 2,
         });
       case "D-Link DGS-3000-10T":
@@ -427,6 +465,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 2,
         });
       case "D-Link DGS-3000-26TC":
@@ -440,6 +479,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 2,
         });
       case "SNR S2962-24T":
@@ -453,6 +493,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 4,
         });
       case "SNR S2985G 24T":
@@ -466,6 +507,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 4,
         });
       case "SNR S2995G":
@@ -479,6 +521,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 28,
         });
       case "SNR S2985G 8T":
@@ -492,6 +535,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 2,
         });
       case "Mikrotik CRS112":
@@ -505,6 +549,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 4,
         });
       case "Mikrotik CRS326":
@@ -518,6 +563,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 2,
         });
       case "Mikrotik CSS326":
@@ -531,6 +577,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 2,
         });
       case "Mikrotik RB2011LS":
@@ -544,6 +591,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 1,
         });
       case "Mikrotik RB760iGS":
@@ -557,6 +605,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 1,
         });
       case "ZyXEL IES-612":
@@ -569,6 +618,7 @@ export default {
             "interface_list_12p",
             "interfaceList"
           ),
+          adsl: true,
           ddm: false,
           fibers: 0,
         });
@@ -583,6 +633,7 @@ export default {
             "interfaceList"
           ),
           ddm: false,
+          adsl: true,
           fibers: 0,
         });
       case "ZYXEL SAM1008":
@@ -595,6 +646,7 @@ export default {
             "interface_list_9p",
             "interfaceList"
           ),
+          adsl: true,
           ddm: false,
           fibers: 0,
         });
@@ -609,6 +661,7 @@ export default {
             "interfaceList"
           ),
           ddm: true,
+          adsl: false,
           fibers: 2,
         });
       case "Linux Server":
@@ -616,6 +669,7 @@ export default {
           interfaceRange: "server",
           interfaceList: "server",
           ddm: false,
+          adsl: false,
           fibers: 0,
         });
       default:
@@ -623,6 +677,7 @@ export default {
           interfaceRange: "auto",
           interfaceList: "auto",
           ddm: false,
+          adsl: false,
           fibers: 0,
         });
     }
