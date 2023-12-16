@@ -18,6 +18,7 @@ import mainComands from "./commands/mainCommands";
 import config from "./config";
 import baseMenu from "./keyboards/baseMenu";
 import messagesFunctions from "./utils/messagesFunctions";
+import userData from "./data/userData";
 const token = helperFunctions.apptype() || "";
 interface MainContext extends Context {
   session: { [key: string]: any }; // Change the type to match your session data structure
@@ -79,9 +80,9 @@ async function sendUptimeNotification() {
     bot.api.sendMessage(
       adminUserId,
       notificationText +
-        `\n\n<i>Выполнено:  <code>${new Date().toLocaleString(
-          "ru-RU"
-        )}</code></i>`,
+      `\n\n<i>Выполнено:  <code>${new Date().toLocaleString(
+        "ru-RU"
+      )}</code></i>`,
       { parse_mode: "HTML" }
     );
   }
@@ -104,8 +105,10 @@ bot.command(["start", "st", "run"], async (ctx) => {
 bot.command("test", async (ctx) => {
   ctx.deleteMessage();
   helperFunctions.setSessionData(ctx);
+
   await ctx.conversation.enter("cableMetr");
 });
+
 
 /**App callbackQuery */
 bot.callbackQuery("back", async (ctx) => {

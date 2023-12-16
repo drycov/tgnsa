@@ -121,16 +121,20 @@ const mainCommands = {
           null,
           "\t"
         );
-        const adminUid = await userData.getAdminsUsers().then((res) => res);
-        // console.log(adminUid)
-        await userData.saveUser(newUserInfo).then((result) => {
-          adminUid.forEach((res: { isAdmin: any; id: string | number }) => {
+        const result = await userData.saveUser(JSON.stringify(newUserInfo, null, "\t"));
+        const adminUid = await userData.getAdminsUsers();
+
+        adminUid.forEach((res: {
+          tgId: any; isAdmin: boolean; id: string | number
+        }) => {
+          try {
             if (res.isAdmin) {
-              ctx.api.sendMessage(res.id, result);
-            } else {
-              ctx.api.sendMessage(config.defaultAdmin, result);
+              ctx.api.sendMessage(res.tgId, result);
+              ctx.api.sendMessage(config.BotChatAdmin, result);
             }
-          });
+          } catch (error) {
+            ctx.api.sendMessage(config.defaultAdmin, result);
+          }
         });
         delete ctx.session.conversation;
         messg += util.format('"%s":"%s",', "data", JSON.stringify(newUserInfo));

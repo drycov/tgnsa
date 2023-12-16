@@ -6,7 +6,7 @@
   "scripts": {
     "start:prod": "cross-env APP_TYPE=PROD node --no-warnings --loader ts-node/esm ./src/bot.ts",
     "start": "cross-env APP_TYPE=PROD nodemon --inspect --no-warnings ./src/bot.ts",
-    "start:two": "node --no-warnings --loader ts-node/esm ./dist/bot.js",
+    "start:two": "node --trace-warnings --loader ts-node/esm ./dist/bot.js",
     "start:dev": "cross-env APP_TYPE=DEV node --trace-warnings --loader ts-node/esm ./src/bot.ts",
     "build": "rimraf target && tsc && npm run copy",
     "ts.check": "tsc --project tsconfig.json",
