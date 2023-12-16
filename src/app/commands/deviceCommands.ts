@@ -2,16 +2,20 @@ import { type Conversation } from "@grammyjs/conversations";
 import { Context, InputFile } from "grammy";
 import util from "util";
 import * as fs from "fs";
+import * as path from "path";
+const configPath = path.join(__dirname, '../', '../', '../', `config.json`);
+const config = require(configPath);
+
 import messages from "../assets/messages";
 import { IpCheck } from "../assets/regexp";
-import config from "../config";
+// import config from "../config";
+
 import deviceData from "../core/deviceData";
 import baseMenu from "../keyboards/baseMenu";
 import deviceMenu from "../keyboards/deviceMenu";
 import helperFunctions from "../utils/helperFunctions";
 import logger from "../utils/logger";
 import snmpFunctions from "../utils/snmpFunctions";
-import path from "path";
 
 interface MyContext extends Context {
   session: { [key: string]: any }; // Change the type to match your session data structure

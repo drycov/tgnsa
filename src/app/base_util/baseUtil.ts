@@ -5,8 +5,8 @@ import ping from "ping";
 import * as path from 'path';
 import * as fs from 'fs';
 import util from "util";
-import config from "../config";
-// const Netmask = netmask.Netmask
+const configPath = path.join(__dirname, '../', '../', '../', `config.json`);
+const config = require(configPath);// const Netmask = netmask.Netmask
 
 export default {
   subnetCalculate: (host: any) => {

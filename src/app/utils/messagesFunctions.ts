@@ -1,5 +1,5 @@
 import util from "util";
-import pjson from "../../package.json";
+import pjson from "../../../package.json";
 import messagesData from "../assets/messages";
 import symbols from "../assets/symbols";
 import config from "../config";

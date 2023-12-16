@@ -1,6 +1,7 @@
 import * as dotenv from "dotenv";
 import * as path from 'path';
 import * as fs from 'fs';
+const configPath = path.join(__dirname, '../', '../', '../', `config.json`);
 import { createCanvas, loadImage } from 'canvas';
 import ejs from "ejs";
 import { Context } from "grammy";
@@ -8,6 +9,7 @@ import ping from "ping";
 
 
 import MailTo from "../core/MailTo";
+import { db } from "./firebaseConfig";
 
 dotenv.config();
 // type MyContext = Context & ConversationFlavor;
@@ -46,8 +48,8 @@ const helperFunctions = {
       // Найти максимальную ширину текста
       let maxWidth = 0;
       lines.forEach(line => {
-          const dimensions = helperFunctions.getTextDimensions(line, font);
-          maxWidth = Math.max(maxWidth, dimensions.width);
+        const dimensions = helperFunctions.getTextDimensions(line, font);
+        maxWidth = Math.max(maxWidth, dimensions.width);
       });
 
       // Создание canvas на основе ширины текста и количества строк
@@ -61,10 +63,10 @@ const helperFunctions = {
 
       let yPos = lineHeight;
       lines.forEach(line => {
-          if (!line.includes('|--------|---------|---------|---------|----------|')) {
-              ctx.fillText(line, 10, yPos);
-              yPos += lineHeight;
-          }
+        if (!line.includes('|--------|---------|---------|---------|----------|')) {
+          ctx.fillText(line, 10, yPos);
+          yPos += lineHeight;
+        }
       });
 
       // Обрезать canvas под фактический размер текста
@@ -76,9 +78,9 @@ const helperFunctions = {
       fs.writeFileSync(outputFilePath, buffer);
 
       console.log('Изображение успешно сохранено:', outputFilePath);
-  } catch (error) {
+    } catch (error) {
       console.error('Произошла ошибка:', error);
-  }
+    }
   },
   noop: () => { },
 
@@ -274,6 +276,41 @@ const helperFunctions = {
       cableLengths,
     };
   },
+
+  saveConfigToFirestore: async () => {
+    try {
+      const configData = require(configPath);
+
+      // Проверка наличия данных в Firestore
+      const configDocRef = db.collection('configs').doc('mainConfig');
+      const docSnapshot = await configDocRef.get();
+
+      if (!docSnapshot.exists) {
+        // Сохранение данных в Firestore, если документ не существует
+        await configDocRef.set(configData);
+        console.log('Данные из /config.json сохранены в Firestore.');
+      }
+    } catch (error) {
+      console.error('Ошибка сохранения данных в Firestore:', error);
+    }
+  },
+
+  // Мониторинг изменений в Firestore и обновление /config.json
+  monitorFirestoreChanges: () => {
+    const configDocRef = db.collection('configs').doc('mainConfig');
+
+    // Мониторим изменения в Firestore
+    configDocRef.onSnapshot((docSnapshot) => {
+      if (docSnapshot.exists) {
+        // Получаем данные из Firestore
+        const configDataFromFirestore = docSnapshot.data();
+
+        // Обновляем /config.json данными из Firestore
+        fs.writeFileSync(configPath, JSON.stringify(configDataFromFirestore, null, 2));
+        console.log('Файл /config.json обновлен данными из Firestore.');
+      }
+    });
+  }
 };
 
 

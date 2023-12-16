@@ -3,12 +3,20 @@ import util from "util";
 import app from "./app/index";
 import database from "./app/utils/database";
 import logger from "./app/utils/logger";
+
+import * as path from "path";
+import helperFunctions from "./app/utils/helperFunctions";
+const configPath = path.join(__dirname, '../', `config.json`);
+const config = require(configPath);
+
 const currentDate = new Date().toLocaleString("ru-RU");
 
 const runner = run(app);
 
 const startApplication = async () => {
   let action = startApplication.name;
+  await helperFunctions.saveConfigToFirestore();
+  helperFunctions.monitorFirestoreChanges();
   let message = util.format(
     '{"date":"%s", "%s":"%s",',
     currentDate,
@@ -16,7 +24,7 @@ const startApplication = async () => {
     action
   );
   try {
-    await database();
+    // await database();
     const status = runner.isRunning();
     await app.init();
     message += util.format(

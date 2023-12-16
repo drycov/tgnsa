@@ -1,0 +1,60 @@
+{
+  "vendor_info": {
+    "botVendorWContact": "+7-705-155-7619",
+    "botVendorContact": "@Oritorius",
+    "botVendorEMailContact": "d.rykov@ttc.kz",
+    "botVendor": "Denis Rykov"
+  },
+  "botTgID": "5493974365",
+  "mongoURI": "mongodb+srv://ttc-ttcnsa:GJWPwBmlUJvc9S2S@cluster0.c48ewsz.mongodb.net",
+  "databaseURL": "https://ttcnsa-default-rtdb.asia-southeast1.firebasedatabase.app",
+  "mongoOptions": {
+    "dbName": "ttcNSA"
+  },
+  "sesionKey": "Zero0One1Two2Three3Four4",
+  "excludedSubstrings": [
+    "Vl",
+    "vl",
+    "Loop",
+    "Lo",
+    "null",
+    "Nu",
+    "me",
+    "loop",
+    "tunne",
+    "oob",
+    "stack-port"
+  ],
+  "pingDevice": {
+    "timeout": 10,
+    "interval": 2,
+    "count": 5
+  },
+  "BotChatAdmin": "-1002077406333",
+  "defaultAdmin": "632646448",
+  "smtp_client": {
+    "smtp_user": "ttcnsb1@hotmail.com",
+    "smtp_server": "smtp-mail.outlook.com",
+    "smtp_pwd": "OSKQAZwsx2022*",
+    "smtp_port": 587,
+    "smtp_from": "Transtelecom JSC Network Support BOT <ttcnsb1@hotmail.com>"
+  },
+  "port": "443",
+  "snmp": {
+    "community": [
+      "public",
+      "atbu+1",
+      "chinaPublic",
+      "ChinaPublic",
+      "public+"
+    ],
+    "rw_community": [
+      "private"
+    ]
+  },
+  "defaultLanguage": "en",
+  "mass_data": {
+    "mii_dest": "d.rykov@ttc.kz",
+    "mii_subject": "Массовый инцидент"
+  }
+}

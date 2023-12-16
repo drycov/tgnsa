@@ -15,7 +15,11 @@ import messages from "./assets/messages";
 import advancedCommands from "./commands/advancedCommands";
 import deviceCommands from "./commands/deviceCommands";
 import mainComands from "./commands/mainCommands";
-import config from "./config";
+
+import * as path from "path";
+const configPath = path.join(__dirname, '../',  '../', `config.json`);
+const config = require(configPath);
+
 import baseMenu from "./keyboards/baseMenu";
 import messagesFunctions from "./utils/messagesFunctions";
 import userData from "./data/userData";

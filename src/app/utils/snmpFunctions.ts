@@ -3,7 +3,10 @@ import util from "util";
 import joid from "../../src/oid.json";
 import logger from "./logger";
 import messagesFunctions from "./messagesFunctions";
-import config from "../config";
+import * as path from "path";
+const configPath = path.join(__dirname, '../', '../', '../', `config.json`);
+const config = require(configPath);
+
 const currentDate = new Date().toLocaleString("ru-RU");
 const snmpFunctions = {
   getSingleOID: async (

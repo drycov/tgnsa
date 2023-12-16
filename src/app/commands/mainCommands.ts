@@ -7,7 +7,11 @@ import {
   default as messageText,
   default as messages,
 } from "../assets/messages";
-import config from "../config";
+import * as path from "path";
+
+const configPath = path.join(__dirname, '../', '../', '../', `config.json`);
+
+const config = require(configPath);
 import access from "../core/access";
 import userData from "../data/userData";
 import baseMenu from "../keyboards/baseMenu";
@@ -15,6 +19,7 @@ import mainMenu from "../keyboards/mainMenu";
 import helperFunctions from "../utils/helperFunctions";
 import messagesFunctions from "../utils/messagesFunctions";
 import logger from "../utils/logger";
+import User from "../models/User";
 interface MyContext extends Context {
   session: { [key: string]: any }; // Change the type to match your session data structure
 }
@@ -100,28 +105,22 @@ const mainCommands = {
         const code = await helperFunctions
           .verifyEmail(email)
           .then((res) => res);
-        const newUserInfo = JSON.stringify(
-          {
-            // _id: ctx.message?.from.id,
-            is_bot: ctx.message?.from.is_bot,
-            tgId: ctx.message?.from.id,
-            firstName: firstName,
-            lastName: lastName,
-            companyPost: companyPost,
-            phoneNumber: phoneNumber,
-            email: email,
-            userVerified: false,
-            verificationCode: code,
-            // deportament: deportament,
-            // country: country,
-            username: ctx.message?.from.username,
-            isAdmin: false,
-            userAllowed: false,
-          },
-          null,
-          "\t"
-        );
-        const result = await userData.saveUser(JSON.stringify(newUserInfo, null, "\t"));
+        const newUserInfo: User = {
+          is_bot: ctx.message?.from.is_bot !== undefined ? ctx.message.from.is_bot : false,
+          tgId: ctx.message?.from.id !== undefined ? ctx.message.from.id : 0, // Здесь 0 - это ваше значение по умолчанию
+          firstName: firstName,
+          lastName: lastName,
+          companyPost: companyPost,
+          phoneNumber: phoneNumber !== undefined ? phoneNumber : "null", // Здесь 0 - это ваше значение по умолчанию
+          email: email,
+          userVerified: false,
+          verificationCode: code,
+          username: ctx.message?.from.username !== undefined ? ctx.message?.from.username : `firstName lastName`, // Здесь 0 - это ваше значение по умолчанию
+          isAdmin: false,
+          userAllowed: false,
+        };
+
+        const result = await userData.saveUser(newUserInfo);
         const adminUid = await userData.getAdminsUsers();
 
         adminUid.forEach((res: {

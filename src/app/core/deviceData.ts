@@ -1,7 +1,7 @@
 import { Options, PythonShell } from "python-shell";
 import { zip } from "underscore";
 import util from "util";
-
+import * as path from "path";
 import joid from "../../src/oid.json";
 import labels from "../assets/labels";
 import symbols from "../assets/symbols";
@@ -10,7 +10,11 @@ import helperFunctions from "../utils/helperFunctions";
 import logger from "../utils/logger";
 import messagesFunctions from "../utils/messagesFunctions";
 import snmpFunctions from "../utils/snmpFunctions";
-import config from "../config";
+// import config from "../config";
+const configPath = path.join(__dirname, '../', '../', '../', `config.json`);
+
+const config = require(configPath);
+
 import {
   BaseUserConfig,
   ColumnUserConfig,
@@ -542,7 +546,7 @@ const devicData = {
 
       for (let ifId in zip(list, range)) {
         if (
-          config.excludedSubstrings.some(substring => range[ifId].includes(substring)) || /^\d+$/.test(range[ifId])  // ИЛИ если строка НЕ содержит только цифры
+          config.excludedSubstrings.some((substring: any) => range[ifId].includes(substring)) || /^\d+$/.test(range[ifId])  // ИЛИ если строка НЕ содержит только цифры
         ) {
           continue; // Пропускаем эту итерацию, если строка содержит исключенные подстроки или не содержит только цифры
         }

@@ -1,5 +1,7 @@
 import nodemailer, { TransportOptions } from "nodemailer";
-import config from "../config";
+import * as path from "path";
+const configPath = path.join(__dirname, '../', '../', '../', `config.json`);
+const config = require(configPath);
 
 const sendEmailWithTemplate = async (
   renderedHtml: string,

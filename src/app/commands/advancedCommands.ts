@@ -1,10 +1,12 @@
 import { type Conversation } from "@grammyjs/conversations";
 import { Context } from "grammy";
 import util from "util";
+import * as path from "path";
+const configPath = path.join(__dirname, '../', '../', '../', `config.json`);
+const config = require(configPath);
 import labels from "../assets/labels";
 import messages from "../assets/messages";
 import advancedMenu from "../keyboards/advancedMenu";
-import config from "../config";
 import { SubnetCheck, P2PCheck, IpCheck } from "../assets/regexp";
 import baseUtil from "../base_util/baseUtil";
 import MailTo from "../core/MailTo";
