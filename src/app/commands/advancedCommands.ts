@@ -10,11 +10,13 @@ import advancedMenu from "../keyboards/advancedMenu";
 import { SubnetCheck, P2PCheck, IpCheck } from "../assets/regexp";
 import baseUtil from "../base_util/baseUtil";
 import MailTo from "../core/MailTo";
-import massData from "../core/massData";
+// import massData from "../core/massData";
 import userData from "../data/userData";
 import baseMenu from "../keyboards/baseMenu";
 import messagesFunctions from "../utils/messagesFunctions";
 import helperFunctions from "../utils/helperFunctions";
+import massData from "../data/massData";
+import MassIncidient from "../models/MassIncidient";
 
 interface MyContext extends Context {
   session: { [key: string]: any }; // Change the type to match your session data structure
@@ -183,6 +185,7 @@ export default {
     const massStart = helperFunctions.HumanDate(d_t);
     // generateNextMiId
     const id = await massData.generateNextMiId().then((res) => res);
+
     const massInc = JSON.stringify(
       {
         _id: id,
@@ -193,14 +196,25 @@ export default {
         ts: massStart,
         te: me,
         from:
-          user.firstName + " " + user.lastName + " (" + user.deportament + ") ",
+          user.firstName + " " + user.lastName + " (" + user.companyPost + ") ",
         phone: user.phoneNuber || "0",
         priority: priority,
       },
       null,
       "\t"
     );
-
+    const massIncData: MassIncidient = {
+      mi_id: id,
+      station: station,
+      city: city,
+      addr: addr,
+      commet: cause, // Здесь 0 - это ваше значение по умолчанию
+      ts: massStart,
+      te: me,
+      from: user.firstName + " " + user.lastName + " (" + user.companyPost + ") ",
+      phone: user.phoneNuber || "0",
+      priority: priority,
+    };
     const template = await helperFunctions
       .generateEmailTemplate(massInc, "mass-template")
       .then((res) => {
@@ -212,13 +226,14 @@ export default {
       config.mass_data.mii_dest,
       config.mass_data.mii_subject
     );
+    const result = massData.saveMassData(massIncData);
 
     // const miData = MailTo.msgToSupport(JSON.stringify(massInc, null, '\t'));
 
     await ctx.reply(
       "Запрос на массовый инцидент подан\n\n\n" +
-        "miData" +
-        `\n\n<i>Выполнено:  <code>${currentDate}</code></i>`,
+      result +
+      `\n\n<i>Выполнено:  <code>${currentDate}</code></i>`,
       { reply_markup: baseMenu.inBack, parse_mode: "HTML" }
     );
   },

@@ -1,5 +1,5 @@
 import util from "util";
-import UserModel from "../models/User";
+// import UserModel from "../models/User";
 import { db } from '../utils/firebaseConfig';
 
 import logger from "../utils/logger";
