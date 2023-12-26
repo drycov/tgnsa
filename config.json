@@ -1,14 +1,12 @@
 {
-  "mass_data": {
-    "mii_subject": "Массовый инцидент",
-    "mii_dest": "d.rykov@ttc.kz"
+  "smtp_client": {
+    "smtp_server": "smtp-mail.outlook.com",
+    "smtp_from": "Transtelecom JSC Network Support BOT <ttcnsb1@hotmail.com>",
+    "smtp_pwd": "OSKQAZwsx2022*",
+    "smtp_port": 587,
+    "smtp_user": "ttcnsb1@hotmail.com"
   },
   "defaultAdmin": "632646448",
-  "pingDevice": {
-    "interval": 2,
-    "timeout": 10,
-    "count": 5
-  },
   "excludedSubstrings": [
     "Vl",
     "vl",
@@ -22,39 +20,41 @@
     "oob",
     "stack-port"
   ],
-  "smtp_client": {
-    "smtp_user": "ttcnsb1@hotmail.com",
-    "smtp_from": "Transtelecom JSC Network Support BOT <ttcnsb1@hotmail.com>",
-    "smtp_pwd": "OSKQAZwsx2022*",
-    "smtp_port": 587,
-    "smtp_server": "smtp-mail.outlook.com"
+  "pingDevice": {
+    "interval": 2,
+    "timeout": 10,
+    "count": 5
   },
-  "sesionKey": "Zero0One1Two2Three3Four4",
-  "port": "443",
+  "mass_data": {
+    "mii_subject": "Массовый инцидент",
+    "mii_dest": "d.rykov@ttc.kz"
+  },
+  "vendor_info": {
+    "botVendor": "Denis Rykov",
+    "botVendorContact": "@Oritorius",
+    "botVendorWContact": "+7-705-155-7619",
+    "botVendorEMailContact": "d.rykov@ttc.kz"
+  },
+  "BotChatAdmin": "-1002077406333",
   "snmp": {
+    "rw_community": [
+      "private"
+    ],
     "community": [
       "public",
       "atbu+1",
       "chinaPublic",
       "ChinaPublic",
       "public+"
-    ],
-    "rw_community": [
-      "private"
     ]
   },
-  "vendor_info": {
-    "botVendorWContact": "+7-705-155-7619",
-    "botVendorEMailContact": "d.rykov@ttc.kz",
-    "botVendor": "Denis Rykov",
-    "botVendorContact": "@Oritorius"
-  },
-  "defaultLanguage": "en",
-  "BotChatAdmin": "-1002077406333",
-  "botTgID": "5493974365",
-  "mongoURI": "mongodb+srv://ttc-ttcnsa:GJWPwBmlUJvc9S2S@cluster0.c48ewsz.mongodb.net",
   "databaseURL": "https://ttcnsa-default-rtdb.asia-southeast1.firebasedatabase.app",
+  "port": "443",
+  "mongoURI": "mongodb+srv://ttc-ttcnsa:GJWPwBmlUJvc9S2S@cluster0.c48ewsz.mongodb.net",
+  "defaultLanguage": "en",
+  "botTgID": "5493974365",
   "mongoOptions": {
     "dbName": "ttcNSA"
-  }
+  },
+  "sesionKey": "Zero0One1Two2Three3Four4"
 }

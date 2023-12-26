@@ -2,7 +2,6 @@
 
 // Определение интерфейса для объекта MassIncidient
 interface MassIncidient {
-  mi_id: string;
   station: string;
   city: string;
   addr: string;

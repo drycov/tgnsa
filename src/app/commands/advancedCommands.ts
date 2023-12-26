@@ -183,12 +183,22 @@ export default {
 
     const d_t = new Date();
     const massStart = helperFunctions.HumanDate(d_t);
-    // generateNextMiId
-    const id = await massData.generateNextMiId().then((res) => res);
 
+    const massIncData: MassIncidient = {
+      station: station,
+      city: city,
+      addr: addr,
+      commet: cause, // Здесь 0 - это ваше значение по умолчанию
+      ts: massStart,
+      te: me,
+      from: user.firstName + " " + user.lastName + " (" + user.companyPost + ") ",
+      phone: user.phoneNumber || "0",
+      priority: priority,
+    };
+    const result = await massData.saveMassData(massIncData);
     const massInc = JSON.stringify(
       {
-        _id: id,
+        mi_id: result,
         station: station,
         city: city,
         addr: addr,
@@ -197,24 +207,12 @@ export default {
         te: me,
         from:
           user.firstName + " " + user.lastName + " (" + user.companyPost + ") ",
-        phone: user.phoneNuber || "0",
+        phone: user.phoneNumber || "0",
         priority: priority,
       },
       null,
       "\t"
     );
-    const massIncData: MassIncidient = {
-      mi_id: id,
-      station: station,
-      city: city,
-      addr: addr,
-      commet: cause, // Здесь 0 - это ваше значение по умолчанию
-      ts: massStart,
-      te: me,
-      from: user.firstName + " " + user.lastName + " (" + user.companyPost + ") ",
-      phone: user.phoneNuber || "0",
-      priority: priority,
-    };
     const template = await helperFunctions
       .generateEmailTemplate(massInc, "mass-template")
       .then((res) => {
@@ -226,13 +224,18 @@ export default {
       config.mass_data.mii_dest,
       config.mass_data.mii_subject
     );
-    const result = massData.saveMassData(massIncData);
+    let MImessage = util.format(`\n
+<code>Уведомления №: %s\nУведомляем Вас о следующей проблеме:%s на сетях станции: %s.\nВ связи с проблемой прошу не производить прием заявок из: %s по следующим адресам: %s
 
-    // const miData = MailTo.msgToSupport(JSON.stringify(massInc, null, '\t'));
+Проблема обнаружена в %s. 
+Ориентировочное время устранения: %s
 
+Информацию передал: %s
+Контактный телефон: %s\n</code>`,
+      result, cause, station, city, addr, massStart, me, user.firstName + " " + user.lastName + " (" + user.companyPost + ") ", user.phoneNumber)
     await ctx.reply(
       "Запрос на массовый инцидент подан\n\n\n" +
-      result +
+      "со следующим содержимым: " + MImessage +
       `\n\n<i>Выполнено:  <code>${currentDate}</code></i>`,
       { reply_markup: baseMenu.inBack, parse_mode: "HTML" }
     );
