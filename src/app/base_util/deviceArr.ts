@@ -100,6 +100,8 @@ export default {
         swModel = "SNR S2985G 24T";
       } else if (dirtyData.includes("SNR-S2985G-8T")) {
         swModel = "SNR S2985G 8T";
+      } else if (dirtyData.includes("SNR-S2982G-24TE")){
+        swModel = "SNR S2982G 24T"
       }
     } else if (dirtyData.includes("IES-612")) {
       swModel = "ZyXEL IES-612";

@@ -210,8 +210,8 @@ const deviceCommands = {
       .then((status) => {
         return status;
       });
-    await ctx.reply(
-      portStatus + `\n\n<i>Выполнено:  <code>${currentDate}</code></i>`,
+    await ctx.reply(`Длинна кабелей на устройстве: ${host}\n` +
+      ` <pre>${portStatus}</pre> + \n\n<i>Выполнено:  <code>${currentDate}</code></i>`,
       {
         reply_markup: deviceMenu.checkDevice,
         parse_mode: "HTML",

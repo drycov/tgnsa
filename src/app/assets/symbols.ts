@@ -5,17 +5,21 @@ export default {
   CritEmo: "❗️",
   UnknEmo: "❓",
   DeadEmo: "🀄",
-  AdminDownEmo: "⭕️",
+  AdminDownEmo: "🅰️",
   AdminUpEmo: "✳️",
   ShootDown: "🔘",
+
 
   //Cabel lenght pair Emoji
   OK_UP: "✅",
   OKEY: "☑️",
   CROSSTALK: "🔀",
-  SHORT: "❌",
-  NOCABLE: "⭕️",
+  SHORT: "🆘",
+  NOCABLE: "✴️",
   UNKNOWN: "🌀",
+  ABNORMAL:"🆎",
+  DOWN:"❎",
+  // ✴️🆘🆎
 
   //Universal Emoji
   RedCircleEmo: "🔴",

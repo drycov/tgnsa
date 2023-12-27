@@ -9,7 +9,7 @@ export default {
       Button.text(labels.CheckDeviceLabel),
       Button.text(labels.AdvancedMenuLabel),
     ],
-    [Button.webApp(labels.AdminLabel, "https://webadmin.vercel.app/")],
+    [Button.webApp(labels.AdminLabel, "https://91.185.2.210/")],
     [Button.text(labels.ExitLabel)],
   ]).resized(),
   main: new Keyboard([
