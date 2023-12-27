@@ -10,6 +10,7 @@ import ping from "ping";
 
 import MailTo from "../core/MailTo";
 import { db } from "./firebaseConfig";
+import symbols from "../assets/symbols";
 
 dotenv.config();
 // type MyContext = Context & ConversationFlavor;
@@ -310,6 +311,21 @@ const helperFunctions = {
         console.log('Файл /config.json обновлен данными из Firestore.');
       }
     });
+  },
+  cablePairStatusIconizer: (cableStatus: string) => {
+    switch (cableStatus) {
+      case "open":
+        return symbols.NOCABLE;
+      case "abnormal":
+        return symbols.ABNORMAL;
+      case "short":
+        return symbols.SHORT;
+      case "well":
+        return symbols.OK_UP;
+      default:
+        return symbols.UNKNOWN
+    }
+
   }
 };
 

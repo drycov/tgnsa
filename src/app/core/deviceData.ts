@@ -23,6 +23,8 @@ import {
   table,
 } from "table";
 
+import Table from "cli-table3";
+
 const currentDate = new Date().toLocaleString("ru-RU");
 type OidLoaderType = {
   [key: string]: string;
@@ -159,14 +161,6 @@ const devicData = {
     host: string,
     portIfList: string[],
     portIfRange: string[],
-    baseATUcSnrMarg: string,
-    baseATUcAttun: string,
-    baseATUcPower: string,
-    baseATUcRate: string,
-    baseATUrSnrMarg: string,
-    baseATUrAttun: string,
-    baseATUrPower: string,
-    baseATUrRate: string,
     community: string,
     results: any[],
     unstandart?: boolean,
@@ -175,26 +169,53 @@ const devicData = {
     const action = devicData.processADSLInfo.name;
     let message = `{"date":"${currentDate}", "action":"${action}", `;
     message += util.format('"%s":"%s", ', "host", host);
-    console.log(portIfList.length)
+    const getOidValue = async (oid: string) => {
+      try {
+        return await snmpFunctions.getSingleOID(host, oid, community);
+      } catch (error) {
+        logger.error(error);
+        return error;
+      }
+    };
     try {
       for (let i = 0; i < portIfList.length; i++) {
-        const oidATUcSnrMarg = baseATUcSnrMarg + portIfList[i];
-        const oidATUcAttun = baseATUcAttun + portIfList[i];
-        const oidATUcPower = baseATUcPower + portIfList[i];
-        const oidATUcRate = baseATUcRate + portIfList[i];
-        const oidATUrSnrMarg = baseATUrSnrMarg + portIfList[i];
-        const oidATUrAttun = baseATUrAttun + portIfList[i];
-        const oidATUrPower = baseATUrPower + portIfList[i];
-        const oidATUrRate = baseATUrRate + portIfList[i];
+        if (
+          config.excludedSubstrings.some((substring: any) => portIfRange[i].includes(substring)) || /^\d+$/.test(portIfRange[i]) || portIfRange[i].includes('enet') || portIfRange[i].includes('ethernet') // ИЛИ если строка НЕ содержит только цифры
+        ) {
+          continue; // Пропускаем эту итерацию, если строка содержит исключенные подстроки или не содержит только цифры
+        }
+
+           const oidATUcSnrMarg = joid.adsl_oid.adslAtucCurrSnrMgn + portIfList[i];
+        const oidATUcAttun = joid.adsl_oid.adslAtucCurrAtn + portIfList[i];
+        const oidATUcPower = joid.adsl_oid.adslAtucCurrOutputPwr + portIfList[i];
+        const oidATUcRate = joid.adsl_oid.adslAtucCurrAttainableRate + portIfList[i];
+        const oidATUcCrRate = joid.adsl_oid.adslAtucChanCurrTxRate + portIfList[i];
+
+        const oidATUrSnrMarg = joid.adsl_oid.adslAturCurrSnrMgn + portIfList[i];
+        const oidATUrAttun = joid.adsl_oid.adslAturCurrAtn + portIfList[i];
+        const oidATUrPower = joid.adsl_oid.adslAturCurrOutputPwr + portIfList[i];
+        const oidATUrRate = joid.adsl_oid.adslAturCurrAttainableRate + portIfList[i];
+        const oidATUrCrRate = joid.adsl_oid.adslAturChanCurrTxRate + portIfList[i];
+
 
         const getATUcSnrMarg = await snmpFunctions.getSingleOID(host, oidATUcSnrMarg, community);
         const getATUcAttun = await snmpFunctions.getSingleOID(host, oidATUcAttun, community);
         const getATUcPower = await snmpFunctions.getSingleOID(host, oidATUcPower, community);
         const getATUcRate = await snmpFunctions.getSingleOID(host, oidATUcRate, community);
+        const getATUcCrRate = await snmpFunctions.getSingleOID(host, oidATUcCrRate, community);
+
         const getATUrSnrMarg = await snmpFunctions.getSingleOID(host, oidATUrSnrMarg, community);
         const getATUrAttun = await snmpFunctions.getSingleOID(host, oidATUrAttun, community);
         const getATUrPower = await snmpFunctions.getSingleOID(host, oidATUrPower, community);
         const getATUrRate = await snmpFunctions.getSingleOID(host, oidATUrRate, community);
+        const getATUrCrRate = await snmpFunctions.getSingleOID(host, oidATUrCrRate, community);
+
+        const portOperStatus = await getOidValue(
+          joid.basic_oids.oid_oper_ports + portIfList[i]
+        );
+        const portAdminStatus = await getOidValue(
+          joid.basic_oids.oid_admin_ports + portIfList[i]
+        );
 
         let SnrMargRX = !unstandart
           ? parseFloat(parseFloat(getATUcSnrMarg).toFixed(2))
@@ -224,16 +245,62 @@ const devicData = {
           PowerLevelTX = powerConverter(PowerLevelTX);
         }
 
+
+
+        let fixIntName = portIfRange[i];
+        if (portIfRange[i].includes("Huawei")) {
+          fixIntName = await getOidValue(joid.linux_server.oid_ifName + '.' + portIfList[i]);
+        }
         let snr = `${SnrMargRX}/${SnrMargTX}`
         let att = `${AttRX}/${AttTX}`
         let pwr = `${PowerLevelRX}/${PowerLevelTX}`
-        let rate = `${getATUcRate / 1000}/${getATUrRate / 1000}`
+        let maxRate = `${getATUcRate / 1000}/${getATUrRate / 1000}`
+        let curRate = `${getATUcCrRate / 1000}/${getATUrCrRate / 1000}`
+
+        switch (portOperStatus) {
+          case 1:
+            snr = snr
+            att = att
+            pwr = pwr
+            maxRate = maxRate
+            curRate = curRate
+            break;
+          case 2:
+            snr = "-/-"
+            att = "-/-"
+            pwr = "-/-"
+            maxRate = "-/-"
+            curRate = "-/-"
+            break;
+          default:
+            snr = "-/-"
+            att = "-/-"
+            pwr = "-/-"
+            maxRate = "-/-"
+            curRate = "-/-"
+
+            break;
+        }
+        if (portAdminStatus == "2") {
+          snr = "-/-"
+          att = "-/-"
+          pwr = "-/-"
+          maxRate = "-/-"
+          curRate = "-/-"
+
+        }
+
+
+
+
+
         results.push([
-          portIfRange[i],
+          fixIntName,
           snr,
           att,
           pwr,
-          rate,
+          curRate,
+          maxRate
         ]);
 
 
@@ -247,7 +314,7 @@ const devicData = {
       return `${symbols.SHORT} Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее`;
     }
   },
-  processCableLengthInfo: async (
+  processCableLengthInfo1: async (
     host: string,
     portIfList: string[],
     portIfRange: string[],
@@ -294,9 +361,11 @@ const devicData = {
               host,
               vctOID + list[ifId],
               1
-            );
-
-            if (set) {
+            ).then((res) => {
+              return res;
+            });
+            console.log(set)
+            if (await set) {
               const length = await snmpFunctions.getSingleOID(
                 host,
                 vctOIDRes + list[ifId],
@@ -306,14 +375,16 @@ const devicData = {
               vtc_r = helperFunctions.parseReport(length);
               console.log(helperFunctions.parseCableLengthReport(length));
               console.log("parse_log", vtc_r)
-              if(vtc_r.length == 0){
+              if (vtc_r.length == 0) {
                 continue;
               }
+              console.log(vtc_r.length)
               if (length) {
-                for (let i = 0; i < vtc_r.length; i++) {
-                  vtc_res.push(
-                    vtc_r[i].cableLength,
-                    vtc_r[i].cableStatus
+                for (let i = 0; i < Math.min(5, vtc_r.length); i++) {
+
+                  // for (let i = 0; i < vtc_r.length; i++) {
+                  vtc_res.push([vtc_r[i].cableLength,
+                  vtc_r[i].cableStatus]
                   );
                 }
               }
@@ -326,19 +397,23 @@ const devicData = {
           }
 
           let operStatus;
-          if (portOperStatus == "1") {
-            operStatus = symbols.OK_UP;
-          } else if (portOperStatus == "2") {
-            operStatus = symbols.SHORT;
-          } else {
-            operStatus = symbols.UNKNOWN;
+          switch (portOperStatus) {
+            case 1:
+              operStatus = symbols.OK_UP
+              break;
+            case 2:
+              operStatus = symbols.OKEY;
+              break;
+            default:
+              operStatus = symbols.UNKNOWN;
+              break;
           }
           if (portAdminStatus == "2") {
-            operStatus = util.format("%s", symbols.NOCABLE);
+            operStatus = util.format("%s", symbols.AdminDownEmo);
           }
 
           results.push([
-            fixIntName, operStatus, vtc_res[1], vtc_res[2],vtc_res[3],vtc_res[4]]
+            fixIntName, operStatus, vtc_res[1], vtc_res[2], vtc_res[3], vtc_res[4]]
           );
           console.log(results)
         }
@@ -348,6 +423,104 @@ const devicData = {
       logger.error(message);
       return `${symbols.SHORT} Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее`;
     }
+  },
+
+  processCableLengthInfo: async (
+    host: string,
+    portIfList: string[],
+    portIfRange: string[],
+    community: string,
+    vctOID: string,
+    vctOIDRes: string,
+    results: any[],
+    write: boolean = true,
+  ) => {
+    const action = devicData.processCableLengthInfo.name;
+    let message = `{"date":"${currentDate}", "action":"${action}", `;
+    message += util.format('"%s":"%s", ', "host", host);
+
+    const getOidValue = async (oid: string) => {
+      try {
+        return await snmpFunctions.getSingleOID(host, oid, community);
+      } catch (error) {
+        logger.error(error);
+        return error;
+      }
+    };
+
+    try {
+      const zipArray = zip(portIfList, portIfRange);
+      for (const [ifId] of zipArray.entries()) {
+        if (
+          config.excludedSubstrings.some((substring: any) => portIfRange[ifId].includes(substring)) || /^\d+$/.test(portIfRange[ifId])  // ИЛИ если строка НЕ содержит только цифры
+        ) {
+          continue;
+        }
+
+        const portOperStatus = await getOidValue(joid.basic_oids.oid_oper_ports + portIfList[ifId]);
+        const portAdminStatus = await getOidValue(joid.basic_oids.oid_admin_ports + portIfList[ifId]);
+        if (
+          portOperStatus == "2" ||
+          (portOperStatus == "2" && portAdminStatus == "2")
+        ) {
+
+          const vtc_res = [];
+          if (write) {
+            if (await snmpFunctions.setSnmpOID(host, vctOID + portIfList[ifId], 1)) {
+              let length = await snmpFunctions.getSingleOID(
+                host,
+                vctOIDRes + portIfList[ifId],
+                community
+              );
+              if (
+                length.length == 0) {
+                continue;
+              }
+              if (length) {
+                let parsedReport = helperFunctions.parseReport(length);
+                vtc_res.push(...parsedReport.slice(0, 4)); // Добавление первых 4 элементов напрямую
+              }
+            }
+          }
+
+          let fixIntName = portIfRange[ifId];
+          if (portIfRange[ifId].includes("Huawei")) {
+            fixIntName = await getOidValue(joid.linux_server.oid_ifName + '.' + portIfList[ifId]);
+          }
+
+          let operStatus;
+          switch (portOperStatus) {
+            case 1:
+              operStatus = symbols.OK_UP
+              break;
+            case 2:
+              operStatus = symbols.OKEY;
+              break;
+            default:
+              operStatus = symbols.UNKNOWN;
+              break;
+          }
+          if (portAdminStatus == "2") {
+            operStatus = util.format("%s", symbols.AdminDownEmo);
+          }
+
+          results.push([
+            fixIntName,
+            operStatus,
+            ...(vtc_res.length >= 1 ? [util.format(`%s %s`, helperFunctions.cablePairStatusIconizer(vtc_res[0].cableStatus), vtc_res[0].cableLength)] : ["NaN"]),
+            ...(vtc_res.length >= 2 ? [util.format(`%s %s`, helperFunctions.cablePairStatusIconizer(vtc_res[1].cableStatus), vtc_res[1].cableLength)] : ["NaN"]),
+            ...(vtc_res.length >= 3 ? [util.format(`%s %s`, helperFunctions.cablePairStatusIconizer(vtc_res[2].cableStatus), vtc_res[2].cableLength)] : ["NaN"]),
+            ...(vtc_res.length >= 4 ? [util.format(`%s %s`, helperFunctions.cablePairStatusIconizer(vtc_res[3].cableStatus), vtc_res[3].cableLength)] : ["NaN"]),
+          ]);
+        }
+      }
+
+    } catch (error) {
+      message += `"error":"${error}"}`;
+      logger.error(message);
+      return `${symbols.SHORT} Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее`;
+    }
+    return results;
   },
 
   getDDMInfo: async (host: string, community: string): Promise<string> => {
@@ -368,9 +541,35 @@ const devicData = {
       const aiflist = JSON.parse(JSON_aiflist);
       const portIfList = aiflist.interfaceList;
       const portIfRange = aiflist.interfaceRange;
+
+      const walkOidValue = async (oid: string) => {
+        try {
+          return await snmpFunctions.getMultiOID(host, oid, community);
+        } catch (error) {
+          logger.error(error);
+          return error;
+        }
+      };
+      const intRange = await walkOidValue(joid.basic_oids.oid_port_name);
+      const intList = await walkOidValue(joid.basic_oids.oid_ifIndex);
+
+      const list = intList;
+      const range = intRange;
+
       const ddm = aiflist.ddm;
       const adsl = aiflist.adsl;
       const fibers = aiflist.fibers;
+      let table3 = new Table({
+        head: ["IF", "🔺Tx", "🔻RX", "🌡C", "⚡️V"],
+        chars: {
+          'top': '', 'top-mid': '', 'top-left': '', 'top-right': ''
+          , 'bottom': '', 'bottom-mid': '', 'bottom-left': '', 'bottom-right': ''
+          , 'left': '', 'left-mid': '', 'mid': '', 'mid-mid': ''
+          , 'right': '', 'right-mid': '', 'middle': ' '
+        },
+        style: { 'padding-left': 0, 'padding-right': 0 }
+      });
+
       const columnConfig: Indexable<ColumnUserConfig> = [
         { width: 8, alignment: "center" }, // IF
         { width: 6, alignment: "center" }, // 🔺Tx
@@ -395,43 +594,45 @@ const devicData = {
         logger.error(message);
         return `${symbols.WarnEmo} Функция DDM не поддерживается или не реализована\n`;
       } else if (adsl) {
-        const columnConfig: Indexable<ColumnUserConfig> = [
-          { width: 8, alignment: "center" }, // IF
-          { width: 9, alignment: "center" }, // 🔺Tx
-          { width: 9, alignment: "center" }, // 🔻RX
-          { width: 9, alignment: "center" }, // 🌡C
-          { width: 10, alignment: "center" }, // ⚡️V
-        ];
-
-        const config: BaseUserConfig = {
-          columns: columnConfig,
-          columnDefault: {
-            paddingLeft: 0,
-            paddingRight: 0,
-            // width: 6,
+        const list = intList;
+        const range = intRange;
+        let tableAdsl = new Table({
+          head: ["IF", "SNR", "Attn", "Pwr", "Curr.Rate","Max.Rate"],
+          chars: {
+            'top': '', 'top-mid': '', 'top-left': '', 'top-right': ''
+            , 'bottom': '', 'bottom-mid': '', 'bottom-left': '', 'bottom-right': ''
+            , 'left': '', 'left-mid': '', 'mid': '', 'mid-mid': ''
+            , 'right': '', 'right-mid': '', 'middle': ' '
           },
-          border: getBorderCharacters(`ramac`),
-        };
+          style: { 'padding-left': 0, 'padding-right': 0 }
+        });
+
         const oidLoader: OidLoaderType = (joid as JoidType)["adsl_oid"];
-        results.push(["IF", "SNR", "Attn", "Pwr", "Rate"]);
+
         await devicData.processADSLInfo(
           host,
-          portIfList,
-          portIfRange,
-          oidLoader["adslAtucCurrSnrMgn"],
-          oidLoader["adslAtucCurrAtn"],
-          oidLoader["adslAtucCurrOutputPwr"],
-          oidLoader["adslAtucCurrAttainableRate"],
-          oidLoader["adslAturCurrSnrMgn"],
-          oidLoader["adslAturCurrAtn"],
-          oidLoader["adslAturCurrOutputPwr"],
-          oidLoader["adslAturCurrAttainableRate"],
+          list,
+          range,
           community,
           results,
           true,
         );
-        const tab = table(results, config);
-        return tab;
+        const headers: string[] = results.shift(); // Уточнение типа для заголовков
+
+        const convertedData = results.map((row: (string | number)[]) => {
+          const obj: { [key: string]: string | number } = {}; // Уточнение типа для объекта
+          headers.forEach((header: string, index: number) => { // Использование явных типов для header и index
+            obj[header] = row[index];
+          });
+          return obj;
+        });
+
+
+        convertedData.forEach(obj => {
+          const row = headers.map(header => obj[header]);
+          tableAdsl.push(row);
+        });
+        return tableAdsl.toString().replace(/\x1B\[[0-9;]*m/g, '');
       } else {
         // const noDDMport = portIfList.length - fibers;
         // const DDMport = portIfList.length;
@@ -453,7 +654,7 @@ const devicData = {
           return `${symbols.WarnEmo} Функция DDM не поддерживается или не реализована\n`;
         }
         const oidLoader: OidLoaderType = (joid as JoidType)[oidLoaderKey];
-        results.push(["IF", "🔺Tx", "🔻RX", "🌡C", "⚡️V"]);
+
         // const oidLoader: OidLoaderType = joid[oidLoaderKey];
 
         if (model.includes("SNR")) {
@@ -534,8 +735,24 @@ const devicData = {
             results
           );
         }
-        const tab = table(results, config);
-        return tab;
+        const headers: string[] = results.shift(); // Уточнение типа для заголовков
+
+        const convertedData = results.map((row: (string | number)[]) => {
+          const obj: { [key: string]: string | number } = {}; // Уточнение типа для объекта
+          headers.forEach((header: string, index: number) => { // Использование явных типов для header и index
+            obj[header] = row[index];
+          });
+          return obj;
+        });
+
+
+        convertedData.forEach(obj => {
+          const row = headers.map(header => obj[header]);
+          table3.push(row);
+        });
+        return table3.toString().replace(/\x1B\[[0-9;]*m/g, '');
+        // const tab = table(results, config);
+        // return tab;
       }
     } catch (error) {
       message += `"error":"${error}"}`;
@@ -658,15 +875,17 @@ const devicData = {
         );
 
         let operStatus;
-
-        if (portOperStatus == "1") {
-          operStatus = symbols.OK_UP;
-        } else if (portOperStatus == "2") {
-          operStatus = symbols.NOCABLE;
-        } else {
-          operStatus = symbols.UNKNOWN;
+        switch (portOperStatus) {
+          case 1:
+            operStatus = symbols.OK_UP
+            break;
+          case 2:
+            operStatus = symbols.OKEY;
+            break;
+          default:
+            operStatus = symbols.UNKNOWN;
+            break;
         }
-
         if (portAdminStatus == "2") {
           operStatus = util.format("%s", symbols.AdminDownEmo);
         }
@@ -705,7 +924,7 @@ const devicData = {
         }
       }
 
-      const stateInfo = `P.S. Состояния: ${symbols.OK_UP} - Линк есть, ${symbols.NOCABLE} - Линка нет, ${symbols.AdminDownEmo} - Порт выключен, ${symbols.UNKNOWN} - Неизвестно`;
+      const stateInfo = `P.S. Состояния: ${symbols.OK_UP} - Линк есть, ${symbols.OKEY} - Линка нет, ${symbols.AdminDownEmo} - Порт выключен, ${symbols.UNKNOWN} - Неизвестно`;
       const resultMessage = `${results.join("\n")}\n\n${stateInfo}\n`;
       return resultMessage;
     } catch (e) {
@@ -790,31 +1009,22 @@ const devicData = {
           return error;
         }
       };
-      const model = deviceArr.FilterDeviceModel(modelValue);
       const intRange = await walkOidValue(joid.basic_oids.oid_port_name);
       const intList = await walkOidValue(joid.basic_oids.oid_ifIndex);
+      const model = deviceArr.FilterDeviceModel(modelValue);
+
       const list = intList;
       const range = intRange;
-      const columnConfig: Indexable<ColumnUserConfig> = [
-        { width: 16, alignment: "center" }, // IF
-        { width: 4, alignment: "center" }, // Status
-        { width: 10, alignment: "center" }, // 1,2
-        { width: 3, alignment: "center" }, // 3,6
-        { width: 3, alignment: "center" }, // 4,5
-        { width: 7, alignment: "center" }, // 7,8
-
-      ];
-      const tabConfig: BaseUserConfig = {
-        columns: columnConfig,
-        columnDefault: {
-          paddingLeft: 0,
-          paddingRight: 0,
-          // width: 6,
+      let table3 = new Table({
+        head: ["IF", "Sta", "1,2", "3,6", "4,5", "7,8"],
+        chars: {
+          'top': '', 'top-mid': '', 'top-left': '', 'top-right': ''
+          , 'bottom': '', 'bottom-mid': '', 'bottom-left': '', 'bottom-right': ''
+          , 'left': '', 'left-mid': '', 'mid': '', 'mid-mid': ''
+          , 'right': '', 'right-mid': '', 'middle': ' '
         },
-        border: getBorderCharacters(`ramac`),
-      };
-      results.push(["IF", "Sta", "1,2", "3,6", "4,5", "7,8"]);
-
+        style: { 'padding-left': 0, 'padding-right': 0 }
+      });
       if (model && model.includes("SNR")) {
 
         await devicData.processCableLengthInfo(host,
@@ -824,8 +1034,22 @@ const devicData = {
           joid.snr_oids.snr_oid_vct,
           joid.snr_oids.snr_oid_vct_res, results, true)
 
-        const tab = table(results, tabConfig);
-        return tab;
+        const headers: string[] = results.shift(); // Уточнение типа для заголовков
+
+        const convertedData = results.map((row: (string | number)[]) => {
+          const obj: { [key: string]: string | number } = {}; // Уточнение типа для объекта
+          headers.forEach((header: string, index: number) => { // Использование явных типов для header и index
+            obj[header] = row[index];
+          });
+          return obj;
+        });
+
+
+        convertedData.forEach(obj => {
+          const row = headers.map(header => obj[header]);
+          table3.push(row);
+        });
+        return table3.toString().replace(/\x1B\[[0-9;]*m/g, '');
       } else if (model && model.includes("MES2428")) {
         for (let ifId in zip(list, range)) {
           if (

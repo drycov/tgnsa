@@ -16,6 +16,7 @@ import deviceMenu from "../keyboards/deviceMenu";
 import helperFunctions from "../utils/helperFunctions";
 import logger from "../utils/logger";
 import snmpFunctions from "../utils/snmpFunctions";
+import symbols from "../assets/symbols";
 
 interface MyContext extends Context {
   session: { [key: string]: any }; // Change the type to match your session data structure
@@ -205,13 +206,31 @@ const deviceCommands = {
     ctx.session.previosCVid = "main";
     const host = ctx.session.deviceHost;
     const community = ctx.session.snmpCommunity;
-    const portStatus = await deviceData
+    await ctx.reply("Измерение длинны кабеля на устройстве(по отключенным портам): " + host, {
+      reply_markup: {
+        remove_keyboard: true,
+      },
+    });
+    const cableLengths = await deviceData
       .getCableLength(host, community)
       .then((status) => {
         return status;
       });
+      // case "open":
+      //   return symbols.NOCABLE;
+      // case "abnormal":
+      //   return symbols.ABNORMAL;
+      // case "short":
+      //   return symbols.SHORT;
+      // case "well":
+      //   return symbols.OK_UP;
+      // default:
+      //   return symbols.UNKNOWN
+
+      const stateInfo = `P.S. Состояния:\n ${symbols.OK_UP} - ОК, ${symbols.NOCABLE} - Обрыв,\n ${symbols.ABNORMAL} - Ненормальный, ${symbols.SHORT} - Короткое\n ${symbols.OK_UP} - Линк есть, ${symbols.OKEY} - Линка нет,\n ${symbols.AdminDownEmo} - Порт выключен, ${symbols.UNKNOWN} - Неизвестно`;
+
     await ctx.reply(`Длинна кабелей на устройстве: ${host}\n` +
-      ` <pre>${portStatus}</pre> + \n\n<i>Выполнено:  <code>${currentDate}</code></i>`,
+      ` <pre>${cableLengths} \n\n ${stateInfo}</pre> \n\n<i>Выполнено:  <code>${currentDate}</code></i>`,
       {
         reply_markup: deviceMenu.checkDevice,
         parse_mode: "HTML",

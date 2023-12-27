@@ -1,13 +1,8 @@
 {
-  "port": "443",
-  "sesionKey": "Zero0One1Two2Three3Four4",
-  "mongoURI": "mongodb+srv://ttc-ttcnsa:GJWPwBmlUJvc9S2S@cluster0.c48ewsz.mongodb.net",
-  "BotChatAdmin": "-1002077406333",
   "mongoOptions": {
     "dbName": "ttcNSA"
   },
-  "defaultAdmin": "632646448",
-  "databaseURL": "https://ttcnsa-default-rtdb.asia-southeast1.firebasedatabase.app",
+  "BotChatAdmin": "-1002077406333",
   "excludedSubstrings": [
     "Vl",
     "vl",
@@ -19,42 +14,48 @@
     "loop",
     "tunne",
     "oob",
-    "stack-port"
+    "stack-port",
+    "noSuchInstance"
   ],
-  "vendor_info": {
-    "botVendorEMailContact": "d.rykov@ttc.kz",
-    "botVendorContact": "@Oritorius",
-    "botVendor": "Denis Rykov",
-    "botVendorWContact": "+7-705-155-7619"
-  },
+  "mongoURI": "mongodb+srv://ttc-ttcnsa:GJWPwBmlUJvc9S2S@cluster0.c48ewsz.mongodb.net",
+  "port": "443",
+  "sesionKey": "Zero0One1Two2Three3Four4",
   "smtp_client": {
     "smtp_port": 587,
-    "smtp_user": "ttcnsb1@hotmail.com",
-    "smtp_server": "smtp-mail.outlook.com",
     "smtp_pwd": "OSKQAZwsx2022*",
-    "smtp_from": "Transtelecom JSC Network Support BOT <ttcnsb1@hotmail.com>"
-  },
-  "defaultLanguage": "en",
-  "snmp": {
-    "rw_community": [
-      "private"
-    ],
-    "community": [
-      "public",
-      "atbu+1",
-      "chinaPublic",
-      "ChinaPublic",
-      "public+"
-    ]
+    "smtp_user": "ttcnsb1@hotmail.com",
+    "smtp_from": "Transtelecom JSC Network Support BOT <ttcnsb1@hotmail.com>",
+    "smtp_server": "smtp-mail.outlook.com"
   },
   "pingDevice": {
     "interval": 2,
     "count": 5,
     "timeout": 10
   },
+  "vendor_info": {
+    "botVendorContact": "@Oritorius",
+    "botVendor": "Denis Rykov",
+    "botVendorEMailContact": "d.rykov@ttc.kz",
+    "botVendorWContact": "+7-705-155-7619"
+  },
+  "databaseURL": "https://ttcnsa-default-rtdb.asia-southeast1.firebasedatabase.app",
+  "botTgID": "5493974365",
+  "defaultAdmin": "632646448",
+  "snmp": {
+    "community": [
+      "public",
+      "atbu+1",
+      "chinaPublic",
+      "ChinaPublic",
+      "public+"
+    ],
+    "rw_community": [
+      "private"
+    ]
+  },
+  "defaultLanguage": "en",
   "mass_data": {
     "mii_subject": "Массовый инцидент",
     "mii_dest": "d.rykov@ttc.kz"
-  },
-  "botTgID": "5493974365"
+  }
 }

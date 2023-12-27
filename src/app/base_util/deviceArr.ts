@@ -232,6 +232,20 @@ export default {
           adsl: false,
           fibers: 2,
         });
+      case "Huawei MA5616":
+        return JSON.stringify({
+          interfaceRange: baseUtil.InterfaceLoader(
+            "s2700_interfaces",
+            "interfaceRange"
+          ),
+          interfaceList: baseUtil.InterfaceLoader(
+            "interface_list_huawei2700",
+            "interfaceList"
+          ),
+          ddm: false,
+          adsl: true,
+          fibers: 2,
+        });
       case "Tp-Link TL-1600G-52PS":
         return JSON.stringify({
           interfaceRange: baseUtil.InterfaceLoader(
