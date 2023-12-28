@@ -118,13 +118,21 @@ const deviceCommands = {
       .then((status) => {
         return status;
       });
-    await ctx.reply(
-      portStatus + `\n\n<i>Выполнено:  <code>${currentDate}</code></i>`,
-      {
-        reply_markup: deviceMenu.checkDevice,
-        parse_mode: "HTML",
-      }
-    );
+    const stateInfo = `P.S. Состояния: ${symbols.OK_UP} - Линк есть, ${symbols.OKEY} - Линка нет, ${symbols.AdminDownEmo} - Порт выключен, ${symbols.UNKNOWN} - Неизвестно`;
+    try {
+      await ctx.reply(`Состояние портов на устройстве: ${host}\n` +
+        ` <pre>${portStatus} \n\n ${stateInfo}</pre> \n\n<i>Выполнено:  <code>${currentDate}</code></i>`,
+        {
+          reply_markup: deviceMenu.checkDevice,
+          parse_mode: "HTML",
+        }
+      );
+    } catch (e) {
+      await ctx.reply(messages.ErroMessage + "\n", {
+        reply_markup: baseMenu.inBack,
+      });
+    }
+
   },
   vlanList: async (_conversation: MyConversation, ctx: MyContext) => {
     ctx.session.currentCVid = "check_device";
@@ -148,11 +156,16 @@ const deviceCommands = {
       `\n\n<i>Выполнено:  <code>${currentDate}</code></i>`;
     logger.info(vlanListResult.length);
     logger.info(mes.length);
-
-    await ctx.reply(mes, {
-      reply_markup: deviceMenu.checkDevice,
-      parse_mode: "HTML",
-    });
+    try {
+      await ctx.reply(mes, {
+        reply_markup: deviceMenu.checkDevice,
+        parse_mode: "HTML",
+      });
+    } catch (e) {
+      await ctx.reply(messages.ErroMessage + "\n", {
+        reply_markup: baseMenu.inBack,
+      });
+    }
   },
   ddmInfo: async (_conveconversation: MyConversation, ctx: MyContext) => {
     ctx.session.currentCVid = "check_device";
@@ -216,26 +229,21 @@ const deviceCommands = {
       .then((status) => {
         return status;
       });
-      // case "open":
-      //   return symbols.NOCABLE;
-      // case "abnormal":
-      //   return symbols.ABNORMAL;
-      // case "short":
-      //   return symbols.SHORT;
-      // case "well":
-      //   return symbols.OK_UP;
-      // default:
-      //   return symbols.UNKNOWN
 
-      const stateInfo = `P.S. Состояния:\n ${symbols.OK_UP} - ОК, ${symbols.NOCABLE} - Обрыв,\n ${symbols.ABNORMAL} - Ненормальный, ${symbols.SHORT} - Короткое\n ${symbols.OK_UP} - Линк есть, ${symbols.OKEY} - Линка нет,\n ${symbols.AdminDownEmo} - Порт выключен, ${symbols.UNKNOWN} - Неизвестно`;
-
-    await ctx.reply(`Длинна кабелей на устройстве: ${host}\n` +
-      ` <pre>${cableLengths} \n\n ${stateInfo}</pre> \n\n<i>Выполнено:  <code>${currentDate}</code></i>`,
-      {
-        reply_markup: deviceMenu.checkDevice,
-        parse_mode: "HTML",
-      }
-    );
+    const stateInfo = `P.S. Состояния:\n ${symbols.OK_UP} - ОК, ${symbols.NOCABLE} - Обрыв,\n ${symbols.ABNORMAL} - Ненормальный, ${symbols.SHORT} - Короткое\n ${symbols.OK_UP} - Линк есть, ${symbols.OKEY} - Линка нет,\n ${symbols.AdminDownEmo} - Порт выключен, ${symbols.UNKNOWN} - Неизвестно`;
+    try {
+      await ctx.reply(`Длинна кабелей на устройстве: ${host}\n` +
+        ` <pre>${cableLengths} \n\n ${stateInfo}</pre> \n\n<i>Выполнено:  <code>${currentDate}</code></i>`,
+        {
+          reply_markup: deviceMenu.checkDevice,
+          parse_mode: "HTML",
+        }
+      );
+    } catch (e) {
+      await ctx.reply(messages.ErroMessage + "\n", {
+        reply_markup: baseMenu.inBack,
+      });
+    }
   },
 };
 export default deviceCommands;

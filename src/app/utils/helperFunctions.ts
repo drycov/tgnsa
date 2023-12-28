@@ -11,6 +11,7 @@ import ping from "ping";
 import MailTo from "../core/MailTo";
 import { db } from "./firebaseConfig";
 import symbols from "../assets/symbols";
+import Table from "cli-table3";
 
 dotenv.config();
 // type MyContext = Context & ConversationFlavor;
@@ -326,6 +327,27 @@ const helperFunctions = {
         return symbols.UNKNOWN
     }
 
+  },
+  tableFormattedOutput: (results: any[], head?: string[]) => {
+    let table = new Table({
+      head: head,
+      chars: {
+        'top': '', 'top-mid': '', 'top-left': '', 'top-right': ''
+        , 'bottom': '', 'bottom-mid': '', 'bottom-left': '', 'bottom-right': ''
+        , 'left': '', 'left-mid': '', 'mid': '', 'mid-mid': ''
+        , 'right': '', 'right-mid': '', 'middle': ' '
+      },
+      colAligns:['center'],
+      style: { 'padding-left': 0, 'padding-right': 0 },
+      wordWrap: true,
+        wrapOnWordBoundary: true,
+    });
+    results.forEach(row => {
+      table.push(row);
+    });
+    
+    const tableString = table.toString().replace(/\x1B\[[0-9;]*m/g, '');
+    return tableString;
   }
 };
 
