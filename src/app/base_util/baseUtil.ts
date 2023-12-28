@@ -14,8 +14,7 @@ export default {
     let sc;
     sc = new Netmask(host);
     return util.format(
-      "<b>Расчет IP-сети <code>%s</code></b>\n\nАдрес сети:<code>%s</code>\nМаска подсети: <code>%s</code>\nПервый хост: <code>%s</code>\nПоследний хост: <code>%s</code>\nХостов/Сетей: <code>%s</code>",
-      host,
+      "Адрес сети:<code>%s</code>\nМаска подсети: <code>%s</code>\nПервый хост: <code>%s</code>\nПоследний хост: <code>%s</code>\nХостов/Сетей: <code>%s</code>",
       sc.base,
       sc.mask,
       sc.first,
@@ -30,8 +29,7 @@ export default {
     let sc;
     sc = new Netmask(host);
     return util.format(
-      "<b>Расчет P2P-пары <code>%s</code></b>\n\nХост:  <code>%s</code> \nШлюз: <code>%s</code> \nМаска подсети: <code>%s</code>",
-      host,
+      "Хост:  <code>%s</code> \nШлюз: <code>%s</code> \nМаска подсети: <code>%s</code>",
       sc.last,
       sc.first,
       sc.mask

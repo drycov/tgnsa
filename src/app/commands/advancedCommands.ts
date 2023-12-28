@@ -57,7 +57,7 @@ export default {
 
     const cidrData = baseUtil.subnetCalculate(subnet);
     await ctx.reply(
-      `${cidrData}\n\n<i>Выполнено:  <code>${currentDate}</code></i>`,
+      `<b>Расчет IP-сети: <code>${subnet}</code></b>\n\n<pre>${cidrData}</pre>\n\n<i>Выполнено:  <code>${currentDate}</code></i>`,
       {
         reply_markup: baseMenu.inBack,
         parse_mode: "HTML",
@@ -88,7 +88,7 @@ export default {
 
     const cidrData = baseUtil.p2pCalculate(subnet);
     await ctx.reply(
-      `${cidrData}\n\n<i>Выполнено:  <code>${currentDate}</code></i>`,
+      `<b>Расчет P2P-пары: <code>${subnet}</code></b>\n\n<pre>${cidrData}</pre>\n\n<i>Выполнено:  <code>${currentDate}</code></i>`,
       {
         reply_markup: baseMenu.inBack,
         parse_mode: "HTML",
@@ -123,8 +123,8 @@ export default {
     if (pingLog) {
       await ctx.reply(
         util.format(
-          "%s\n<code>%s</code>\n\n<i>Выполнено:  <code>%s</code></i>",
-          labels.PingDeviceLabel,
+          "Проверка доступности устройства: <code>%s</code>\n<pre><code>%s</code></pre>\n\n<i>Выполнено:  <code>%s</code></i>",
+          host,
           pingLog.toString(),
           currentDate
         ),
@@ -225,13 +225,13 @@ export default {
       config.mass_data.mii_subject
     );
     let MImessage = util.format(`\n
-<code>Уведомления №: %s\nУведомляем Вас о следующей проблеме:%s на сетях станции: %s.\nВ связи с проблемой прошу не производить прием заявок из: %s по следующим адресам: %s
+<pre><code>Уведомления №: %s\nУведомляем Вас о следующей проблеме:%s на сетях станции: %s.\nВ связи с проблемой прошу не производить прием заявок из: %s по следующим адресам: %s
 
 Проблема обнаружена в %s. 
 Ориентировочное время устранения: %s
 
 Информацию передал: %s
-Контактный телефон: %s\n</code>`,
+Контактный телефон: %s\n</code></pre>`,
       result, cause, station, city, addr, massStart, me, user.firstName + " " + user.lastName + " (" + user.companyPost + ") ", user.phoneNumber)
     await ctx.reply(
       "Запрос на массовый инцидент подан\n\n\n" +

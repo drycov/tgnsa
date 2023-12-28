@@ -107,7 +107,7 @@ const deviceCommands = {
     const host = ctx.session.deviceHost;
     const community = ctx.session.snmpCommunity;
 
-    await ctx.reply("Проверка портов на устройстве: " + host, {
+    await ctx.reply(`Проверка портов на устройстве:  <code>${host}</code>`, {
       reply_markup: {
         remove_keyboard: true,
       },
@@ -120,7 +120,7 @@ const deviceCommands = {
       });
     const stateInfo = `P.S. Состояния: ${symbols.OK_UP} - Линк есть, ${symbols.OKEY} - Линка нет, ${symbols.AdminDownEmo} - Порт выключен, ${symbols.UNKNOWN} - Неизвестно`;
     try {
-      await ctx.reply(`Состояние портов на устройстве: ${host}\n` +
+      await ctx.reply(`Состояние портов на устройстве:  <code>${host}</code>\n` +
         ` <pre>${portStatus} \n\n ${stateInfo}</pre> \n\n<i>Выполнено:  <code>${currentDate}</code></i>`,
         {
           reply_markup: deviceMenu.checkDevice,
@@ -140,7 +140,7 @@ const deviceCommands = {
     const host = ctx.session.deviceHost;
     const community = ctx.session.snmpCommunity;
 
-    await ctx.reply("Вывод списка VLAN на устройстве: " + host, {
+    await ctx.reply(`Вывод списка VLAN на устройстве:   <code>${host}</code>`, {
       reply_markup: {
         remove_keyboard: true,
       },
@@ -175,7 +175,7 @@ const deviceCommands = {
     const action = deviceCommands.ddmInfo.name;
 
 
-    await ctx.reply("Вывод уровня оптического сигнала/ADSL на устройстве: " + host, {
+    await ctx.reply(`Вывод уровня оптического сигнала/ADSL на устройстве: <code>${host}</code>`, {
       reply_markup: {
         remove_keyboard: true,
       },
@@ -219,7 +219,7 @@ const deviceCommands = {
     ctx.session.previosCVid = "main";
     const host = ctx.session.deviceHost;
     const community = ctx.session.snmpCommunity;
-    await ctx.reply("Измерение длинны кабеля на устройстве(по отключенным портам): " + host, {
+    await ctx.reply(`Измерение длинны кабеля на устройстве(по отключенным портам):  <code>${host}</code>`, {
       reply_markup: {
         remove_keyboard: true,
       },
@@ -232,7 +232,7 @@ const deviceCommands = {
 
     const stateInfo = `P.S. Состояния:\n ${symbols.OK_UP} - ОК, ${symbols.NOCABLE} - Обрыв,\n ${symbols.ABNORMAL} - Ненормальный, ${symbols.SHORT} - Короткое\n ${symbols.OK_UP} - Линк есть, ${symbols.OKEY} - Линка нет,\n ${symbols.AdminDownEmo} - Порт выключен, ${symbols.UNKNOWN} - Неизвестно`;
     try {
-      await ctx.reply(`Длинна кабелей на устройстве: ${host}\n` +
+      await ctx.reply(`Длинна кабелей на устройстве:  <code>${host}</code>\n` +
         ` <pre>${cableLengths} \n\n ${stateInfo}</pre> \n\n<i>Выполнено:  <code>${currentDate}</code></i>`,
         {
           reply_markup: deviceMenu.checkDevice,
