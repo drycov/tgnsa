@@ -106,11 +106,23 @@ const deviceCommands = {
     ctx.session.previosCVid = "main";
     const host = ctx.session.deviceHost;
     const community = ctx.session.snmpCommunity;
+    let action = deviceCommands.portInfo.name;
+    let message = util.format(
+      '{"date":"%s", "%s":%s","%s":"%s", ',
+      currentDate,
+      "action",
+      action,
+      "userId",
+      ctx.session.userId
+    );
+    
+    message += util.format('"%s":"%s", ', "host", host);
 
     await ctx.reply(`Проверка портов на устройстве:  <code>${host}</code>`, {
       reply_markup: {
         remove_keyboard: true,
       },
+      parse_mode: "HTML",
     });
 
     const portStatus = await deviceData
@@ -120,6 +132,8 @@ const deviceCommands = {
       });
     const stateInfo = `P.S. Состояния: ${symbols.OK_UP} - Линк есть, ${symbols.OKEY} - Линка нет, ${symbols.AdminDownEmo} - Порт выключен, ${symbols.UNKNOWN} - Неизвестно`;
     try {
+      message += `"status":"done"}`;
+      logger.info(message);
       await ctx.reply(`Состояние портов на устройстве:  <code>${host}</code>\n` +
         ` <pre>${portStatus} \n\n ${stateInfo}</pre> \n\n<i>Выполнено:  <code>${currentDate}</code></i>`,
         {
@@ -128,8 +142,11 @@ const deviceCommands = {
         }
       );
     } catch (e) {
+      message += `"error":"${e}"}`;
+      logger.error(message);
       await ctx.reply(messages.ErroMessage + "\n", {
         reply_markup: baseMenu.inBack,
+        parse_mode: "HTML",
       });
     }
 
@@ -139,11 +156,21 @@ const deviceCommands = {
     ctx.session.previosCVid = "main";
     const host = ctx.session.deviceHost;
     const community = ctx.session.snmpCommunity;
-
+    let action = deviceCommands.vlanList.name;
+    let message = util.format(
+      '{"date":"%s", "%s":%s","%s":"%s", ',
+      currentDate,
+      "action",
+      action,
+      "userId",
+      ctx.session.userId
+    );
     await ctx.reply(`Вывод списка VLAN на устройстве:   <code>${host}</code>`, {
       reply_markup: {
         remove_keyboard: true,
       },
+      parse_mode: "HTML",
+
     });
 
     const vlanListResult = await deviceData
@@ -157,11 +184,15 @@ const deviceCommands = {
     logger.info(vlanListResult.length);
     logger.info(mes.length);
     try {
+      message += `"status":"done"}`;
+      logger.info(message);
       await ctx.reply(mes, {
         reply_markup: deviceMenu.checkDevice,
         parse_mode: "HTML",
       });
     } catch (e) {
+      message += `"error":"${e}"}`;
+      logger.error(message);
       await ctx.reply(messages.ErroMessage + "\n", {
         reply_markup: baseMenu.inBack,
       });
@@ -173,12 +204,21 @@ const deviceCommands = {
     const host = ctx.session.deviceHost;
     const community = ctx.session.snmpCommunity;
     const action = deviceCommands.ddmInfo.name;
-
+    let message = util.format(
+      '{"date":"%s", "%s":%s","%s":"%s", ',
+      currentDate,
+      "action",
+      action,
+      "userId",
+      ctx.session.userId
+    );
 
     await ctx.reply(`Вывод уровня оптического сигнала/ADSL на устройстве: <code>${host}</code>`, {
       reply_markup: {
         remove_keyboard: true,
       },
+      parse_mode: "HTML",
+
     });
     const DDMInfo = await deviceData
       .getDDMInfo(host, community)
@@ -199,9 +239,11 @@ const deviceCommands = {
         });
         fs.unlinkSync(tempFilePNGPath);
         fs.unlinkSync(tempFilePath);
-
+        message += `"status":"done"}`;
+        logger.info(message);
       } catch (error) {
-        console.error('Ошибка отправки файла:', error);
+        message += `"error":"${error}"}`;
+        logger.error(message);
       }
     } else {
       await ctx.reply(
@@ -212,6 +254,8 @@ const deviceCommands = {
           parse_mode: "HTML",
         }
       );
+      message += `"status":"done"}`;
+      logger.info(message);
     }
   },
   cableMetr: async (_conversation: MyConversation, ctx: MyContext) => {
@@ -219,6 +263,15 @@ const deviceCommands = {
     ctx.session.previosCVid = "main";
     const host = ctx.session.deviceHost;
     const community = ctx.session.snmpCommunity;
+    const action = deviceCommands.cableMetr.name;
+    let message = util.format(
+      '{"date":"%s", "%s":%s","%s":"%s", ',
+      currentDate,
+      "action",
+      action,
+      "userId",
+      ctx.session.userId
+    );
     await ctx.reply(`Измерение длинны кабеля на устройстве(по отключенным портам):  <code>${host}</code>`, {
       reply_markup: {
         remove_keyboard: true,
@@ -239,7 +292,11 @@ const deviceCommands = {
           parse_mode: "HTML",
         }
       );
+      message += `"status":"done"}`;
+      logger.info(message);
     } catch (e) {
+      message += `"error":"${e}"}`;
+        logger.error(message);
       await ctx.reply(messages.ErroMessage + "\n", {
         reply_markup: baseMenu.inBack,
       });

@@ -106,6 +106,8 @@ const mainCommands = {
           .verifyEmail(email)
           .then((res) => res);
         const newUserInfo: User = {
+          ttc_id:'5',
+          station:"2",
           is_bot: ctx.message?.from.is_bot !== undefined ? ctx.message.from.is_bot : false,
           tgId: ctx.message?.from.id !== undefined ? ctx.message.from.id : 0, // Здесь 0 - это ваше значение по умолчанию
           firstName: firstName,

@@ -15,14 +15,16 @@ import messages from "./assets/messages";
 import advancedCommands from "./commands/advancedCommands";
 import deviceCommands from "./commands/deviceCommands";
 import mainComands from "./commands/mainCommands";
+import joid from "../src/oid.json";
 
 import * as path from "path";
-const configPath = path.join(__dirname, '../',  '../', `config.json`);
+const configPath = path.join(__dirname, '../', '../', `config.json`);
 const config = require(configPath);
 
 import baseMenu from "./keyboards/baseMenu";
 import messagesFunctions from "./utils/messagesFunctions";
 import userData from "./data/userData";
+import devicData from "./core/deviceData";
 const token = helperFunctions.apptype() || "";
 interface MainContext extends Context {
   session: { [key: string]: any }; // Change the type to match your session data structure
@@ -109,8 +111,13 @@ bot.command(["start", "st", "run"], async (ctx) => {
 bot.command("test", async (ctx) => {
   ctx.deleteMessage();
   helperFunctions.setSessionData(ctx);
+  if (ctx.message && ctx.message.text) {
+    const data = helperFunctions.parseTelegramCommand(ctx.message.text);
+   const res = await devicData.runNetmikoScript([data?.ipAddress, "public", joid.basic_oids.dot1qVlanStaticEgressPorts + data?.vlan, joid.basic_oids.dot1qVlanStaticUntaggedPorts + data?.vlan,joid.basic_oids.dot1qVlanForbiddenEgressPorts + data?.vlan]).then((res) => { return res });
+   await ctx.reply(res);
+    // Здесь можно использовать полученные данные из data
+  }
 
-  await ctx.conversation.enter("cableMetr");
 });
 
 

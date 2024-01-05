@@ -20,12 +20,13 @@ interface MyContext extends Context {
 }
 
 
-// const statusMapping: { [key: string]: string } = {
-//   "0": "NO",
-//   "1": "YES",
-//   "3": "VACATION",
-//   да: "YES",
-// };
+interface TelegramCommand {
+  command: string;
+  ipAddress: string;
+  port: number;
+}
+
+
 const helperFunctions = {
   delay: (ms: any) => {
     new Promise((resolve) => setTimeout(resolve, ms));
@@ -337,18 +338,46 @@ const helperFunctions = {
         , 'left': '', 'left-mid': '', 'mid': '', 'mid-mid': ''
         , 'right': '', 'right-mid': '', 'middle': ' '
       },
-      colAligns:['center'],
+      colAligns: ['center'],
       style: { 'padding-left': 0, 'padding-right': 0 },
       wordWrap: true,
-        wrapOnWordBoundary: true,
+      wrapOnWordBoundary: true,
     });
     results.forEach(row => {
       table.push(row);
     });
-    
+
     const tableString = table.toString().replace(/\x1B\[[0-9;]*m/g, '');
     return tableString;
+  },
+  memberPorts: (inputString: string): string => {
+    const hexToBin: Record<string, string> = {
+      '0': '0000', '1': '0001', '2': '0010', '3': '0011',
+      '4': '0100', '5': '0101', '6': '0110', '7': '0111',
+      '8': '1000', '9': '1001', 'A': '1010', 'B': '1011',
+      'C': '1100', 'D': '1101', 'E': '1110', 'F': '1111',
+    };
+
+    return inputString.split('').map(char => hexToBin[char.toUpperCase()] || char).join('');
+  },
+  parseTelegramCommand(text: string) {
+    const parts = text.trim().split(' ');
+  
+    if (parts.length === 3 && parts[0].startsWith('/')) {
+      const command = parts[0];
+      const ipAddress = parts[1];
+      const vlan = parseInt(parts[2], 10);
+  
+      // Проверка валидности IP-адреса
+      const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
+      if (ipRegex.test(ipAddress) && !isNaN(vlan)) {
+        return { command, ipAddress, vlan };
+      }
+    }
+  
+    return null;
   }
+
 };
 
 

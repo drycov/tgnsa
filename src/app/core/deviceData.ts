@@ -35,7 +35,7 @@ const devicData = {
     model?: string | undefined,
 
   ) => {
-    const action = devicData.processDDMInfo.name;
+    const action = devicData.processPortStatus.name;
     let message = `{"date":"${currentDate}", "action":"${action}", `;
     message += util.format('"%s":"%s", ', "host", host);
     const getOidValue = async (oid: string) => {
@@ -50,8 +50,16 @@ const devicData = {
 
     try {
       for (let i = 0; i < portIfList.length; i++) {
+        const testIntDescr = await getOidValue(
+          descrOid + portIfList[i]
+        );
         if (
-          config.excludedSubstrings.some((substring: any) => portIfRange[i].includes(substring)) || /^\d+$/.test(portIfRange[i]) || portIfRange[i].includes('.ServiceInstance')|| portIfRange[i].includes("E1") // ИЛИ если строка НЕ содержит только цифры
+          config.excludedSubstrings.some((substring: any) => portIfRange[i].includes(substring)) 
+          || /^\d+$/.test(portIfRange[i]) 
+          || /[a-zA-Z]+[0-9]\/[0-9]\/[0-9]\/[0-9]\./g.test(portIfRange[i])
+          || portIfRange[i].includes('.ServiceInstance') 
+          || portIfRange[i].includes("E1")
+          || portIfRange[i].includes(`${testIntDescr}.`) // ИЛИ если строка НЕ содержит только цифры
         ) {
           continue; // Пропускаем эту итерацию, если строка содержит исключенные подстроки или не содержит только цифры
         }
@@ -67,6 +75,10 @@ const devicData = {
         const get_inerrors = await getOidValue(
           joid.basic_oids.oid_inerrors + portIfList[i]
         );
+        if((portIfRange[i].includes("Po")||portIfRange[i].includes("po")||portIfRange[i].includes("ControlEthernet"))&&(portOperStatus!=1||portAdminStatus==2)){
+          continue; // Пропускаем эту итерацию, если строка содержит исключенные подстроки или не содержит только цифры
+        
+        }
 
         let operStatus;
         switch (portOperStatus) {
@@ -94,7 +106,7 @@ const devicData = {
         if (intDescr == "noSuchInstance" || intDescr == "noSuchObject") {
           fixIntDescr = " ";
         }
-        if(parseInt(get_inerrors) == 0 || get_inerrors=="noSuchInstance" ||get_inerrors== "noSuchObject" ){
+        if (parseInt(get_inerrors) == 0 || get_inerrors == "noSuchInstance" || get_inerrors == "noSuchObject") {
           fixInErrors = " ";
         }
 
@@ -105,6 +117,7 @@ const devicData = {
           fixInErrors
         ]);
       }
+
       message += `"status":"done"}`;
       logger.info(message);
 
@@ -999,19 +1012,24 @@ const devicData = {
     }
   },
 
-  runNetmikoScript: (): Promise<string> => {
+  runNetmikoScript: (arg: any []): Promise<any> => {
     const options: Options = {
-      mode: "json",
+      mode: "text",
       pythonOptions: ["-u"], // unbuffered output
-      scriptPath: "/", // путь к файлу netmiko_script.py
+      scriptPath: "./python", // путь к файлу netmiko_script.py
+      args:arg
     };
 
-    return new Promise(() => {
-      PythonShell.runString("ps.py", options).then((messages) => {
-        logger.info(messages);
+    
+    return new Promise((resolve) => {
+      PythonShell.run('ps.py', options).then(messages=>{
+        // results is an array consisting of messages collected during execution
+        console.log('results: %j', messages);
+        resolve(messages);
       });
     });
   },
+
 };
 
 export default devicData;
