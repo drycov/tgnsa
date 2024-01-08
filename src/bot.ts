@@ -1,110 +1,138 @@
 import { run } from "@grammyjs/runner";
 import util from "util";
-import https from "https"
-import io from "@pm2/io"
-
+import https from "https";
 import app from "./app/index";
-import database from "./app/utils/database";
+import web from "./web/index";
+import * as fs from "fs";
 import logger from "./app/utils/logger";
-
 import * as path from "path";
 import helperFunctions from "./app/utils/helperFunctions";
+import readline from "readline";
+
+const currentDate = new Date().toLocaleString("ru-RU");
 const configPath = path.join(__dirname, '../', `config.json`);
 const config = require(configPath);
 const port = process.env.PORT || config.port;
 
-const currentDate = new Date().toLocaleString("ru-RU");
-
 const runner = run(app);
-let server: https.Server;
+let server: https.Server | null = null;
+
+const options = {
+  cert: fs.readFileSync(path.join(__dirname, './sslcert/fullchain.pem')),
+  key: fs.readFileSync(path.join(__dirname, './sslcert/privkey.pem'))
+};
 
 function startServer(port: string | number) {
-  const server = https.createServer((req, res) => {
-    res.writeHead(200, { 'Content-Type': 'text/html' });
-
-    res.end(`<html><head>
-    <!-- ... -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- ... other scripts -->
-  </head><body>
-    Привет мир! Это HTTP сервер!
-    
-    </body></html>`);
-  });
-    
-  server.listen(port, () => {
-    console.log(`Сервер запущен на порту ${port}`);
+  server = https.createServer(options, web).listen(port, () => {
+    const serverAddress = server?.address();
+    if (serverAddress && typeof serverAddress !== "string") {
+      const { address, port } = serverAddress;
+      const hostname = address === "::" ? "localhost" : address;
+      console.log(
+        "\x1b[32m%s\x1b[0m",
+        `Server is running at https://${hostname}:${port}`
+      );
+    } else {
+      console.log("\x1b[32m%s\x1b[0m", `Server is running on ${serverAddress}`);
+    }
   });
 }
+
+function restartServer(port: string | number) {
+  if (server) {
+    server.close(() => {
+      console.log("\x1b[33m%s\x1b[0m", "Server stopped");
+      startServer(port);
+    });
+  } else {
+    console.log("Server is not running, cannot restart.");
+  }
+}
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
+
+rl.on("line", (input) => {
+  if (input === "stop") {
+    rl.pause();
+    rl.question(
+      "Вы действительно хотите остановить сервер? (yes/no) ",
+      (answer) => {
+        if (answer.toLowerCase() === "yes") {
+          process.emit("SIGINT");
+        } else {
+          rl.resume();
+        }
+      }
+    );
+  } else if (input === "restart") {
+    rl.pause();
+    restartServer(port);
+  }
+});
+
 const startApplication = async () => {
-  let action = startApplication.name;
   await helperFunctions.saveConfigToFirestore();
   helperFunctions.monitorFirestoreChanges();
-  let message = util.format(
-    '{"date":"%s", "%s":"%s",',
-    currentDate,
-    "action",
-    action
-  );
+
   try {
-    // await database();
     const status = runner.isRunning();
     await app.init();
-    message += util.format(
-      '"%s":"%s"}',
+
+    const message = util.format(
+      '{"date":"%s", "%s":"%s", "%s":"%s"}',
+      currentDate,
+      "action",
+      startApplication.name,
       "status",
-      status
-        ? `${app.botInfo.username} Running`
-        : `${app.botInfo.username} Not Running`
+      status ? `${app.botInfo.username} Running` : `${app.botInfo.username} Not Running`
     );
     logger.info(message);
   } catch (error) {
-    console.error("Error during initialization:", error);
-    message += util.format('"%s":"%s"}', "error", error);
-    logger.error(message);
+    const errorMessage = util.format('{"date":"%s", "%s":"%s", "%s":"%s"}', currentDate, "action", startApplication.name, "error", error);
+    logger.error(errorMessage);
   }
 };
 
 startApplication();
-// PM2_PUBLIC_KEY=8bttggxx2kqgol6
-// PM2_SECRET_KEY=2uv8dlcc0y6lul2
-io.init({
 
-  tracing:true,
-  apmOptions:{
-    appName:"tgnsa",
-    publicKey:"8bttggxx2kqgol6",
-    secretKey:"2uv8dlcc0y6lul2"
-  }
-  // transactions: true // will enable the transaction tracing
-  // http: true // will enable metrics about the http server (optional)
-})
-
-if(!process.env.NOWEB && process.env.APP_TYPE == "DEV"){
+console.log(`NOWEB:${process.env.NOWEB} APP_TYPE:${process.env.APP_TYPE}`)
+if (process.env.NOWEB && process.env.APP_TYPE === "DEV") {
   startServer(port);
 }
 
-console.log(process.env.NOWEB,process.env.APP_TYPE )
-
-
 const stopRunner = () => {
-  let action = stopRunner.name;
-  let message = util.format(
-    '{"date":"%s", "%s":"%s",',
+  const action = stopRunner.name;
+  const message = util.format(
+    '{"date":"%s", "%s":"%s", "%s":"%s"}',
     currentDate,
     "action",
-    action
+    action,
+    "status",
+    `${app.botInfo.username} Stopped`
   );
+
   if (runner.isRunning()) {
-    message += util.format(
-      '"%s":"%s"}',
-      "status",
-      `${app.botInfo.username} Stopped`
-    );
     logger.info(message);
     runner.stop();
   }
 };
 
-process.once("SIGINT", stopRunner);
-process.once("SIGTERM", stopRunner);
+const gracefulShutdown = () => {
+  stopRunner();
+  if (server) {
+    server.close(() => {
+      console.log("\x1b[33m%s\x1b[0m", "Server stopped");
+      process.exit(0);
+    });
+  } else {
+    process.exit(0);
+  }
+};
+
+process.on("SIGINT", gracefulShutdown);
+process.on("SIGTERM", gracefulShutdown);
+
+rl.prompt();

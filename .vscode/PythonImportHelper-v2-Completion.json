@@ -67,15 +67,6 @@
         "documentation": {}
     },
     {
-        "label": "random",
-        "kind": 6,
-        "isExtraImport": true,
-        "importPath": "random",
-        "description": "random",
-        "detail": "random",
-        "documentation": {}
-    },
-    {
         "label": "_Known",
         "kind": 6,
         "importPath": "node_modules.flatted.python.flatted",
@@ -316,24 +307,6 @@
         "description": "python.ps",
         "peekOfCode": "result_untagged = asyncio.run(untagged())\nuntagged, tagged = classify_ports(result_member,result_untagged)\nprint(f\"{decode_ports(result_member)}\\n{decode_ports(result_untagged)}\\n\\n{untagged}\\n{tagged}\")",
         "detail": "python.ps",
-        "documentation": {}
-    },
-    {
-        "label": "generate_duty",
-        "kind": 2,
-        "importPath": "target.src.python.ps",
-        "description": "target.src.python.ps",
-        "peekOfCode": "def generate_duty():\n    duty = {}\n    year = 2022\n    while year == 2022:  # Генерация только для 2022 года\n        duty[str(year)] = {}\n        for month in range(1, 13):  # Генерация для каждого месяца\n            days_in_month = 31 if month in [1, 3, 5, 7, 8, 10, 12] else 30 if month != 2 else 28\n            duty[str(year)][str(month).zfill(2)] = {}\n            day = 1\n            while day <= days_in_month:  # Генерация для каждого дня месяца",
-        "detail": "target.src.python.ps",
-        "documentation": {}
-    },
-    {
-        "label": "duty_data",
-        "kind": 5,
-        "importPath": "target.src.python.ps",
-        "description": "target.src.python.ps",
-        "peekOfCode": "duty_data = generate_duty()\n# Вывод сгенерированных данных\nprint(duty_data)",
-        "detail": "target.src.python.ps",
         "documentation": {}
     }
 ]
