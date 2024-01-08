@@ -99,7 +99,7 @@ const startApplication = async () => {
 startApplication();
 
 console.log(`NOWEB:${process.env.NOWEB} APP_TYPE:${process.env.APP_TYPE}`)
-if (process.env.NOWEB && process.env.APP_TYPE === "DEV") {
+if ((process.env.NOWEB && process.env.APP_TYPE === "DEV")||process.env.RUN_WAPP) {
   startServer(port);
 }
 
