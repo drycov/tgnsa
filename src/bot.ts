@@ -23,20 +23,21 @@ const options = {
 };
 
 function startServer(port: string | number) {
-  server = https.createServer(options, web).listen(port, () => {
+  const serverPort = typeof port === 'string' ? parseInt(port, 10) : port;
+  server = https.createServer(options, web).listen(serverPort, "91.185.5.210", () => {
     const serverAddress = server?.address();
     if (serverAddress && typeof serverAddress !== "string") {
       const { address, port } = serverAddress;
-      const hostname = address === "::" ? "localhost" : address;
       console.log(
         "\x1b[32m%s\x1b[0m",
-        `Server is running at https://${hostname}:${port}`
+        `Server is running at https://${address}:${port}`
       );
     } else {
       console.log("\x1b[32m%s\x1b[0m", `Server is running on ${serverAddress}`);
     }
   });
 }
+
 
 function restartServer(port: string | number) {
   if (server) {
