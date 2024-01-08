@@ -9,7 +9,7 @@ import cookieSession from 'cookie-session';
 import expressLayouts from "express-ejs-layouts";
 import useragent from "express-useragent";
 import process from "process";
-// import * as favicon from "serve-favicon";
+import favicon from "serve-favicon";
 
 import logger from "../app/utils/logger";
 import loggerMiddleware from "./middlewares/loggerMiddleware";
@@ -36,7 +36,7 @@ app.use(
 app.use(cookieParser());
 app.use(useragent.express());
 app.use(compression());
-// app.use(favicon(path.join(__dirname, "./public", "favicon.ico")));
+app.use(favicon(path.join(__dirname, "./public", "favicon.ico")));
 app.use(express.static(path.join(__dirname, "./static")));
 
 app.use(bodyParser.json());
