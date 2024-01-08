@@ -4,6 +4,7 @@ import joid from "../../src/oid.json";
 import logger from "./logger";
 import messagesFunctions from "./messagesFunctions";
 import * as path from "path";
+import { zip } from "underscore";
 const configPath = path.join(__dirname, '../', '../', '../', `config.json`);
 const config = require(configPath);
 
@@ -140,6 +141,35 @@ const snmpFunctions = {
           const result = varbinds.map((vb) => vb.value);
           session.close(); // Закрыть сессию после успешного выполнения
           resolve(result);
+        }
+      });
+    });
+  },
+  getMultiOIDValue: (host: string, oid: string, community: string): Promise<any> => {
+    const action = snmpFunctions.getMultiOID.name;
+    let message = util.format('{"date":"%s", "action":"%s", ', currentDate, action);
+    message += util.format('"%s":"%s", ', "host", host);
+
+    const session = new Session({
+      host: host,
+      community: community,
+    });
+    return new Promise((resolve, reject) => {
+      let results: any[] = [];
+      session.getSubtree({ oid: oid }, (error, varbinds) => {
+        if (error) {
+          message += util.format('"%s":"%s"}', "error", error);
+          logger.error(message);
+          session.close(); // Закрыть сессию в случае 
+          resolve(false);
+          reject(error);
+        } else {
+          varbinds.forEach((vb) => {
+            results.push({ oid: vb.oid, value: vb.value });
+          });
+          
+          session.close();
+          resolve(results);
         }
       });
     });

@@ -17,8 +17,11 @@ export default {
       swModel = "Huawei S5320-28P-LI-AC";
     } else if (dirtyData.includes("S6320-54C-EI-48S-AC")) {
       swModel = "Huawei S6320-54C-EI-48S-AC";
-    } else if (dirtyData.includes("Huawei Integrated Access Software")) {
-      swModel = "Huawei MA5616";
+    } else if(dirtyData.includes("S5700-26X-SI-12S-AC")){
+      swModel = "Huawei S5700-26X-SI-12S-AC"
+    }
+    else if (dirtyData.includes("Huawei Integrated Access Software")) {
+      swModel = "Huawei SmartAX MA5616";
     } else if (dirtyData.includes("DGS-3420-28SC")) {
       swModel = "Dlink DGS-3420-28SC";
     } else if (dirtyData.includes("DGS-3620-28SC")) {
@@ -86,6 +89,10 @@ export default {
         swModel = "Mikrotik RB2011LS";
       } else if (dirtyData.includes("RB760")) {
         swModel = "Mikrotik RB760iGS";
+      }else if(dirtyData.includes("RB SXT")){
+        swModel = "MikroTik SXT SA5"
+      }else if (dirtyData.includes("RB911G-5HPacD")){
+        swModel = "Mikrotik NetBox 5"
       }
     } else if (dirtyData.includes("SwOS")) {
       if (dirtyData.includes("CSS326-24G-2S+")) {
@@ -123,6 +130,8 @@ export default {
       } else if (dirtyData.includes("C2960")) {
         swModel = "Cisco C2960";
       }
+    } else if (dirtyData.includes("LPOS")){
+      swModel = "Sprinter TX TopGate E1"
     } else if (dirtyData.includes("Linux")) {
       swModel = "Linux Server";
     } else {

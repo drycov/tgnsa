@@ -11,10 +11,14 @@ module.exports = {
       env_production: {
         NODE_ENV: "production",
         APP_TYPE: "PROD",
+        NOWEB: "true",
+        PORT:"443"
       },
       env_development: {
         NODE_ENV: "development",
         APP_TYPE: "DEV",
+        NOWEB: "false",
+        PORT:"443"
       },
     },
   ],

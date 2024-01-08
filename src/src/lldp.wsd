@@ -1,0 +1,42 @@
+@startuml LLDP
+' Устройство 10.145.5.20
+node "agg-altay-osk" as Local {
+    interface "te1/0/2" as LocalTe1_0_2
+    interface "te1/0/3" as LocalTe1_0_3
+    interface "te1/0/4" as LocalTe1_0_4
+}
+
+' Устройства, к которым подключено agg-altay-osk
+node "alsiskad-altay-osk" as Remote1 {
+    interface "te1/0/1" as Remote1Te1_0_1
+}
+
+node "agg-snp-altay-osk" as Remote2 {
+    interface "te1/0/3" as Remote2Te1_0_3
+}
+
+node "BS-ELE" as Remote3 {
+    interface "bridge1/ether1" as Remote3Bridge1Ether1
+    interface "MNG-RRL" as Remote3MNG_RRL
+}
+
+node "RRL03-ELE2UPR" as Remote4 {
+    interface "bridge1/ether1" as Remote4Bridge1Ether1
+    interface "MNG" as Remote4MNG
+}
+
+node "RRL04-ELE2FAV" as Remote5 {
+    interface "bridge1/ether1" as Remote5Bridge1Ether1
+    interface "MNG" as Remote5MNG
+}
+
+' Связи
+LocalTe1_0_2 -- Remote1Te1_0_1 : gi1/0/1
+LocalTe1_0_3 -- Remote2Te1_0_3 : gi1/0/2
+LocalTe1_0_4 -- Remote3Bridge1Ether1 : gi1/0/3
+LocalTe1_0_4 -- Remote4Bridge1Ether1 : gi1/0/4
+LocalTe1_0_4 -- Remote3MNG_RRL : gi1/0/5
+LocalTe1_0_4 -- Remote4MNG : gi1/0/6
+LocalTe1_0_4 -- Remote5Bridge1Ether1 : gi1/0/7
+LocalTe1_0_4 -- Remote5MNG : gi1/0/8
+@enduml

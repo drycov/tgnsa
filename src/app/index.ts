@@ -9,22 +9,23 @@ import { Bot, Context, GrammyError, HttpError, session } from "grammy";
 import helperFunctions from "./utils/helperFunctions";
 
 import os from "os";
+import * as path from "path";
 import util from "util";
+import joid from "../src/oid.json";
 import labels from "./assets/labels";
 import messages from "./assets/messages";
 import advancedCommands from "./commands/advancedCommands";
 import deviceCommands from "./commands/deviceCommands";
 import mainComands from "./commands/mainCommands";
-import joid from "../src/oid.json";
-
-import * as path from "path";
 const configPath = path.join(__dirname, '../', '../', `config.json`);
 const config = require(configPath);
 
 import baseMenu from "./keyboards/baseMenu";
 import messagesFunctions from "./utils/messagesFunctions";
-import userData from "./data/userData";
-import devicData from "./core/deviceData";
+
+import deviceArr from "./base_util/deviceArr";
+import logger from "./utils/logger";
+import snmpFunctions from "./utils/snmpFunctions";
 const token = helperFunctions.apptype() || "";
 interface MainContext extends Context {
   session: { [key: string]: any }; // Change the type to match your session data structure
@@ -108,19 +109,93 @@ bot.command(["start", "st", "run"], async (ctx) => {
   await ctx.conversation.exit();
   await ctx.conversation.enter("start");
 });
+// bot.command("test", async (ctx) => {
+//   ctx.deleteMessage();
+//   helperFunctions.setSessionData(ctx);
+//   if (ctx.message && ctx.message.text) {
+//     const data = helperFunctions.parseTelegramCommand(ctx.message.text);
+//    const res = await devicData.runNetmikoScript([data?.ipAddress, "public", joid.basic_oids.dot1qVlanStaticEgressPorts + data?.vlan, joid.basic_oids.dot1qVlanStaticUntaggedPorts + data?.vlan,joid.basic_oids.dot1qVlanForbiddenEgressPorts + data?.vlan]).then((res) => { return res });
+//    await ctx.reply(res);
+//     // Здесь можно использовать полученные данные из data
+//   }
+
+// });
+
 bot.command("test", async (ctx) => {
   ctx.deleteMessage();
   helperFunctions.setSessionData(ctx);
+
+  const walkOidValue = async (oid: string, host: string, community: string) => {
+    try {
+      return await snmpFunctions.getMultiOIDValue(host, oid, community);
+    } catch (error) {
+      logger.error(error);
+      return error;
+    }
+  };
+
+  const getOidValue = async (oid: string, host: string, community: string) => {
+    try {
+      return await snmpFunctions.getSingleOID(host, oid, community);
+    } catch (error) {
+      logger.error(error);
+      return error;
+    }
+  };
+
   if (ctx.message && ctx.message.text) {
     const data = helperFunctions.parseTelegramCommand(ctx.message.text);
-   const res = await devicData.runNetmikoScript([data?.ipAddress, "public", joid.basic_oids.dot1qVlanStaticEgressPorts + data?.vlan, joid.basic_oids.dot1qVlanStaticUntaggedPorts + data?.vlan,joid.basic_oids.dot1qVlanForbiddenEgressPorts + data?.vlan]).then((res) => { return res });
-   await ctx.reply(res);
-    // Здесь можно использовать полученные данные из data
+
+    if (data) {
+      const lldpData = async (oidRemSysName: string, oidRemSysModel: string, oidRemIfName: string, ipAddress: string, community: string) => {
+        try {
+          const resRemSysName = await walkOidValue(oidRemSysName, ipAddress, community);
+          const resRemSysModel = await walkOidValue(oidRemSysModel, ipAddress, community);
+          const resRemSysIfName = await walkOidValue(oidRemIfName, ipAddress, community);
+          const resLocalSysName = await getOidValue(joid.basic_oids.oid_sysname, ipAddress, community);
+          const resLocalModel = await getOidValue(joid.basic_oids.oid_model, ipAddress, community);
+          const resLocalSysModel = deviceArr.FilterDeviceModel(resLocalModel);
+
+          const parsedIfName = await Promise.all(resRemSysIfName.map(async (item: any) => {
+            const regex = /(\d+)(?=,\d+$)/;
+            const oidString = item.oid.join(',');
+            const match = oidString.match(regex);
+            const extractedNumber = match ? match[0] : null;
+            const ifName = await getOidValue(joid.linux_server.oid_ifName + '.' + extractedNumber, ipAddress, community);
+            return ifName;
+          }));
+
+          const connections = parsedIfName.map((localIfName: string, index: number) => ({
+            localIfName,
+            remSysName: resRemSysName[index].value,
+            remModel: deviceArr.FilterDeviceModel(resRemSysModel[index].value),
+            remIfName: resRemSysIfName[index].value
+          }));
+
+          const dataArray = {
+            localIP: ipAddress,
+            localSysName: resLocalSysName,
+            localModel: resLocalSysModel,
+            connections,
+          };
+
+          return JSON.stringify(dataArray, null, "\t");
+        } catch (error) {
+          logger.error(error);
+          return error;
+        }
+      };
+
+      const res = await lldpData('.1.0.8802.1.1.2.1.4.1.1.9', '.1.0.8802.1.1.2.1.4.1.1.10', '.1.0.8802.1.1.2.1.4.1.1.7', data?.ipAddress, "public");
+      console.log(res);
+
+
+      await ctx.reply(`<pre>${res}</pre>`, {
+        parse_mode: "HTML",
+      });
+    }
   }
-
 });
-
-
 /**App callbackQuery */
 bot.callbackQuery("back", async (ctx) => {
   await ctx.conversation.exit();

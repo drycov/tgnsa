@@ -1,0 +1,22 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var grammy_markup_1 = require("@loskir/grammy-markup");
+var grammy_1 = require("grammy");
+var labels_1 = require("../assets/labels");
+exports.default = {
+    admin: new grammy_1.Keyboard([
+        [
+            grammy_markup_1.Button.text(labels_1.default.CheckDeviceLabel),
+            grammy_markup_1.Button.text(labels_1.default.AdvancedMenuLabel),
+        ],
+        [grammy_markup_1.Button.webApp(labels_1.default.AdminLabel, "https://tgnsa.ru:3000/tgadm/")],
+        [grammy_markup_1.Button.text(labels_1.default.ExitLabel)],
+    ]).resized(),
+    main: new grammy_1.Keyboard([
+        [
+            grammy_markup_1.Button.text(labels_1.default.CheckDeviceLabel),
+            grammy_markup_1.Button.text(labels_1.default.AdvancedMenuLabel),
+        ],
+        [grammy_markup_1.Button.text(labels_1.default.ExitLabel)],
+    ]).resized(),
+};

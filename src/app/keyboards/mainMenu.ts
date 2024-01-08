@@ -9,7 +9,7 @@ export default {
       Button.text(labels.CheckDeviceLabel),
       Button.text(labels.AdvancedMenuLabel),
     ],
-    [Button.webApp(labels.AdminLabel, "https://91.185.2.210/")],
+    [Button.webApp(labels.AdminLabel, "http://tgnsa.ru:3000/")],
     [Button.text(labels.ExitLabel)],
   ]).resized(),
   main: new Keyboard([
