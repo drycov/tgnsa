@@ -6,6 +6,7 @@ package-lock.json
 sessions/*
 logs/*
 dist/*
+target/*
 # Ignored files
 .DS_Store
 # .env
