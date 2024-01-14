@@ -4,8 +4,8 @@
   "description": "Support bot for TTC",
   "main": "app.ts",
   "scripts": {
-    "start:prod": "cross-env APP_TYPE=PROD NOWEB=true PORT=443 RUN_WAPP=false node --no-warnings --loader ts-node/esm ./src/app.ts",
-    "start": "cross-env APP_TYPE=DEV NOWEB=false PORT=443 RUN_WAPP=true nodemon --inspect --no-warnings ./src/app.ts",
+    "start:prod": "cross-env APP_TYPE=PROD  PORT=5000  node --no-warnings --loader ts-node/esm ./src/app.ts",
+    "start": "cross-env APP_TYPE=DEV  PORT=5000  nodemon --inspect --no-warnings ./src/app.ts",
     "build": "rimraf target && tsc && npm run copy",
     "ts.check": "tsc --project tsconfig.json",
     "copy": "cp -rf src/src/* dist/src/ && copyfiles -u 1 source/package.json dist/",

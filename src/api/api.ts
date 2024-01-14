@@ -1,35 +1,14 @@
-import os from "os";
-import * as path from "path";
 import bodyParser from "body-parser";
-import compression from "compression";
-import cookieParser from 'cookie-parser';
-import util from "util";
 import express, { NextFunction, Request, Response } from "express";
-import cookieSession from 'cookie-session';
-import useragent from "express-useragent";
-import process from "process";
+import * as path from "path";
 import logger from "../bot/utils/logger";
 
-import router from "./router";
 import loggerMiddleware from "./middlewares /loggerMiddleware";
-import { error } from "console";
+import router from "./router";
 const configPath = path.join(__dirname, '../', '../', `config.json`);
 const config = require(configPath);
 const app = express();
 const currentDate = new Date().toLocaleString("ru-RU");
-
-app.use(
-  cookieSession({
-    name: 'session',
-    keys: [config.sesionKey,], // Replace with your secret keys
-    maxAge: 60 * 60 * 1000, // 1 hours
-  })
-);
-
-app.use(cookieParser());
-app.use(useragent.express());
-app.use(compression());
-app.use(express.static(path.join(__dirname, "./static")));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));

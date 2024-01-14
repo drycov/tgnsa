@@ -1,6 +1,6 @@
 import { run } from "@grammyjs/runner";
 import util from "util";
-import { Server, createServer } from "https";
+import { Server, createServer } from "http";
 import app from "./bot/bot";
 import web from "./api/api";
 import * as fs from "fs";
@@ -12,7 +12,7 @@ import readline from "readline";
 const currentDate = new Date().toLocaleString("ru-RU");
 const configPath = path.join(__dirname, '../', `config.json`);
 const config = require(configPath);
-const port = process.env.PORT || config.port;
+const port = process.env.PORT || 5000;
 
 const runner = run(app);
 
@@ -27,18 +27,21 @@ const options = {
 
 function startAPIServer(port: string | number) {
   const serverPort = typeof port === 'string' ? parseInt(port, 10) : port;
-  server = createServer(options,web).listen(serverPort, "localhost", () => {
-    const serverAddress = server?.address();
-    if (serverAddress && typeof serverAddress !== "string") {
-      const { address, port } = serverAddress;
-      console.log(  
-        "\x1b[32m%s\x1b[0m",
-        `Server is running at https://${address}:${port}`
-      );
-    } else {
-      console.log("\x1b[32m%s\x1b[0m", `Server is running on ${serverAddress}`);
-    }
-  });
+  
+  web.listen(serverPort, () => console.log( "\x1b[32m%s\x1b[0m",`Listening on port ${port}`)); //Строка 6
+
+  // server = createServer(web).listen(serverPort, "127.0.0.1", () => {
+  //   const serverAddress = server?.address();
+  //   if (serverAddress && typeof serverAddress !== "string") {
+  //     const { address, port } = serverAddress;
+  //     console.log(
+  //       "\x1b[32m%s\x1b[0m",
+  //       `Server is running at http://${address}:${port}`
+  //     );
+  //   } else {
+  //     console.log("\x1b[32m%s\x1b[0m", `Server is running on ${serverAddress}`);
+  //   }
+  // });
 }
 
 function restartServer(port: string | number) {
@@ -100,10 +103,8 @@ const startApplication = async () => {
 };
 
 startApplication();
+startAPIServer(port);
 
-if ((process.env.NOWEB && process.env.APP_TYPE === "DEV") || !process.env.RUN_WAPP) {
-  startAPIServer(port);
-}
 
 
 const stopRunner = () => {

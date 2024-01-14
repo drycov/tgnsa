@@ -1,32 +1,20 @@
 {
+  "sesionKey": "Zero0One1Two2Three3Four4",
+  "defaultLanguage": "en",
+  "botTgID": "5493974365",
+  "databaseURL": "https://ttcnsa-default-rtdb.asia-southeast1.firebasedatabase.app",
+  "mass_data": {
+    "mii_subject": "Массовый инцидент",
+    "mii_dest": "d.rykov@ttc.kz"
+  },
   "vendor_info": {
-    "botVendor": "Denis Rykov",
-    "botVendorWContact": "+7-705-155-7619",
     "botVendorContact": "@Oritorius",
-    "botVendorEMailContact": "d.rykov@ttc.kz"
+    "botVendorEMailContact": "d.rykov@ttc.kz",
+    "botVendorWContact": "+7-705-155-7619",
+    "botVendor": "Denis Rykov"
   },
   "defaultAdmin": "6818244868",
-  "databaseURL": "https://ttcnsa-default-rtdb.asia-southeast1.firebasedatabase.app",
-  "snmp": {
-    "rw_community": [
-      "private"
-    ],
-    "community": [
-      "public",
-      "atbu+1",
-      "chinaPublic",
-      "ChinaPublic",
-      "public+"
-    ]
-  },
-  "BotChatAdmin": "-1002084129010",
-  "smtp_client": {
-    "smtp_port": 587,
-    "smtp_server": "smtp-mail.outlook.com",
-    "smtp_from": "Transtelecom JSC Network Support BOT <ttcnsb1@hotmail.com>",
-    "smtp_user": "ttcnsb1@hotmail.com",
-    "smtp_pwd": "OSKQAZwsx2022*"
-  },
+  "apiPort": "5000",
   "excludedSubstrings": [
     "Vl",
     "vl",
@@ -41,21 +29,34 @@
     "stack-port",
     "noSuchInstance"
   ],
-  "mass_data": {
-    "mii_subject": "Массовый инцидент",
-    "mii_dest": "d.rykov@ttc.kz"
+  "snmp": {
+    "community": [
+      "public",
+      "atbu+1",
+      "chinaPublic",
+      "ChinaPublic",
+      "public+"
+    ],
+    "rw_community": [
+      "private"
+    ]
   },
-  "sesionKey": "Zero0One1Two2Three3Four4",
+  "pingDevice": {
+    "interval": 2,
+    "count": 4,
+    "timeout": 10
+  },
   "port": "443",
+  "BotChatAdmin": "-1002084129010",
+  "mongoURI": "mongodb+srv://ttc-ttcnsa:GJWPwBmlUJvc9S2S@cluster0.c48ewsz.mongodb.net",
   "mongoOptions": {
     "dbName": "ttcNSA"
   },
-  "mongoURI": "mongodb+srv://ttc-ttcnsa:GJWPwBmlUJvc9S2S@cluster0.c48ewsz.mongodb.net",
-  "defaultLanguage": "en",
-  "botTgID": "5493974365",
-  "pingDevice": {
-    "count": 4,
-    "timeout": 10,
-    "interval": 2
+  "smtp_client": {
+    "smtp_pwd": "OSKQAZwsx2022*",
+    "smtp_port": 587,
+    "smtp_from": "Transtelecom JSC Network Support BOT <ttcnsb1@hotmail.com>",
+    "smtp_server": "smtp-mail.outlook.com",
+    "smtp_user": "ttcnsb1@hotmail.com"
   }
 }

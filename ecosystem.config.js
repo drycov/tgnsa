@@ -13,12 +13,12 @@ module.exports = {
         APP_TYPE: "PROD",
         NOWEB: "true",
         RUN_WAPP:"false",
-        PORT:"443"      },
+        PORT:"3000"      },
       env_development: {
         NODE_ENV: "development",
         APP_TYPE: "DEV",
         NOWEB: "false",
-        PORT:"443",
+        PORT:"3000",
         RUN_WAPP:"true"
       },
     },
