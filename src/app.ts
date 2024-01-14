@@ -29,19 +29,6 @@ function startAPIServer(port: string | number) {
   const serverPort = typeof port === 'string' ? parseInt(port, 10) : port;
   
   web.listen(serverPort, () => console.log( "\x1b[32m%s\x1b[0m",`Listening on port ${port}`)); //Строка 6
-
-  // server = createServer(web).listen(serverPort, "127.0.0.1", () => {
-  //   const serverAddress = server?.address();
-  //   if (serverAddress && typeof serverAddress !== "string") {
-  //     const { address, port } = serverAddress;
-  //     console.log(
-  //       "\x1b[32m%s\x1b[0m",
-  //       `Server is running at http://${address}:${port}`
-  //     );
-  //   } else {
-  //     console.log("\x1b[32m%s\x1b[0m", `Server is running on ${serverAddress}`);
-  //   }
-  // });
 }
 
 function restartServer(port: string | number) {

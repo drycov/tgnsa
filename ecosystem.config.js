@@ -7,19 +7,31 @@ module.exports = {
       watch: true,
       autorestart: true,
       max_restarts: 10,
-      ignore_watch: ["logs", "node_modules", "sessions", ".vscode", "source","config.json"],
+      ignore_watch: ["logs",".git", "node_modules","src/api", "sessions", ".vscode", "source", "config.json"],
       env_production: {
         NODE_ENV: "production",
         APP_TYPE: "PROD",
-        NOWEB: "true",
-        RUN_WAPP:"false",
-        PORT:"3000"      },
+        PORT: "5000"
+      },
       env_development: {
         NODE_ENV: "development",
         APP_TYPE: "DEV",
-        NOWEB: "false",
-        PORT:"3000",
-        RUN_WAPP:"true"
+        PORT: "5000",
+      },
+    },
+    {
+      name: "WebApp",
+      cwd: "/opt/ttcNSA/src/api/client",
+      script: "npm start",
+      watch: true,
+      autorestart: true,
+      max_restarts: 10,
+      ignore_watch: [ "node_modules",".git", "config.json"],
+      env_production: {
+        NODE_ENV: "production",
+      },
+      env_development: {
+        NODE_ENV: "development",
       },
     },
   ],
