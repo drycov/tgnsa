@@ -1,6 +1,5 @@
 import { run } from "@grammyjs/runner";
 import util from "util";
-import { Server, createServer } from "http";
 import app from "./bot/bot";
 import web from "./api/api";
 import * as fs from "fs";
@@ -8,6 +7,7 @@ import logger from "./bot/utils/logger";
 import * as path from "path";
 import helperFunctions from "./bot/utils/helperFunctions";
 import readline from "readline";
+import { Server } from "http";
 
 const currentDate = new Date().toLocaleString("ru-RU");
 const configPath = path.join(__dirname, '../', `config.json`);
@@ -15,9 +15,6 @@ const config = require(configPath);
 const port = process.env.PORT || 5000;
 
 const runner = run(app);
-
-// server: Server | null = null;
-
 let server: Server | null = null;
 
 const options = {
@@ -25,13 +22,15 @@ const options = {
   key: fs.readFileSync(path.join(__dirname, './sslcert/privkey.pem'))
 };
 
-function startAPIServer(port: string | number) {
+function startAPIServer(port: string | number): void {
   const serverPort = typeof port === 'string' ? parseInt(port, 10) : port;
-  
-  web.listen(serverPort, () => console.log( "\x1b[32m%s\x1b[0m",`Listening on port ${port}`)); //Строка 6
+
+  server = web.listen(serverPort, 'localhost', () => {
+    console.log("\x1b[32m%s\x1b[0m", `Server is listening on port ${serverPort}`);
+  });
 }
 
-function restartServer(port: string | number) {
+function restartServer(port: string | number): void {
   if (server) {
     server.close(() => {
       console.log("\x1b[33m%s\x1b[0m", "Server stopped");
@@ -71,9 +70,8 @@ const startApplication = async () => {
   helperFunctions.monitorFirestoreChanges();
 
   try {
-    const status = runner.isRunning();
     await app.init();
-
+    const status = runner.isRunning();
     const message = util.format(
       '{"date":"%s", "%s":"%s", "%s":"%s"}',
       currentDate,
@@ -91,8 +89,6 @@ const startApplication = async () => {
 
 startApplication();
 startAPIServer(port);
-
-
 
 const stopRunner = () => {
   const action = stopRunner.name;

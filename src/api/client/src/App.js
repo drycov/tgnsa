@@ -6,22 +6,22 @@ import Button from "./components/Button/Button"
 import './App.css';
 
 function App() {
-  const { tg, onToggleButton, onToggleBackButton, onToggleSettingsButton } = useTelegram();
-
+  const { tg,onToggleButton ,onToggleBackButton,onToggleSettingsButton,onTogglePopupButton} = useTelegram();
   useEffect(() => {
-    const initializeApp = async () => {
-      await tg.ready();
-      onToggleButton();
-    };
-
-    initializeApp();
-  }, [tg, onToggleButton]);
+    tg.ready();
+    onToggleButton();
+  }, [tg,onToggleButton]);
+ 
 
   return (
     <div className="App">
       <Header />
+      <Button onClick={onToggleButton}>MainButton</Button>
       <Button onClick={onToggleBackButton}>BackButton</Button>
       <Button onClick={onToggleSettingsButton}>SettingsButton</Button>
+      <Button onClick={onTogglePopupButton}>PopupButton</Button>
+
+
     </div>
   );
 }
