@@ -26,6 +26,23 @@ type JoidType = {
 };
 
 const devicData = {
+
+  walkOidValue: async (oid: string, host: string, community: string) => {
+    try {
+      return await snmpFunctions.getMultiOIDValue(host, oid, community);
+    } catch (error) {
+      logger.error(error);
+      throw error;
+    }
+  },
+  getOidValue: async (oid: string, host: string, community: string) => {
+    try {
+      return await snmpFunctions.getSingleOID(host, oid, community);
+    } catch (error) {
+      logger.error(error);
+      throw error;
+    }
+  },
   processPortStatus: async (
     host: string,
     portIfList: string[],
@@ -54,10 +71,10 @@ const devicData = {
           descrOid + portIfList[i]
         );
         if (
-          config.excludedSubstrings.some((substring: any) => portIfRange[i].includes(substring)) 
-          || /^\d+$/.test(portIfRange[i]) 
+          config.excludedSubstrings.some((substring: any) => portIfRange[i].includes(substring))
+          || /^\d+$/.test(portIfRange[i])
           || /[a-zA-Z]+[0-9]\/[0-9]\/[0-9]\/[0-9]\./g.test(portIfRange[i])
-          || portIfRange[i].includes('.ServiceInstance') 
+          || portIfRange[i].includes('.ServiceInstance')
           || portIfRange[i].includes("E1")
           || portIfRange[i].includes(`${testIntDescr}.`) // ИЛИ если строка НЕ содержит только цифры
         ) {
@@ -75,9 +92,9 @@ const devicData = {
         const get_inerrors = await getOidValue(
           joid.basic_oids.oid_inerrors + portIfList[i]
         );
-        if((portIfRange[i].includes("Po")||portIfRange[i].includes("po")||portIfRange[i].includes("ControlEthernet"))&&(portOperStatus!=1||portAdminStatus==2)){
+        if ((portIfRange[i].includes("Po") || portIfRange[i].includes("po") || portIfRange[i].includes("ControlEthernet")) && (portOperStatus != 1 || portAdminStatus == 2)) {
           continue; // Пропускаем эту итерацию, если строка содержит исключенные подстроки или не содержит только цифры
-        
+
         }
 
         let operStatus;
@@ -121,9 +138,13 @@ const devicData = {
       message += `"status":"done"}`;
       logger.info(message);
 
-    } catch (error) {
-      message += `"error":"${error}"}`;
-      logger.error(message);
+    } catch (e: any) {
+      const error = {
+        date: currentDate,
+        action,
+        error: e.message as string,
+      };
+      logger.error(JSON.stringify(error));
       return `${symbols.SHORT} Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее`;
     }
 
@@ -281,9 +302,13 @@ const devicData = {
       }
       message += `"status":"done"}`;
       logger.info(message);
-    } catch (error) {
-      message += `"error":"${error}"}`;
-      logger.error(message);
+    } catch (e: any) {
+      const error = {
+        date: currentDate,
+        action,
+        error: e.message as string,
+      };
+      logger.error(JSON.stringify(error));
       return `${symbols.SHORT} Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее`;
     }
   },
@@ -435,9 +460,13 @@ const devicData = {
       }
       message += `"status":"done"}`;
       logger.info(message);
-    } catch (error) {
-      message += `"error":"${error}"}`;
-      logger.error(message);
+    } catch (e: any) {
+      const error = {
+        date: currentDate,
+        action,
+        error: e.message as string,
+      };
+      logger.error(JSON.stringify(error));
       return `${symbols.SHORT} Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее`;
     }
   },
@@ -546,9 +575,13 @@ const devicData = {
           console.log(results)
         }
       }
-    } catch (error) {
-      message += `"error":"${error}"}`;
-      logger.error(message);
+    } catch (e: any) {
+      const error = {
+        date: currentDate,
+        action,
+        error: e.message as string,
+      };
+      logger.error(JSON.stringify(error));
       return `${symbols.SHORT} Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее`;
     }
   },
@@ -643,9 +676,13 @@ const devicData = {
         }
       }
 
-    } catch (error) {
-      message += `"error":"${error}"}`;
-      logger.error(message);
+    } catch (e: any) {
+      const error = {
+        date: currentDate,
+        action,
+        error: e.message as string,
+      };
+      logger.error(JSON.stringify(error));
       return `${symbols.SHORT} Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее`;
     }
     return results;
@@ -828,11 +865,6 @@ const devicData = {
     );
     message += util.format('"%s":"%s", ', "host", host);
 
-    const result = util.format(
-      "%s Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее",
-      symbols.SHORT
-    );
-
     try {
       const dirty = await snmpFunctions
         .getSingleOID(host, joid.basic_oids.oid_model, community)
@@ -859,10 +891,14 @@ const devicData = {
         swUpTime,
         UpTime
       );
-    } catch (error) {
-      message += util.format('"%s":"%s"}', "error", error);
-      logger.error(message);
-      return result;
+    } catch (e: any) {
+      const error = {
+        date: currentDate,
+        action,
+        error: e.message as string,
+      };
+      logger.error(JSON.stringify(error));
+      return `${symbols.SHORT} Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее`;
     }
   },
 
@@ -905,13 +941,14 @@ const devicData = {
 
       await devicData.processPortStatus(host, list, range, community, results, model)
       return helperFunctions.tableFormattedOutput(results, ["IF", "St.", "Descripion", "Errors"])
-    } catch (e) {
-      message += util.format('"%s":"%s"}', "error", e);
-      logger.error(e);
-      return util.format(
-        "%s Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее",
-        symbols.SHORT
-      );
+    } catch (e: any) {
+      const error = {
+        date: currentDate,
+        action,
+        error: e.message as string,
+      };
+      logger.error(JSON.stringify(error));
+      return `${symbols.SHORT} Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее`;
     }
   },
 
@@ -928,12 +965,21 @@ const devicData = {
 
     try {
       await devicData.processVlan(host, community, results,)
-      message += `"status":"done"}`;
-      logger.info(message);
+      const message = {
+        date: currentDate,
+        action,
+        status: "done",
+      };
+
+      logger.info(JSON.stringify(message));
       return helperFunctions.tableFormattedOutput(results, ["Vlan ID", "Vlan NAME"])
-    } catch (e) {
-      message += util.format('"%s":"%s"}', "error", e);
-      logger.error(message);
+    } catch (e: any) {
+      const error = {
+        date: currentDate,
+        action,
+        error: e.message as string,
+      };
+      logger.error(JSON.stringify(error));
       return `${symbols.SHORT} Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее`;
     }
   },
@@ -1011,18 +1057,75 @@ const devicData = {
       return errorMessage;
     }
   },
+  getLLDPdata: async (oidRemSysName: string, oidRemSysModel: string, oidRemIfName: string, ipAddress: string, community: string) => {
+    let action = devicData.getLLDPdata.name;
 
-  runNetmikoScript: (arg: any []): Promise<any> => {
+    try {
+      const [resRemSysName, resRemSysModel, resRemSysIfName, resLocalSysName, resLocalModel] = await Promise.all([
+        devicData.walkOidValue(oidRemSysName, ipAddress, community),
+        devicData.walkOidValue(oidRemSysModel, ipAddress, community),
+        devicData.walkOidValue(oidRemIfName, ipAddress, community),
+        devicData.getOidValue(joid.basic_oids.oid_sysname, ipAddress, community),
+        devicData.getOidValue(joid.basic_oids.oid_model, ipAddress, community),
+      ]);
+
+      const resLocalSysModel = deviceArr.FilterDeviceModel(resLocalModel);
+
+      const parsedIfName = await Promise.all(resRemSysIfName.map(async (item: any) => {
+        const regex = /(\d+)(?=,\d+$)/;
+        const oidString = item.oid.join(',');
+        const match = oidString.match(regex);
+        const extractedNumber = match ? match[0] : null;
+        const ifName = await devicData.getOidValue(joid.linux_server.oid_ifName + '.' + extractedNumber, ipAddress, community);
+        return ifName;
+      }));
+
+      const connections = parsedIfName.map((localIfName: string, index: number) => ([
+        localIfName,
+        resRemSysIfName[index].value,
+        resRemSysName[index].value,
+        deviceArr.FilterDeviceModel(resRemSysModel[index].value)
+
+      ]));
+
+      const dataArray = [
+        ipAddress,
+        resLocalSysName,
+        resLocalSysModel,
+        connections,
+      ];
+
+
+      const message = {
+        date: currentDate,
+        action,
+        status: "done",
+      };
+
+      logger.info(JSON.stringify(message));
+      return helperFunctions.generateLLDPTable(dataArray);
+      // return JSON.stringify(dataArray, null, "\t");
+    } catch (e: any) {
+      const errorMessage = util.format(
+        "%s Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее",
+        symbols.SHORT
+      );
+      logger.error(e.message as string);
+      return errorMessage;
+    }
+  },
+
+  runNetmikoScript: (arg: any[]): Promise<any> => {
     const options: Options = {
       mode: "text",
       pythonOptions: ["-u"], // unbuffered output
       scriptPath: "./python", // путь к файлу netmiko_script.py
-      args:arg
+      args: arg
     };
 
-    
+
     return new Promise((resolve) => {
-      PythonShell.run('ps.py', options).then(messages=>{
+      PythonShell.run('ps.py', options).then(messages => {
         // results is an array consisting of messages collected during execution
         console.log('results: %j', messages);
         resolve(messages);

@@ -17,6 +17,9 @@ import helperFunctions from "../utils/helperFunctions";
 import logger from "../utils/logger";
 import snmpFunctions from "../utils/snmpFunctions";
 import symbols from "../assets/symbols";
+import deviceArr from "../base_util/deviceArr";
+import joid from "../../src/oid.json";
+
 
 interface MyContext extends Context {
   session: { [key: string]: any }; // Change the type to match your session data structure
@@ -26,15 +29,7 @@ const currentDate = new Date().toLocaleString("ru-RU");
 
 const deviceCommands = {
   check_device: async (conversation: MyConversation, ctx: MyContext) => {
-    let action = deviceCommands.check_device.name;
-    let message = util.format(
-      '{"date":"%s", "%s":%s","%s":"%s", ',
-      currentDate,
-      "action",
-      action,
-      "userId",
-      ctx.session.userId
-    );
+    const action = deviceCommands.check_device.name;
     ctx.session.currentCVid = "check_device";
     ctx.session.previosCVid = "main";
 
@@ -44,80 +39,52 @@ const deviceCommands = {
 
     ctx = await conversation.wait();
     const host = ctx.message?.text;
-    message += util.format('"%s": "%s", ', (action = "host"), host);
-    if (host) {
-      const ifTru = IpCheck(host);
-      message += util.format('%s: "%s", ', (action = "Ip_check"), ifTru);
-      if (ifTru) {
-        const isAlive = await helperFunctions.isAlive(host).then((res) => {
-          return res;
-        });
-        message += util.format('"%s": "%s"}', (action = "isAlive"), isAlive);
-        if (isAlive) {
-          const community = await snmpFunctions
-            .checkSNMP(host, config.snmp.community)
-            .then((res) => res);
 
-          ctx.session.snmpCommunity = community;
-          ctx.session.deviceHost = host.toString();
+    if (!host || !IpCheck(host)) {
+      // Handle invalid IP address
+      ctx.reply(messages.ErroMessage + "\n", {
+        parse_mode: "HTML",
+        reply_markup: baseMenu.inBack,
+      }).catch(helperFunctions.noop);
+    } else {
+      const isAlive = await helperFunctions.isAlive(host);
 
-          const devInfo = await deviceData.getBasicInfo(host, community);
-          if (devInfo !== "false") {
-            await ctx
-              .reply(
-                devInfo + `\n\n<i>Выполнено:  <code>${currentDate}</code></i>`,
-                {
-                  reply_markup: deviceMenu.checkDevice,
-                  parse_mode: "HTML",
-                }
-              )
-              .catch(helperFunctions.noop);
-            logger.info(message);
-            return;
-          } else {
-            ctx
-              .reply(messages.ErroMessage + "\n" + messages.ErrorSNMPMessage, {
-                parse_mode: "HTML",
-              })
-              .catch(helperFunctions.noop);
-            message += util.format("}");
-            logger.info(message);
-            return;
-          }
+      if (isAlive) {
+        const community = await snmpFunctions.checkSNMP(host, config.snmp.community);
+        ctx.session.snmpCommunity = community;
+        ctx.session.deviceHost = host.toString();
+
+        const devInfo = await deviceData.getBasicInfo(host, community);
+
+        if (devInfo !== "false") {
+          await ctx.reply(devInfo + `\n\n<i>Выполнено:  <code>${currentDate}</code></i>`, {
+            reply_markup: deviceMenu.checkDevice,
+            parse_mode: "HTML",
+          }).catch(helperFunctions.noop);
+        } else {
+          ctx.reply(messages.ErroMessage + "\n" + messages.ErrorSNMPMessage, {
+            parse_mode: "HTML",
+          }).catch(helperFunctions.noop);
         }
       }
-    } else {
-      // Handle invalid IP address
-      ctx
-        .reply(messages.ErroMessage + "\n", {
-          parse_mode: "HTML",
-          reply_markup: baseMenu.inBack,
-        })
-        .catch(helperFunctions.noop);
-      message += util.format("}");
-      logger.info(message);
-      return;
     }
-    logger.info(message);
-    return;
+
+    const message = {
+      date: currentDate,
+      action,
+      userId: ctx.session.userId,
+      status: "done",
+    };
+
+    logger.info(JSON.stringify(message));
   },
+
   portInfo: async (_conversation: MyConversation, ctx: MyContext) => {
     ctx.session.currentCVid = "check_device";
     ctx.session.previosCVid = "main";
     const host = ctx.session.deviceHost;
     const community = ctx.session.snmpCommunity;
     let action = deviceCommands.portInfo.name;
-    let message = util.format(
-      '{"date":"%s", "%s":%s","%s":"%s", ',
-      currentDate,
-      "action",
-      action,
-      "userId",
-      ctx.session.userId
-    );
-    
-    message += util.format('"%s":"%s", ', "host", host);
-
     await ctx.reply(`Проверка портов на устройстве:  <code>${host}</code>`, {
       reply_markup: {
         remove_keyboard: true,
@@ -132,8 +99,14 @@ const deviceCommands = {
       });
     const stateInfo = `P.S. Состояния: ${symbols.OK_UP} - Линк есть, ${symbols.OKEY} - Линка нет, ${symbols.AdminDownEmo} - Порт выключен, ${symbols.UNKNOWN} - Неизвестно`;
     try {
-      message += `"status":"done"}`;
-      logger.info(message);
+      const message = {
+        date: currentDate,
+        action,
+        userId: ctx.session.userId,
+        status: "done",
+      };
+
+      logger.info(JSON.stringify(message));
       await ctx.reply(`Состояние портов на устройстве:  <code>${host}</code>\n` +
         ` <pre>${portStatus} \n\n ${stateInfo}</pre> \n\n<i>Выполнено:  <code>${currentDate}</code></i>`,
         {
@@ -141,12 +114,17 @@ const deviceCommands = {
           parse_mode: "HTML",
         }
       );
-    } catch (e) {
-      message += `"error":"${e}"}`;
-      logger.error(message);
+    } catch (e: any) {
+      const error = {
+        date: currentDate,
+        action,
+        userId: ctx.session.userId,
+        error: e.message as string,
+      };
+
+      logger.error(JSON.stringify(error));
       await ctx.reply(messages.ErroMessage + "\n", {
         reply_markup: baseMenu.inBack,
-        parse_mode: "HTML",
       });
     }
 
@@ -157,14 +135,6 @@ const deviceCommands = {
     const host = ctx.session.deviceHost;
     const community = ctx.session.snmpCommunity;
     let action = deviceCommands.vlanList.name;
-    let message = util.format(
-      '{"date":"%s", "%s":%s","%s":"%s", ',
-      currentDate,
-      "action",
-      action,
-      "userId",
-      ctx.session.userId
-    );
     await ctx.reply(`Вывод списка VLAN на устройстве:   <code>${host}</code>`, {
       reply_markup: {
         remove_keyboard: true,
@@ -178,21 +148,31 @@ const deviceCommands = {
       .then((status) => {
         return status;
       });
-    let mes =
+    let res =
       `VLAN to: <code>${host}</code> \n <pre>${vlanListResult}</pre>` +
       `\n\n<i>Выполнено:  <code>${currentDate}</code></i>`;
-    logger.info(vlanListResult.length);
-    logger.info(mes.length);
     try {
-      message += `"status":"done"}`;
-      logger.info(message);
-      await ctx.reply(mes, {
+      const message = {
+        date: currentDate,
+        action,
+        userId: ctx.session.userId,
+        status: "done",
+      };
+
+      logger.info(JSON.stringify(message));
+      await ctx.reply(res, {
         reply_markup: deviceMenu.checkDevice,
         parse_mode: "HTML",
       });
-    } catch (e) {
-      message += `"error":"${e}"}`;
-      logger.error(message);
+    } catch (e: any) {
+      const error = {
+        date: currentDate,
+        action,
+        userId: ctx.session.userId,
+        error: e.message as string,
+      };
+
+      logger.error(JSON.stringify(error));
       await ctx.reply(messages.ErroMessage + "\n", {
         reply_markup: baseMenu.inBack,
       });
@@ -204,14 +184,14 @@ const deviceCommands = {
     const host = ctx.session.deviceHost;
     const community = ctx.session.snmpCommunity;
     const action = deviceCommands.ddmInfo.name;
-    let message = util.format(
-      '{"date":"%s", "%s":%s","%s":"%s", ',
-      currentDate,
-      "action",
-      action,
-      "userId",
-      ctx.session.userId
-    );
+    // let message = util.format(
+    //   '{"date":"%s", "%s":%s","%s":"%s", ',
+    //   currentDate,
+    //   "action",
+    //   action,
+    //   "userId",
+    //   ctx.session.userId
+    // );
 
     await ctx.reply(`Вывод уровня оптического сигнала/ADSL на устройстве: <code>${host}</code>`, {
       reply_markup: {
@@ -239,11 +219,26 @@ const deviceCommands = {
         });
         fs.unlinkSync(tempFilePNGPath);
         fs.unlinkSync(tempFilePath);
-        message += `"status":"done"}`;
-        logger.info(message);
-      } catch (error) {
-        message += `"error":"${error}"}`;
-        logger.error(message);
+        const message = {
+          date: currentDate,
+          action,
+          userId: ctx.session.userId,
+          status: "done",
+        };
+
+        logger.info(JSON.stringify(message));
+      } catch (e: any) {
+        const error = {
+          date: currentDate,
+          action,
+          userId: ctx.session.userId,
+          error: e.message as string,
+        };
+
+        logger.error(JSON.stringify(error));
+        await ctx.reply(messages.ErroMessage + "\n", {
+          reply_markup: baseMenu.inBack,
+        });
       }
     } else {
       await ctx.reply(
@@ -254,8 +249,14 @@ const deviceCommands = {
           parse_mode: "HTML",
         }
       );
-      message += `"status":"done"}`;
-      logger.info(message);
+      const message = {
+        date: currentDate,
+        action,
+        userId: ctx.session.userId,
+        status: "done",
+      };
+
+      logger.info(JSON.stringify(message));
     }
   },
   cableMetr: async (_conversation: MyConversation, ctx: MyContext) => {
@@ -264,18 +265,11 @@ const deviceCommands = {
     const host = ctx.session.deviceHost;
     const community = ctx.session.snmpCommunity;
     const action = deviceCommands.cableMetr.name;
-    let message = util.format(
-      '{"date":"%s", "%s":%s","%s":"%s", ',
-      currentDate,
-      "action",
-      action,
-      "userId",
-      ctx.session.userId
-    );
     await ctx.reply(`Измерение длинны кабеля на устройстве(по отключенным портам):  <code>${host}</code>`, {
       reply_markup: {
         remove_keyboard: true,
       },
+      parse_mode: "HTML",
     });
     const cableLengths = await deviceData
       .getCableLength(host, community)
@@ -292,15 +286,52 @@ const deviceCommands = {
           parse_mode: "HTML",
         }
       );
-      message += `"status":"done"}`;
-      logger.info(message);
-    } catch (e) {
-      message += `"error":"${e}"}`;
-        logger.error(message);
+      const message = {
+        date: currentDate,
+        action,
+        userId: ctx.session.userId,
+        status: "done",
+      };
+
+      logger.info(JSON.stringify(message));
+    } catch (e: any) {
+      const error = {
+        date: currentDate,
+        action,
+        userId: ctx.session.userId,
+        error: e.message as string,
+      };
+
+      logger.error(JSON.stringify(error));
       await ctx.reply(messages.ErroMessage + "\n", {
         reply_markup: baseMenu.inBack,
+        parse_mode: "HTML",
+
       });
     }
   },
+  lldpData: async (_conversation: MyConversation, ctx: MyContext) => {
+    ctx.session.currentCVid = "check_device";
+    ctx.session.previosCVid = "main";
+    const host = ctx.session.deviceHost;
+    const community = ctx.session.snmpCommunity;
+    const action = deviceCommands.ddmInfo.name;
+    const currentDate = new Date().toLocaleString("ru-RU");
+    try {
+      const lldpData = await deviceData.getLLDPdata(joid.lldp_oids.lldpRemSysName, joid.lldp_oids.lldpRemSysDesc, joid.lldp_oids.lldpRemPortId, host, community);
+      await ctx.reply(`LLDP соседство: \n   <pre>${lldpData}</pre>\n\n<i>Выполнено:  <code>${currentDate}</code></i>`, {
+        parse_mode: "HTML",
+      });
+    } catch (e: any) {
+      const error = {
+        date: currentDate,
+        action,
+        error: e.message as string,
+      };
+      logger.error(JSON.stringify(error));
+      return `${symbols.SHORT} Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее`;
+    }
+  }
+
 };
 export default deviceCommands;

@@ -32,6 +32,7 @@ export default {
   VlanListLabel: symbols.VlanEmo + " Список VLAN",
   PortInfoLabel: symbols.TestTubeEmo + " Состояние портов",
   CabelLengthLabel: symbols.LinerEMO + " Замер длинны кабеля",
+  DeviceLLDPLabel: symbols.CROSSTALK + " LLDP Информация",
   TrafficGraphLabel: symbols.Group1 + " Трафик на устройстве",
   MMPriorityHigh: symbols.RedCircleEmo + " Высокий!",
   MMPriorityAverage: symbols.YellovCircleEmo + " Средний!",

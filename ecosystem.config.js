@@ -3,7 +3,7 @@ module.exports = {
     {
       name: "TTC_NSA",
       cwd: "/opt/ttcNSA/",
-      script: "npm run start:two",
+      script: "npm run start:prod",
       watch: true,
       autorestart: true,
       max_restarts: 10,
@@ -12,9 +12,8 @@ module.exports = {
         NODE_ENV: "production",
         APP_TYPE: "PROD",
         NOWEB: "true",
-        PORT:"443",
-        RUN_WAPP:"false"
-      },
+        RUN_WAPP:"false",
+        PORT:"443"      },
       env_development: {
         NODE_ENV: "development",
         APP_TYPE: "DEV",

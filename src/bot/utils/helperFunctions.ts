@@ -1,24 +1,21 @@
 import * as dotenv from "dotenv";
 import * as path from 'path';
 import * as fs from 'fs';
-const configPath = path.join(__dirname, '../', '../', '../', `config.json`);
 import { createCanvas, loadImage } from 'canvas';
 import ejs from "ejs";
 import { Context } from "grammy";
 import ping from "ping";
-
-
 import MailTo from "../core/MailTo";
 import { db } from "./firebaseConfig";
 import symbols from "../assets/symbols";
 import Table from "cli-table3";
+const configPath = path.join(__dirname, '../', '../', '../', `config.json`);
 
 dotenv.config();
-// type MyContext = Context & ConversationFlavor;
-interface MyContext extends Context {
-  session: { [key: string]: any }; // Change the type to match your session data structure
-}
 
+interface MyContext extends Context {
+  session: { [key: string]: any };
+}
 
 interface TelegramCommand {
   command: string;
@@ -26,43 +23,35 @@ interface TelegramCommand {
   port: number;
 }
 
-
 const helperFunctions = {
-  delay: (ms: any) => {
-    new Promise((resolve) => setTimeout(resolve, ms));
-  },
-  getTextDimensions: (text: any, font: any) => {
-    const canvas = createCanvas(800, 600); // Начальные размеры canvas для измерения текста
-    const ctx = canvas.getContext('2d');
-    ctx.font = font; // Установка шрифта
+  delay: async (ms: number) => new Promise(resolve => setTimeout(resolve, ms)),
 
+  getTextDimensions: (text: string, font: string) => {
+    const canvas = createCanvas(800, 600);
+    const ctx = canvas.getContext('2d');
+    ctx.font = font;
     return ctx.measureText(text);
   },
 
-
-  textToPNG: async (inputFilePath: any, outputFilePath: any) => {
+  textToPNG: async (inputFilePath: string, outputFilePath: string) => {
     try {
       const textContent = fs.readFileSync(inputFilePath, 'utf-8');
-
       const lines = textContent.split('\n');
-      const font = '12px Arial'; // Размер шрифта 12 пикселей
-      const lineHeight = 20; // Высота строки в пикселях
+      const font = '12px Arial';
+      const lineHeight = 20;
 
-      // Найти максимальную ширину текста
       let maxWidth = 0;
       lines.forEach(line => {
         const dimensions = helperFunctions.getTextDimensions(line, font);
         maxWidth = Math.max(maxWidth, dimensions.width);
       });
 
-      // Создание canvas на основе ширины текста и количества строк
-      const canvas = createCanvas(maxWidth + 20, (lines.length - 4) * lineHeight + 20); // Используемые размеры +20 для отступов
+      const canvas = createCanvas(maxWidth + 20, (lines.length - 4) * lineHeight + 20);
       const ctx = canvas.getContext('2d');
-
-      ctx.fillStyle = '#ffffff'; // Белый фон
+      ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#000000'; // Черный цвет текста
-      ctx.font = font; // Установка шрифта
+      ctx.fillStyle = '#000000';
+      ctx.font = font;
 
       let yPos = lineHeight;
       lines.forEach(line => {
@@ -72,7 +61,6 @@ const helperFunctions = {
         }
       });
 
-      // Обрезать canvas под фактический размер текста
       const trimmedCanvas = createCanvas(maxWidth + 20, yPos);
       const trimmedCtx = trimmedCanvas.getContext('2d');
       trimmedCtx.drawImage(canvas, 0, 0, trimmedCanvas.width, trimmedCanvas.height, 0, 0, trimmedCanvas.width, trimmedCanvas.height);
@@ -85,15 +73,11 @@ const helperFunctions = {
       console.error('Произошла ошибка:', error);
     }
   },
+
   noop: () => { },
 
   apptype: () => {
-    let token;
-    if (process.env.APP_TYPE == "DEV") {
-      token = "" || process.env.DEV_TOKEN;
-    } else {
-      token = "" || process.env.PROD_TOKEN;
-    }
+    const token = process.env.APP_TYPE === "DEV" ? process.env.DEV_TOKEN || "" : process.env.PROD_TOKEN || "";
     return token;
   },
 
@@ -102,17 +86,19 @@ const helperFunctions = {
     ctx.session.userFirstName = ctx.message?.from.first_name;
     ctx.session.userLastName = ctx.message?.from.last_name;
   },
-  HumanDate: (date: any) => {
-    let year = date.getFullYear();
-    let month = ("0" + (date.getMonth() + 1)).slice(-2);
-    let day = ("0" + date.getDate()).slice(-2);
-    let hour = date.getHours();
-    let minute = date.getMinutes();
-    let seconds = date.getSeconds();
-    return (
-      year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + seconds
-    );
+
+  HumanDate: (date: Date) => {
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+    };
+    return date.toLocaleString(undefined, options);
   },
+
   getHumanDate: (date: Date): string => {
     const options: Intl.DateTimeFormatOptions = {
       year: "numeric",
@@ -123,141 +109,87 @@ const helperFunctions = {
       second: "numeric",
       hour12: false,
     };
-
     return date.toLocaleString(undefined, options);
   },
-  secToStr: (uptime: any) => {
+
+  secToStr: (uptime: number) => {
     const totalSeconds = uptime / 100;
     const days = Math.floor(totalSeconds / (3600 * 24));
     const hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = Math.floor(totalSeconds % 60);
-    return `${days.toString().padStart(2, "0")} дней ${hours
-      .toString()
-      .padStart(2, "0")} часов ${minutes
-        .toString()
-        .padStart(2, "0")} минут ${seconds.toString().padStart(2, "0")} секунд`;
+    return `${days.toString().padStart(2, "0")} дней ${hours.toString().padStart(2, "0")} часов ${minutes.toString().padStart(2, "0")} минут ${seconds.toString().padStart(2, "0")} секунд`;
   },
+
   generateEmailTemplate: async (mailData: string, template: string) => {
     const filePath = path.join(__dirname, '../../', 'src', `${template}.ejs`);
-
-    // Read the HTML template file
     const htmlTemplate = fs.readFileSync(filePath, "utf-8");
-
-    // Compile the template with EJS
     const compiledTemplate = ejs.compile(htmlTemplate);
     console.log(mailData);
     const mailDataObj = JSON.parse(mailData);
-    // Render the template with data (replace "<%= ... %>" placeholders)
     const renderedHtml = compiledTemplate(mailDataObj);
-
-    // Call the function to send the email with the rendered HTML template
-    // await sendEmailWithTemplate(renderedHtml);
     return renderedHtml;
   },
+
   generateVerificationCode: (length = 6) => {
     const characters = "0123456789";
     let code = "";
-
     for (let i = 0; i < length; i++) {
       const randomIndex = Math.floor(Math.random() * characters.length);
       code += characters[randomIndex];
     }
-
     return code;
   },
-  verifyEmail: async (email: any): Promise<string> => {
-    // Generate the verification code
+
+  verifyEmail: async (email: string): Promise<string> => {
     const verificationCode = helperFunctions.generateVerificationCode(6);
-
-    // Prepare the confirmation email
-    const confirmMail = JSON.stringify(
-      {
-        text: `Пожалуйста введите данный код:${verificationCode}. Для подтверждения корпоративной почты!`,
-      },
-      null,
-      "\t"
-    );
-
-    const template = await helperFunctions.generateEmailTemplate(
-      confirmMail,
-      "confirm-template"
-    );
-
-    // Replace 'email' with the user's email address
-    // const email = 'user@example.com';
-
-    // Send the confirmation email
+    const confirmMail = JSON.stringify({ text: `Пожалуйста введите данный код:${verificationCode}. Для подтверждения корпоративной почты!` }, null, "\t");
+    const template = await helperFunctions.generateEmailTemplate(confirmMail, "confirm-template");
     MailTo.sendEmailWithTemplate(template, email, "Верификация почты");
-
-    // // Wait for the user to enter the verification code
-    // await ctx.reply("Пожалуйста, введите код подтверждения, отправленный на вашу почту:", {
-    //     reply_markup: menu.inBack,
-    // });
-
-    // const enteredCode = await conversation.form.text();
-
-    // Check if the entered code matches the generated code
-    // const isCodeValid = enteredCode === verificationCode;
-
-    // Return the verification result (true if the code is valid, false otherwise)
     return verificationCode;
   },
+
   generateVerificationCodes: () => {
-    // Generate two random numbers between 1000 and 9999
     const codeA = Math.floor(Math.random() * 90) + 10;
     const codeB = Math.floor(Math.random() * 900000) + 100000;
-
-    // Concatenate the two codes
-    // const jointValue = Number(`${codeA}${codeB}`);
     const jointValue = codeA * codeB;
-
-    // Return an object containing both codes and their joint value
-    return {
-      codeA,
-      codeB,
-      jointValue,
-    };
+    return { codeA, codeB, jointValue };
   },
-  isAlive: async (host: any) => {
-    return new Promise((resolve) => {
-      ping.sys.probe(host, (isAlive) => {
+
+  isAlive: async (host: string) => {
+    return new Promise(resolve => {
+      ping.sys.probe(host, isAlive => {
         if (isAlive !== null) {
           resolve(isAlive);
         } else {
-          resolve(false); // You might want to handle null value as unreachable
+          resolve(false);
         }
       });
     });
   },
+
   mWtodBW: (val: number) => {
     const mW = val;
     const dBm = Math.log10(mW);
     const dBW = dBm * 10 - 30;
     return parseFloat(dBW.toFixed(2));
   },
+
   parseReport: (report: string): any[] => {
     const regex = /\((\d+), (\d+)\)\s+(\w+)\s+(\d+)/g;
     const extractedValues: any[] = [];
     let match: RegExpExecArray | null;
-
     while ((match = regex.exec(report)) !== null) {
       const cablePair = `${match[1]}, ${match[2]}`;
       const cableStatus = match[3];
       const cableLength = parseInt(match[4]);
-
-      extractedValues.push({
-        cablePair,
-        cableStatus,
-        cableLength,
-      });
+      extractedValues.push({ cablePair, cableStatus, cableLength });
     }
-
     return extractedValues;
   },
+
   parseCableLengthReport: (report: string) => {
     const lines = report.split("\n");
-
     const interfaceName = lines[0].trim();
     const cablePairs: string[] = [];
     const cableStatus: string[] = [];
@@ -271,25 +203,15 @@ const helperFunctions = {
         cableLengths.push(parseInt(length));
       }
     }
-
-    return {
-      interfaceName,
-      cablePairs,
-      cableStatus,
-      cableLengths,
-    };
+    return { interfaceName, cablePairs, cableStatus, cableLengths };
   },
 
   saveConfigToFirestore: async () => {
     try {
       const configData = require(configPath);
-
-      // Проверка наличия данных в Firestore
       const configDocRef = db.collection('configs').doc('mainConfig');
       const docSnapshot = await configDocRef.get();
-
       if (!docSnapshot.exists) {
-        // Сохранение данных в Firestore, если документ не существует
         await configDocRef.set(configData);
         console.log('Данные из /config.json сохранены в Firestore.');
       }
@@ -298,22 +220,17 @@ const helperFunctions = {
     }
   },
 
-  // Мониторинг изменений в Firestore и обновление /config.json
   monitorFirestoreChanges: () => {
     const configDocRef = db.collection('configs').doc('mainConfig');
-
-    // Мониторим изменения в Firestore
-    configDocRef.onSnapshot((docSnapshot) => {
+    configDocRef.onSnapshot(docSnapshot => {
       if (docSnapshot.exists) {
-        // Получаем данные из Firestore
         const configDataFromFirestore = docSnapshot.data();
-
-        // Обновляем /config.json данными из Firestore
         fs.writeFileSync(configPath, JSON.stringify(configDataFromFirestore, null, 2));
         console.log('Файл /config.json обновлен данными из Firestore.');
       }
     });
   },
+
   cablePairStatusIconizer: (cableStatus: string) => {
     switch (cableStatus) {
       case "open":
@@ -325,31 +242,30 @@ const helperFunctions = {
       case "well":
         return symbols.OK_UP;
       default:
-        return symbols.UNKNOWN
+        return symbols.UNKNOWN;
     }
-
   },
+
   tableFormattedOutput: (results: any[], head?: string[]) => {
-    let table = new Table({
+    const table = new Table({
       head: head,
       chars: {
-        'top': '', 'top-mid': '', 'top-left': '', 'top-right': ''
-        , 'bottom': '', 'bottom-mid': '', 'bottom-left': '', 'bottom-right': ''
-        , 'left': '', 'left-mid': '', 'mid': '', 'mid-mid': ''
-        , 'right': '', 'right-mid': '', 'middle': ' '
+        'top': '', 'top-mid': '', 'top-left': '', 'top-right': '',
+        'bottom': '', 'bottom-mid': '', 'bottom-left': '', 'bottom-right': '',
+        'left': '', 'left-mid': '', 'mid': '', 'mid-mid': '',
+        'right': '', 'right-mid': '', 'middle': ' '
       },
       colAligns: ['center'],
       style: { 'padding-left': 0, 'padding-right': 0 },
       wordWrap: true,
       wrapOnWordBoundary: true,
     });
-    results.forEach(row => {
-      table.push(row);
-    });
+    results.forEach(row => table.push(row));
 
     const tableString = table.toString().replace(/\x1B\[[0-9;]*m/g, '');
     return tableString;
   },
+
   memberPorts: (inputString: string): string => {
     const hexToBin: Record<string, string> = {
       '0': '0000', '1': '0001', '2': '0010', '3': '0011',
@@ -360,25 +276,50 @@ const helperFunctions = {
 
     return inputString.split('').map(char => hexToBin[char.toUpperCase()] || char).join('');
   },
+
   parseTelegramCommand(text: string) {
     const parts = text.trim().split(' ');
-  
+
     if (parts.length === 3 && parts[0].startsWith('/')) {
       const command = parts[0];
       const ipAddress = parts[1];
       const vlan = parseInt(parts[2], 10);
-  
-      // Проверка валидности IP-адреса
+
       const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
       if (ipRegex.test(ipAddress) && !isNaN(vlan)) {
         return { command, ipAddress, vlan };
       }
     }
-  
+
     return null;
+  },
+  generateLLDPTable: (data: any[]) => {
+    const table = new Table({
+      chars: {
+        'top': '', 'top-mid': '', 'top-left': '', 'top-right': '',
+        'bottom': '', 'bottom-mid': '', 'bottom-left': '', 'bottom-right': '',
+        'left': '', 'left-mid': '', 'mid': '', 'mid-mid': '',
+        'right': '', 'right-mid': '', 'middle': ' '
+      },
+      colAligns: ['center'],
+      style: { 'padding-left': 0, 'padding-right': 0 },
+      wordWrap: true,
+      wrapOnWordBoundary: true,
+    });
+
+    const [ip, deviceName, deviceModel, connections] = data;
+
+    table.push([{ colSpan: 4, content: `${ip} ${deviceName} ${deviceModel}` }]);
+    table.push(['Loccal Port','Remote Port', 'Remote Device', 'Remote Model' ]);
+
+    for (const connection of connections) {
+      const [port, connectedPort, connectedDevice, connectedModel,] = connection;
+      table.push([port, connectedPort, connectedDevice, connectedModel]);
+    }
+
+    const tableString = table.toString().replace(/\x1B\[[0-9;]*m/g, '');
+    return tableString;
   }
-
 };
-
 
 export default helperFunctions;

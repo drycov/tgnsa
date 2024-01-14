@@ -5,7 +5,7 @@ import {
 } from "@grammyjs/conversations";
 import { hydrateFiles } from "@grammyjs/files";
 import { FileAdapter } from "@grammyjs/storage-file";
-import { Bot, Context, GrammyError, HttpError, session } from "grammy";
+import { Bot, BotError, Context, GrammyError, HttpError, NextFunction, session } from "grammy";
 import helperFunctions from "./utils/helperFunctions";
 
 import os from "os";
@@ -46,9 +46,8 @@ bot.use(
 );
 
 /**App Conversations Error handler*/
-bot.errorBoundary(
-  (err) => console.error("Conversation threw an error!", err),
-  conversations(),
+bot.errorBoundary(boundaryHandler
+).use(conversations(),
   createConversation(mainComands.start),
   createConversation(mainComands.main),
   createConversation(advancedCommands.additional),
@@ -60,8 +59,9 @@ bot.errorBoundary(
   createConversation(deviceCommands.portInfo),
   createConversation(deviceCommands.vlanList),
   createConversation(deviceCommands.ddmInfo),
-  createConversation(deviceCommands.cableMetr)
-);
+  createConversation(deviceCommands.cableMetr),
+  createConversation(deviceCommands.lldpData));
+
 
 /**App Start Notification */
 async function sendUptimeNotification() {
@@ -102,12 +102,14 @@ if (process.env.APP_TYPE != "DEV") {
 bot.command(["start", "st", "run"], async (ctx) => {
   helperFunctions.setSessionData(ctx);
   const userInfo = JSON.stringify(ctx.message?.from, null, "\t");
-  await ctx.reply(messagesFunctions.msgWelcome(userInfo));
-  helperFunctions.delay(1000);
-  ctx.deleteMessage();
-
-  await ctx.conversation.exit();
-  await ctx.conversation.enter("start");
+  const gc = await ctx.getChat().then((res) => { return res }).catch((err) => { return err })
+  if (gc.type !== "supergroup" && gc.type !== "group" && gc.type !== "channel") {
+    await ctx.reply(messagesFunctions.msgWelcome(userInfo));
+    helperFunctions.delay(1000);
+    ctx.deleteMessage();
+    await ctx.conversation.exit();
+    await ctx.conversation.enter("start");
+  }
 });
 // bot.command("test", async (ctx) => {
 //   ctx.deleteMessage();
@@ -309,6 +311,13 @@ bot.hears(labels.DDMInfoLabel, async (ctx) => {
 
   await ctx.conversation.enter("ddmInfo");
 });
+bot.hears(labels.DeviceLLDPLabel, async (ctx) => {
+  ctx.deleteMessage();
+  // helper.setSessionData(ctx)
+  await ctx.conversation.exit();
+
+  await ctx.conversation.enter("lldpData");
+});
 bot.hears(labels.CabelLengthLabel, async (ctx) => {
   ctx.deleteMessage();
   // helper.setSessionData(ctx)
@@ -316,6 +325,16 @@ bot.hears(labels.CabelLengthLabel, async (ctx) => {
 
   await ctx.conversation.enter("cableMetr");
 });
+
+
+async function boundaryHandler(err: BotError, next: NextFunction) {
+  console.error("Conversation threw an error!", err),
+    /*
+     * You could call `next` if you want to run
+     * the middleware at C in case of an error:
+     */
+    await next()
+}
 
 /**Error Handler */
 bot.catch((err: any) => {
@@ -326,9 +345,12 @@ bot.catch((err: any) => {
     console.error("Error in request:", e.description);
   } else if (e instanceof HttpError) {
     console.error("Could not contact Telegram:", e);
+  } else if (e instanceof BotError) {
+    console.error("Error in request:", e);
   } else {
     console.error("Unknown error:", e);
   }
 });
+
 
 export default bot;

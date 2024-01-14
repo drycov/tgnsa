@@ -7,6 +7,7 @@ export default {
   checkDevice: new Keyboard([
     [Button.text(labels.PortInfoLabel), Button.text(labels.VlanListLabel)],
     [Button.text(labels.DDMInfoLabel), Button.text(labels.CabelLengthLabel)],
+    [Button.text(labels.DeviceLLDPLabel)],
     [Button.text(labels.BackLabel)],
   ]).resized(),
 };

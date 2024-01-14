@@ -20,6 +20,8 @@ import helperFunctions from "../utils/helperFunctions";
 import messagesFunctions from "../utils/messagesFunctions";
 import logger from "../utils/logger";
 import User from "../models/User";
+import Table from "cli-table3";
+import symbols from "../assets/symbols";
 interface MyContext extends Context {
   session: { [key: string]: any }; // Change the type to match your session data structure
 }
@@ -106,8 +108,8 @@ const mainCommands = {
           .verifyEmail(email)
           .then((res) => res);
         const newUserInfo: User = {
-          ttc_id:'5',
-          station:"2",
+          ttc_id: '5',
+          station: "2",
           is_bot: ctx.message?.from.is_bot !== undefined ? ctx.message.from.is_bot : false,
           tgId: ctx.message?.from.id !== undefined ? ctx.message.from.id : 0, // Здесь 0 - это ваше значение по умолчанию
           firstName: firstName,
@@ -122,35 +124,96 @@ const mainCommands = {
           userAllowed: false,
         };
 
-        const result = await userData.saveUser(newUserInfo);
-        const adminUid = await userData.getAdminsUsers();
-
-        adminUid.forEach((res: {
-          tgId: any; isAdmin: boolean; id: string | number
-        }) => {
-          try {
-            if (res.isAdmin) {
-              ctx.api.sendMessage(res.tgId, result);
-              ctx.api.sendMessage(config.BotChatAdmin, result);
-            }
-          } catch (error) {
-            ctx.api.sendMessage(config.defaultAdmin, result);
-          }
+        const table = new Table({
+          chars: {
+            'top': '', 'top-mid': '', 'top-left': '', 'top-right': '',
+            'bottom': '', 'bottom-mid': '', 'bottom-left': '', 'bottom-right': '',
+            'left': '', 'left-mid': '', 'mid': '', 'mid-mid': '',
+            'right': '', 'right-mid': '', 'middle': ' '
+          },
+          style: { 'padding-left': 0, 'padding-right': 0 },
+          wordWrap: true,
+          wrapOnWordBoundary: true,
         });
+
+
+        const result = await userData.saveUser(newUserInfo);
+        table.push(
+          ['ID In DB', result],
+          ['Telegarm ID', newUserInfo.tgId],
+          ['Username', newUserInfo.username],
+          ['First Name', newUserInfo.firstName],
+          ['Last Name', newUserInfo.lastName],
+          ['Company post', newUserInfo.companyPost],
+          ['Phone', newUserInfo.phoneNumber],
+          ['E-Mail', newUserInfo.email],
+          ['Verified', newUserInfo.userVerified ? symbols.OK_UP : symbols.OKEY],
+          
+        );
+
+        const userProfile = table.toString().replace(/\x1B\[[0-9;]*m/g, '');
+        const adminUid = await userData.getAdminsUsers();
+        if (adminUid.length != 0) {
+          adminUid.forEach(async (res: {
+            tgId: any; isAdmin: boolean; id: string | number
+          }) => {
+            if (res.isAdmin) {
+              const gc = await ctx.api.getChat(res.tgId).then((res) => { return res }).catch((err) => { return err })
+              if (gc.error_code != 400) {
+                ctx.api.sendMessage(res.tgId, `<pre>${userProfile}</pre>`, {
+                  parse_mode: "HTML",
+                });
+              } else {
+                ctx.api.sendMessage(config.BotChatAdmin, `<pre>${userProfile}</pre>`, {
+                  parse_mode: "HTML",
+                });
+              }
+            }
+            const message = {
+              date: currentDate,
+              action,
+              status: "done",
+            };
+
+            logger.info(JSON.stringify(message));
+          });
+        } else {
+          try {
+            ctx.api.sendMessage(config.BotChatAdmin, `<pre>${userProfile}</pre>`, {
+              parse_mode: "HTML",
+            });
+          } catch (e: any) {
+            const error = {
+              date: currentDate,
+              action,
+              error: e.message as string,
+            };
+            logger.error(JSON.stringify(error));
+            ctx.api.sendMessage(config.defaultAdmin, `<pre>${userProfile}</pre>`, {
+              parse_mode: "HTML",
+            });
+          }
+        }
         delete ctx.session.conversation;
-        messg += util.format('"%s":"%s",', "data", JSON.stringify(newUserInfo));
-        messg += util.format('"%s":"%s"}', "info", "User aded on DB");
-        logger.info(messg);
-        // ctx.reply(newUserInfo)
-        // await savedata.saveUser(newUserInfo, 'user').then((res) => { return res });
+        const mes = {
+          date: currentDate,
+          action,
+          status: "done",
+        };
+
+        logger.info(JSON.stringify(mes));
         ctx.reply(messages.UserSavedInDBMessage);
-      } catch (error) {
-        logger.error("Error during user registration:", error);
+      } catch (e: any) {
+
+        const error = {
+          date: currentDate,
+          action,
+          error: e.message as string,
+        };
+        logger.error(JSON.stringify(error));
         ctx.reply(
           "An error occurred during registration. Please try again later."
         );
-        message += util.format('"%s":"%s"}', "error", error);
-        logger.error(message);
       }
     }
   },

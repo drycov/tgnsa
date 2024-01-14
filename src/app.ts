@@ -1,12 +1,12 @@
 import { run } from "@grammyjs/runner";
 import util from "util";
-import https from "https";
-import app from "./app/index";
-import web from "./web/index";
+import { Server, createServer } from "https";
+import app from "./bot/bot";
+import web from "./api/api";
 import * as fs from "fs";
-import logger from "./app/utils/logger";
+import logger from "./bot/utils/logger";
 import * as path from "path";
-import helperFunctions from "./app/utils/helperFunctions";
+import helperFunctions from "./bot/utils/helperFunctions";
 import readline from "readline";
 
 const currentDate = new Date().toLocaleString("ru-RU");
@@ -15,20 +15,23 @@ const config = require(configPath);
 const port = process.env.PORT || config.port;
 
 const runner = run(app);
-let server: https.Server | null = null;
+
+// server: Server | null = null;
+
+let server: Server | null = null;
 
 const options = {
   cert: fs.readFileSync(path.join(__dirname, './sslcert/fullchain.pem')),
   key: fs.readFileSync(path.join(__dirname, './sslcert/privkey.pem'))
 };
 
-function startServer(port: string | number) {
+function startAPIServer(port: string | number) {
   const serverPort = typeof port === 'string' ? parseInt(port, 10) : port;
-  server = https.createServer(options, web).listen(serverPort, "91.185.5.210", () => {
+  server = createServer(options,web).listen(serverPort, "localhost", () => {
     const serverAddress = server?.address();
     if (serverAddress && typeof serverAddress !== "string") {
       const { address, port } = serverAddress;
-      console.log(
+      console.log(  
         "\x1b[32m%s\x1b[0m",
         `Server is running at https://${address}:${port}`
       );
@@ -38,12 +41,11 @@ function startServer(port: string | number) {
   });
 }
 
-
 function restartServer(port: string | number) {
   if (server) {
     server.close(() => {
       console.log("\x1b[33m%s\x1b[0m", "Server stopped");
-      startServer(port);
+      startAPIServer(port);
     });
   } else {
     console.log("Server is not running, cannot restart.");
@@ -99,10 +101,10 @@ const startApplication = async () => {
 
 startApplication();
 
-console.log(`NOWEB:${process.env.NOWEB} APP_TYPE:${process.env.APP_TYPE}`)
-if ((process.env.NOWEB && process.env.APP_TYPE === "DEV")||process.env.RUN_WAPP) {
-  startServer(port);
+if ((process.env.NOWEB && process.env.APP_TYPE === "DEV") || !process.env.RUN_WAPP) {
+  startAPIServer(port);
 }
+
 
 const stopRunner = () => {
   const action = stopRunner.name;
