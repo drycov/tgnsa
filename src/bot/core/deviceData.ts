@@ -97,10 +97,7 @@ const devicData = {
           if ((portIfRange[i].includes("Po") || portIfRange[i].includes("po") || portIfRange[i].includes("ControlEthernet")|| portIfRange[i].includes("Port"))) {
             console.log(`Port ${i}: IF(${portIfRange[i]} ) Условие выполняется`);
             continue;
-          } else {
-            console.log(`Port ${i}: IF(${portIfRange[i]} ) Условие НЕ выполняется`);
           }
-          console.log(`${portIfRange[i]} ${portOperStatus} ${portAdminStatus}`)
         }
         
 
