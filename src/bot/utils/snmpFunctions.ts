@@ -5,6 +5,7 @@ import logger from "./logger";
 import messagesFunctions from "./messagesFunctions";
 import * as path from "path";
 import { zip } from "underscore";
+import helperFunctions from "./helperFunctions";
 const configPath = path.join(__dirname, '../', '../', '../', `config.json`);
 const config = require(configPath);
 
@@ -19,22 +20,32 @@ const snmpFunctions = {
     const session = new Session({
       host: host,
       community: community,
+      timeouts: [5000]
+
     });
     const messageWithHost = message + util.format('"%s":"%s", ', "host", host);
+    let action = snmpFunctions.getSingleOID.name;
 
     return new Promise((resolve, reject) => {
-      session.get({ oid: oid }, (error, results) => {
-        if (!error) {
+      session.get({ oid: oid }, (e, results) => {
+        if (!e) {
           const value = results[0].value;
           session.close(); // Закрыть сессию после успешного выполнения
           resolve(value);
         } else {
-          const errorMessage = messageWithHost + util.format('"%s":"%s"}', "error", error.message);
-          logger.error(errorMessage);
           session.close(); // Закрыть сессию в случае ошибки
+          const error = {
+            date: helperFunctions.currentDate,
+            action: action,
+            host: host,
+            oid: oid,
+            error: e.message as string,
+          };
+          logger.error(JSON.stringify(error));
           resolve(false);
 
-          reject(error);
+          reject(e);
+
         }
       });
     });
@@ -42,7 +53,7 @@ const snmpFunctions = {
 
 
   getSyncSingleOID: (host: string, oid: any, community: string): any => {
-    let action = snmpFunctions.getSingleOID.name;
+    let action = snmpFunctions.getSyncSingleOID.name;
     let message = util.format(
       '{"date":"%s", "action":"%s", ',
       currentDate,
@@ -51,23 +62,35 @@ const snmpFunctions = {
     const session = new Session({
       host: host,
       community: community,
+      timeouts: [5000]
     });
     message += util.format('"%s":"%s", ', "host", host);
     try {
-      session.get({ oid: oid }, (error, varbinds) => {
-        if (!error) {
+      session.get({ oid: oid }, (e, varbinds) => {
+        if (!e) {
           return varbinds[0].value;
         } else {
-          message += util.format('"%s":"%s"}', "error", error.message);
-          logger.error(message);
+          const error = {
+            date: helperFunctions.currentDate,
+            action: action,
+            host: host,
+            oid: oid,
+            error: e.message as string,
+          };
+          logger.error(JSON.stringify(error));
         }
       });
-    } catch (error:any) {
-      message += util.format('"%s":"%s"}', "error", error.message);
-      logger.error(message);
+    } catch (e: any) {
+      const error = {
+        date: helperFunctions.currentDate,
+        host: host,
+        error: e.message as string,
+      };
+      logger.error(JSON.stringify(error));
     }
   },
   checkSNMP: async (host: string, communities: any): Promise<any> => {
+
     return new Promise(async (resolve) => {
       let action = snmpFunctions.checkSNMP.name;
       let message = util.format(
@@ -89,54 +112,65 @@ const snmpFunctions = {
           const session = await snmpFunctions.getSingleOID(
             host,
             oid,
-            community
+            community,
           );
 
           if (session) {
-            message += util.format('"%s":"%s"}', "status", true);
-            logger.info(message);
             resolve(community);
           } else {
             // Try the next community
             tryCommunities(index + 1);
           }
-        } catch (error:any) {
+        } catch (e: any) {
+          const error = {
+            date: helperFunctions.currentDate,
+            // action,
+            error: e.message as string,
+          };
+          logger.error(JSON.stringify(error));
           // Handle the error here, if needed
-          message += util.format('"%s":"%s"}', "error", error.message);
-          logger.error(message);
-
           // Try the next community
           tryCommunities(index + 1);
         }
       }
       try {
         await tryCommunities(0); // Start trying communities from index 0
-      } catch (error:any) {
-        messagesFunctions.msgSNMPError(host);
-        message += util.format('"%s":"%s"}', "error", error.message);
-        logger.error(message);
+      } catch (e: any) {
+        const error = {
+          date: helperFunctions.currentDate,
+          // action,
+          error: e.message as string,
+        };
+        logger.error(JSON.stringify(error));
         // Handle the error here, if needed
       }
     });
   },
   getMultiOID: (host: string, oid: string, community: string): Promise<any> => {
-    const action = snmpFunctions.getMultiOID.name;
-    let message = util.format('{"date":"%s", "action":"%s", ', currentDate, action);
-    message += util.format('"%s":"%s", ', "host", host);
+    // let message = util.format('{"date":"%s", "action":"%s", ', currentDate, action);
+    // message += util.format('"%s":"%s", ', "host", host);
 
     const session = new Session({
       host: host,
       community: community,
+      timeouts: [5000]
     });
 
     return new Promise((resolve, reject) => {
-      session.getSubtree({ oid: oid }, (error, varbinds) => {
-        if (error) {
-          message += util.format('"%s":"%s"}', "error", error);
-          logger.error(message);
+      const action = snmpFunctions.getMultiOID.name;
+      session.getSubtree({ oid: oid }, (e, varbinds) => {
+        if (e) {
           session.close(); // Закрыть сессию в случае 
+          const error = {
+            date: helperFunctions.currentDate,
+            action,
+            oid: oid,
+            error: e.message as string,
+          };
+          logger.error(JSON.stringify(error));
+          console.log(e)
           resolve(false);
-          reject(error);
+          reject(e);
         } else {
           const result = varbinds.map((vb) => vb.value);
           session.close(); // Закрыть сессию после успешного выполнения
@@ -146,28 +180,41 @@ const snmpFunctions = {
     });
   },
   getMultiOIDValue: (host: string, oid: string, community: string): Promise<any> => {
-    const action = snmpFunctions.getMultiOID.name;
-    let message = util.format('{"date":"%s", "action":"%s", ', currentDate, action);
-    message += util.format('"%s":"%s", ', "host", host);
+    // let message = util.format('{"date":"%s", "action":"%s", ', currentDate, action);
+    // message += util.format('"%s":"%s", ', "host", host);
 
     const session = new Session({
       host: host,
       community: community,
+      timeouts: [5000]
+
     });
     return new Promise((resolve, reject) => {
+      const action = snmpFunctions.getMultiOID.name;
+
       let results: any[] = [];
-      session.getSubtree({ oid: oid }, (error, varbinds) => {
-        if (error) {
-          message += util.format('"%s":"%s"}', "error", error.message);
-          logger.error(message);
+      session.getSubtree({ oid: oid }, (e, varbinds) => {
+        if (e) {
           session.close(); // Закрыть сессию в случае 
+          const error = {
+            date: helperFunctions.currentDate,
+            action,
+            oid: oid,
+            error: e.message as string,
+          };
+          logger.error(JSON.stringify(error));
           resolve(false);
-          reject(error);
+          reject(e);
         } else {
           varbinds.forEach((vb) => {
             results.push({ oid: vb.oid, value: vb.value });
           });
-          
+          const message = {
+            date: currentDate,
+            action,
+            host: host,
+            status: "done",
+          };
           session.close();
           resolve(results);
         }
@@ -181,33 +228,39 @@ const snmpFunctions = {
     oid: string,
     value: string | number
   ): Promise<any> => {
-    let action = snmpFunctions.setSnmpOID.name;
-    let message = util.format('{"date":"%s", "action":"%s", ', currentDate, action);
     const community = config.snmp.rw_community[0];
     const session = new Session({
       host: host,
       community: community,
+      timeouts: [5000]
+
     });
-    message += util.format('"%s":"%s", ', "host", host);
-  
+
     return new Promise((resolve, reject) => {
-      session.set({ oid, type: 2, value }, (error, varbinds) => {
-        if (!error) {
+      let action = snmpFunctions.setSnmpOID.name;
+
+      session.set({ oid, type: 2, value }, (e, varbinds) => {
+        if (!e) {
           const result = varbinds[0].value;
           resolve(result);
         } else {
-          message += util.format('"%s":"%s"}', "error", error.message);
-          logger.error(message);
           session.close(); // Закрыть сессию в случае ошибки
-          reject(error);
+          const error = {
+            date: helperFunctions.currentDate,
+            action,
+            oid: oid,
+            error: e.message as string,
+          };
+          logger.error(JSON.stringify(error));
+          reject(e);
           return; // Прервать выполнение функции после reject
         }
       });
     })
-    .finally(() => {
-      session.close(); // Закрыть сессию после завершения
-    });
+      .finally(() => {
+        session.close(); // Закрыть сессию после завершения
+      });
   },
-  
+
 };
 export default snmpFunctions;

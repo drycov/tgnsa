@@ -1,5 +1,7 @@
 import nodemailer, { TransportOptions } from "nodemailer";
 import * as path from "path";
+import logger from "../utils/logger";
+import helperFunctions from "../utils/helperFunctions";
 const configPath = path.join(__dirname, '../', '../', '../', `config.json`);
 const config = require(configPath);
 
@@ -8,6 +10,7 @@ const sendEmailWithTemplate = async (
   to: string,
   subject: string
 ) => {
+
   const transporter = nodemailer.createTransport({
     host: config.smtp_client.smtp_server, // Replace with your SMTP host
     port: config.smtp_client.smtp_port, // Replace with your SMTP port (usually 587 or 465 for SSL)
@@ -30,11 +33,15 @@ const sendEmailWithTemplate = async (
     const info = await transporter.sendMail(mailOptions).then((res) => {
       return res;
     });
-    // console.log('Email sent:', info.response);
     return info;
-  } catch (error) {
-    console.error("Error sending email:", error);
-    return error;
+  } catch (e:any) {
+    const error = {
+      date: helperFunctions.currentDate,
+      // action,
+      error: e.message as string,
+    };
+    logger.error(JSON.stringify(error));
+    return e;
   }
   // return info.messageId
 };

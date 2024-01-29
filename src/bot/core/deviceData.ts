@@ -43,6 +43,22 @@ const devicData = {
       throw error;
     }
   },
+  walkOidOnlyValue: async (oid: string, host: string, community: string) => {
+    try {
+      return await snmpFunctions.getMultiOID(host, oid, community);
+    } catch (error) {
+      logger.error(error);
+      throw error;
+    }
+  },
+  getOidOnlyValue: async (oid: string, host: string, community: string) => {
+    try {
+      return await snmpFunctions.getSingleOID(host, oid, community);
+    } catch (error) {
+      logger.error(error);
+      throw error;
+    }
+  },
   processPortStatus: async (
     host: string,
     portIfList: string[],
@@ -55,51 +71,44 @@ const devicData = {
     const action = devicData.processPortStatus.name;
     let message = `{"date":"${currentDate}", "action":"${action}", `;
     message += util.format('"%s":"%s", ', "host", host);
-    const getOidValue = async (oid: string) => {
-      try {
-        return await snmpFunctions.getSingleOID(host, oid, community);
-      } catch (error) {
-        logger.error(error);
-        return error;
-      }
-    };
+
     let descrOid = model?.includes("IES-612") || model?.includes("IES1248-51") || model?.includes("SAM1008") ? joid.AAM1212_oid.subrPortName : joid.basic_oids.oid_descr_ports;
 
     try {
       for (let i = 0; i < portIfList.length; i++) {
-        const testIntDescr = await getOidValue(
-          descrOid + portIfList[i]
+        const testIntDescr = await devicData.getOidValue(
+          descrOid + portIfList[i], host, community
         );
         if (
           config.excludedSubstrings.some((substring: any) => portIfRange[i].includes(substring))
           || /^\d+$/.test(portIfRange[i])
           || /[a-zA-Z]+[0-9]\/[0-9]\/[0-9]\/[0-9]\./g.test(portIfRange[i])
           || portIfRange[i].includes('.ServiceInstance')
+          || portIfRange[i].includes('noSuchInstance')
           || portIfRange[i].includes("E1")
           || portIfRange[i].includes("AUX")
           || portIfRange[i].includes(`${testIntDescr}.`) // ИЛИ если строка НЕ содержит только цифры
         ) {
           continue; // Пропускаем эту итерацию, если строка содержит исключенные подстроки или не содержит только цифры
         }
-        const intDescr = await getOidValue(
-          descrOid + portIfList[i]
+        const intDescr = await devicData.getOidValue(
+          descrOid + portIfList[i], host, community
         );
-        const portOperStatus = await getOidValue(
-          joid.basic_oids.oid_oper_ports + portIfList[i]
+        const portOperStatus = await devicData.getOidValue(
+          joid.basic_oids.oid_oper_ports + portIfList[i], host, community
         );
-        const portAdminStatus = await getOidValue(
-          joid.basic_oids.oid_admin_ports + portIfList[i]
+        const portAdminStatus = await devicData.getOidValue(
+          joid.basic_oids.oid_admin_ports + portIfList[i], host, community
         );
-        const get_inerrors = await getOidValue(
-          joid.basic_oids.oid_inerrors + portIfList[i]
+        const get_inerrors = await devicData.getOidValue(
+          joid.basic_oids.oid_inerrors + portIfList[i], host, community
         );
-        if(!portIfRange[i].includes("port")){
-          if ((portIfRange[i].includes("Po") || portIfRange[i].includes("po") || portIfRange[i].includes("ControlEthernet")|| portIfRange[i].includes("Port"))) {
-            console.log(`Port ${i}: IF(${portIfRange[i]} ) Условие выполняется`);
+        if (!portIfRange[i].includes("port")) {
+          if ((portIfRange[i].includes("Po") || portIfRange[i].includes("po") || portIfRange[i].includes("ControlEthernet") || portIfRange[i].includes("Port"))) {
             continue;
           }
         }
-        
+
 
         let operStatus;
         switch (portOperStatus) {
@@ -122,7 +131,7 @@ const devicData = {
         let fixInErrors = get_inerrors;
 
         if (portIfRange[i].includes("Huawei")) {
-          fixIntName = await getOidValue(joid.linux_server.oid_ifName + '.' + portIfList[i]);
+          fixIntName = await devicData.getOidValue(joid.linux_server.oid_ifName + '.' + portIfList[i], host, community);
         }
         if (intDescr == "noSuchInstance" || intDescr == "noSuchObject") {
           fixIntDescr = " ";
@@ -132,10 +141,11 @@ const devicData = {
         }
 
         results.push([
-          fixIntName,
           operStatus,
-          fixIntDescr,
-          fixInErrors
+          fixIntName,
+          fixInErrors,
+          fixIntDescr
+
         ]);
       }
 
@@ -185,7 +195,6 @@ const devicData = {
       throw new Error(messagesFunctions.msgSNMPError(host));
     }
     for (let l in vlanName) {
-      console.log(vlanId[l], vlanName[l].length)
       results.push([
         vlanId[l],
         vlanName[l]
@@ -269,6 +278,7 @@ const devicData = {
           oidDDMVoltage,
           community
         );
+
         if (
           getDDMLevelTX !== "noSuchInstance" &&
           getDDMLevelTX !== "  -" &&
@@ -278,6 +288,8 @@ const devicData = {
           getDDMVoltage !== "0" &&
           getDDMVoltage !== 0
         ) {
+          console.log({getDDMLevelRX,getDDMLevelTX,getDDMTemperature,getDDMVoltage})
+
           let DDMLevelRX = !unstandart
             ? parseFloat(parseFloat(getDDMLevelRX).toFixed(2))
             : parseFloat((parseFloat(getDDMLevelRX) / 1000).toFixed(2));
@@ -295,10 +307,13 @@ const devicData = {
             DDMLevelRX = powerConverter(DDMLevelRX);
             DDMLevelTX = powerConverter(DDMLevelTX);
           }
+
+          console.log({DDMLevelRX,DDMLevelTX,DDMVoltage,DDMTemperature})
+
           results.push([
             portIfRange[i],
             DDMLevelTX,
-            DDMLevelTX,
+            DDMLevelRX,
             DDMTemperature,
             DDMVoltage,
           ]);
@@ -329,14 +344,7 @@ const devicData = {
     const action = devicData.processADSLInfo.name;
     let message = `{"date":"${currentDate}", "action":"${action}", `;
     message += util.format('"%s":"%s", ', "host", host);
-    const getOidValue = async (oid: string) => {
-      try {
-        return await snmpFunctions.getSingleOID(host, oid, community);
-      } catch (error) {
-        logger.error(error);
-        return error;
-      }
-    };
+
     try {
       for (let i = 0; i < portIfList.length; i++) {
         if (
@@ -357,7 +365,6 @@ const devicData = {
         const oidATUrRate = joid.adsl_oid.adslAturCurrAttainableRate + portIfList[i];
         const oidATUrCrRate = joid.adsl_oid.adslAturChanCurrTxRate + portIfList[i];
 
-
         const getATUcSnrMarg = await snmpFunctions.getSingleOID(host, oidATUcSnrMarg, community);
         const getATUcAttun = await snmpFunctions.getSingleOID(host, oidATUcAttun, community);
         const getATUcPower = await snmpFunctions.getSingleOID(host, oidATUcPower, community);
@@ -370,11 +377,11 @@ const devicData = {
         const getATUrRate = await snmpFunctions.getSingleOID(host, oidATUrRate, community);
         const getATUrCrRate = await snmpFunctions.getSingleOID(host, oidATUrCrRate, community);
 
-        const portOperStatus = await getOidValue(
-          joid.basic_oids.oid_oper_ports + portIfList[i]
+        const portOperStatus = await devicData.getOidValue(
+          joid.basic_oids.oid_oper_ports + portIfList[i], host, community
         );
-        const portAdminStatus = await getOidValue(
-          joid.basic_oids.oid_admin_ports + portIfList[i]
+        const portAdminStatus = await devicData.getOidValue(
+          joid.basic_oids.oid_admin_ports + portIfList[i], host, community
         );
 
         let SnrMargRX = !unstandart
@@ -409,7 +416,7 @@ const devicData = {
 
         let fixIntName = portIfRange[i];
         if (portIfRange[i].includes("Huawei")) {
-          fixIntName = await getOidValue(joid.linux_server.oid_ifName + '.' + portIfList[i]);
+          fixIntName = await devicData.getOidValue(joid.linux_server.oid_ifName + '.' + portIfList[i], host, community);
         }
         let snr = `${SnrMargRX}/${SnrMargTX}`
         let att = `${AttRX}/${AttTX}`
@@ -488,14 +495,6 @@ const devicData = {
     const action = devicData.processCableLengthInfo.name;
     let message = `{"date":"${currentDate}", "action":"${action}", `;
     message += util.format('"%s":"%s", ', "host", host);
-    const getOidValue = async (oid: string) => {
-      try {
-        return await snmpFunctions.getSingleOID(host, oid, community);
-      } catch (error) {
-        logger.error(error);
-        return error;
-      }
-    };
     const list = portIfList;
     const range = portIfRange;
     try {
@@ -505,11 +504,11 @@ const devicData = {
         ) {
           continue; // Пропускаем эту итерацию, если строка содержит исключенные подстроки или не содержит только цифры
         }
-        const portOperStatus = await getOidValue(
-          joid.basic_oids.oid_oper_ports + list[ifId]
+        const portOperStatus = await devicData.getOidValue(
+          joid.basic_oids.oid_oper_ports + list[ifId], host, community
         );
-        const portAdminStatus = await getOidValue(
-          joid.basic_oids.oid_admin_ports + list[ifId]
+        const portAdminStatus = await devicData.getOidValue(
+          joid.basic_oids.oid_admin_ports + list[ifId], host, community
         );
         if (
           portOperStatus == "2" ||
@@ -525,21 +524,16 @@ const devicData = {
             ).then((res) => {
               return res;
             });
-            console.log(set)
             if (await set) {
               const length = await snmpFunctions.getSingleOID(
                 host,
                 vctOIDRes + list[ifId],
                 community
               );
-              console.log('test length', length);
               vtc_r = helperFunctions.parseReport(length);
-              console.log(helperFunctions.parseCableLengthReport(length));
-              console.log("parse_log", vtc_r)
               if (vtc_r.length == 0) {
                 continue;
               }
-              console.log(vtc_r.length)
               if (length) {
                 for (let i = 0; i < Math.min(5, vtc_r.length); i++) {
 
@@ -554,7 +548,7 @@ const devicData = {
 
           let fixIntName = range[ifId];
           if (range[ifId].includes("Huawei")) {
-            fixIntName = await getOidValue(joid.linux_server.oid_ifName + '.' + list[ifId]);
+            fixIntName = await devicData.getOidValue(joid.linux_server.oid_ifName + '.' + list[ifId], host, community);
           }
 
           let operStatus;
@@ -576,7 +570,6 @@ const devicData = {
           results.push([
             fixIntName, operStatus, vtc_res[1], vtc_res[2], vtc_res[3], vtc_res[4]]
           );
-          console.log(results)
         }
       }
     } catch (e: any) {
@@ -603,16 +596,6 @@ const devicData = {
     const action = devicData.processCableLengthInfo.name;
     let message = `{"date":"${currentDate}", "action":"${action}", `;
     message += util.format('"%s":"%s", ', "host", host);
-
-    const getOidValue = async (oid: string) => {
-      try {
-        return await snmpFunctions.getSingleOID(host, oid, community);
-      } catch (error) {
-        logger.error(error);
-        return error;
-      }
-    };
-
     try {
       const zipArray = zip(portIfList, portIfRange);
       for (const [ifId] of zipArray.entries()) {
@@ -622,8 +605,8 @@ const devicData = {
           continue;
         }
 
-        const portOperStatus = await getOidValue(joid.basic_oids.oid_oper_ports + portIfList[ifId]);
-        const portAdminStatus = await getOidValue(joid.basic_oids.oid_admin_ports + portIfList[ifId]);
+        const portOperStatus = await devicData.getOidValue(joid.basic_oids.oid_oper_ports + portIfList[ifId], host, community);
+        const portAdminStatus = await devicData.getOidValue(joid.basic_oids.oid_admin_ports + portIfList[ifId], host, community);
         if (
           portOperStatus == "2" ||
           (portOperStatus == "2" && portAdminStatus == "2")
@@ -650,7 +633,7 @@ const devicData = {
 
           let fixIntName = portIfRange[ifId];
           if (portIfRange[ifId].includes("Huawei")) {
-            fixIntName = await getOidValue(joid.linux_server.oid_ifName + '.' + portIfList[ifId]);
+            fixIntName = await devicData.getOidValue(joid.linux_server.oid_ifName + '.' + portIfList[ifId], host, community);
           }
 
           let operStatus;
@@ -687,7 +670,7 @@ const devicData = {
         error: e.message as string,
       };
       logger.error(JSON.stringify(error));
-      return `${symbols.SHORT} Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее`;
+      return JSON.stringify(error);
     }
     return results;
   },
@@ -708,22 +691,15 @@ const devicData = {
       const model: any = deviceArr.FilterDeviceModel(dirty);
       const JSON_aiflist = await deviceArr.ArrayInterfaceModel(model);
       const aiflist = JSON.parse(JSON_aiflist);
-      const portIfList = aiflist.interfaceList;
-      const portIfRange = aiflist.interfaceRange;
+      // const portIfList = aiflist.interfaceList;
+      // const portIfRange = aiflist.interfaceRange;
 
-      const walkOidValue = async (oid: string) => {
-        try {
-          return await snmpFunctions.getMultiOID(host, oid, community);
-        } catch (error) {
-          logger.error(error);
-          return error;
-        }
-      };
-      const intRange = await walkOidValue(joid.basic_oids.oid_port_name);
-      const intList = await walkOidValue(joid.basic_oids.oid_ifIndex);
+      const intRange = await devicData.walkOidOnlyValue(joid.basic_oids.oid_port_name, host, community);
+      const intList = await devicData.walkOidOnlyValue(joid.basic_oids.oid_ifIndex, host, community);
 
       const list = intList;
       const range = intRange;
+
 
       const ddm = aiflist.ddm;
       const adsl = aiflist.adsl;
@@ -731,9 +707,13 @@ const devicData = {
 
       if (ddm && fibers === 0) {
         // results.push(`${symbols.WarnEmo} Функция DDM не поддерживается или не реализована`);
-        message += `"error":"ddm not supported"}`;
-        logger.error(message);
-        return `${symbols.WarnEmo} Функция DDM не поддерживается или не реализована\n`;
+        const error = {
+          date: currentDate,
+          action,
+          error: "ddm not supported",
+        };
+        logger.error(JSON.stringify(error));
+        return JSON.stringify(error);
       } else if (adsl) {
 
         await devicData.processADSLInfo(
@@ -747,9 +727,6 @@ const devicData = {
         return helperFunctions.tableFormattedOutput(results, ["IF", "SNR", "Attn", "Pwr", "Curr.Rate", "Max.Rate"])
 
       } else {
-        // const noDDMport = portIfList.length - fibers;
-        // const DDMport = portIfList.length;
-
         const oidLoaderKey: keyof JoidType = model.includes("SNR")
           ? "snr_oids"
           : model.includes("Eltex")
@@ -758,13 +735,16 @@ const devicData = {
               ? "dlink_oids"
               : model.includes("SG200-26")
                 ? "cisco_oids"
-                : "";
+                : model.includes("IOS") ? "ios_oids" : "";
 
         if (oidLoaderKey === "") {
-          // results.push(`${symbols.WarnEmo} Функция DDM не поддерживается или не реализована\n\n`);
-          message += `"error":"ddm not supported"}`;
-          logger.error(message);
-          return `${symbols.WarnEmo} Функция DDM не поддерживается или не реализована\n`;
+          const error = {
+            date: currentDate,
+            action,
+            error: "ddm not supported",
+          };
+          logger.error(JSON.stringify(error));
+          return JSON.stringify(error);
         }
         const oidLoader: OidLoaderType = (joid as JoidType)[oidLoaderKey];
 
@@ -773,8 +753,8 @@ const devicData = {
         if (model.includes("SNR")) {
           await devicData.processDDMInfo(
             host,
-            portIfList,
-            portIfRange,
+            list,
+            range,
             oidLoader["snr_oid_DDMRXPower"],
             oidLoader["snr_oid_DDMTXPower"],
             oidLoader["snr_oid_DDMTemperature"],
@@ -789,8 +769,8 @@ const devicData = {
         ) {
           await devicData.processDDMInfo(
             host,
-            portIfList,
-            portIfRange,
+            list,
+            range,
             oidLoader["eltex_DDM_mes14_mes24_mes_3708"],
             oidLoader["eltex_DDM_mes14_mes24_mes_3708"],
             oidLoader["eltex_DDM_mes14_mes24_mes_3708"],
@@ -809,8 +789,8 @@ const devicData = {
         ) {
           await devicData.processDDMInfo(
             host,
-            portIfList,
-            portIfRange,
+            list,
+            range,
             oidLoader["eltex_DDM_mes23_mes33_mes35_mes53"],
             oidLoader["eltex_DDM_mes23_mes33_mes35_mes53"],
             oidLoader["eltex_DDM_mes23_mes33_mes35_mes53"],
@@ -826,8 +806,8 @@ const devicData = {
         ) {
           await devicData.processDDMInfo(
             host,
-            portIfList,
-            portIfRange,
+            list,
+            range,
             oidLoader["dlink_dgs36xx_ses32xx_dgs_30xx_ddm_rx_power"],
             oidLoader["dlink_dgs36xx_ses32xx_dgs_30xx_ddm_tx_power"],
             oidLoader["dlink_dgs36xx_ses32xx_dgs_30xx_ddm_temperatura"],
@@ -838,22 +818,27 @@ const devicData = {
         } else if (model.includes("SG200-26")) {
           await devicData.processDDMInfo(
             host,
-            portIfList,
-            portIfRange,
+            list,
+            range,
             oidLoader["cisco_DDM_S200"],
             oidLoader["cisco_DDM_S200"],
             oidLoader["cisco_DDM_S200"],
             oidLoader["cisco_DDM_S200"],
             community,
-            results
+            results,
+            true
           );
         }
         return helperFunctions.tableFormattedOutput(results, ["IF", "Tx", "RX", "°C", "V"])
       }
-    } catch (error) {
-      message += `"error":"${error}"}`;
-      logger.error(message);
-      return `${symbols.SHORT} Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее`;
+    } catch (e: any) {
+      const error = {
+        date: currentDate,
+        action,
+        error: e.message,
+      };
+      logger.error(JSON.stringify(error));
+      return JSON.stringify(error);
     }
   },
 
@@ -917,34 +902,16 @@ const devicData = {
 
     try {
       const results: any[] = [];
-      const getOidValue = async (oid: string) => {
-        try {
-          return await snmpFunctions.getSingleOID(host, oid, community);
-        } catch (error) {
-          logger.error(error);
-          return error;
-        }
-      };
 
-      const walkOidValue = async (oid: string) => {
-        try {
-          return await snmpFunctions.getMultiOID(host, oid, community);
-        } catch (error) {
-          logger.error(error);
-          return error;
-        }
-      };
-      const modelValue = await getOidValue(joid.basic_oids.oid_model);
+      const modelValue = await devicData.getOidValue(joid.basic_oids.oid_model, host, community);
       const model = deviceArr.FilterDeviceModel(modelValue);
-
-      const intRange = await walkOidValue(joid.basic_oids.oid_port_name);
-      const intList = await walkOidValue(joid.basic_oids.oid_ifIndex);
+      const intRange = await devicData.walkOidOnlyValue(joid.basic_oids.oid_port_name, host, community);
+      const intList = await devicData.walkOidOnlyValue(joid.basic_oids.oid_ifIndex, host, community);
 
       const list = intList;
       const range = intRange;
-
       await devicData.processPortStatus(host, list, range, community, results, model)
-      return helperFunctions.tableFormattedOutput(results, ["IF", "St.", "Descripion", "Errors"])
+      return helperFunctions.tableFormattedOutput(results, ["St.", "IF", "Errors", "Descripion"])
     } catch (e: any) {
       const error = {
         date: currentDate,
@@ -952,7 +919,7 @@ const devicData = {
         error: e.message as string,
       };
       logger.error(JSON.stringify(error));
-      return `${symbols.SHORT} Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее`;
+      return JSON.stringify(error);
     }
   },
 
@@ -984,11 +951,20 @@ const devicData = {
         error: e.message as string,
       };
       logger.error(JSON.stringify(error));
-      return `${symbols.SHORT} Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее`;
+      return JSON.stringify(error);
     }
   },
 
   getCableLength: async (host: string, community: string) => {
+    let action = devicData.getVlanList.name;
+
+    let message = util.format(
+      '{"date":"%s", "action":"%s", ',
+      currentDate,
+      action
+    );
+    message += util.format('"%s":"%s", ', "host", host);
+
     try {
       const results: any[] = [];
       const modelValue = await snmpFunctions.getSingleOID(
@@ -996,24 +972,9 @@ const devicData = {
         joid.basic_oids.oid_model,
         community
       );
-      const walkOidValue = async (oid: string) => {
-        try {
-          return await snmpFunctions.getMultiOID(host, oid, community);
-        } catch (error) {
-          logger.error(error);
-          return error;
-        }
-      };
-      const getOidValue = async (oid: string) => {
-        try {
-          return await snmpFunctions.getSingleOID(host, oid, community);
-        } catch (error) {
-          logger.error(error);
-          return error;
-        }
-      };
-      const intRange = await walkOidValue(joid.basic_oids.oid_port_name);
-      const intList = await walkOidValue(joid.basic_oids.oid_ifIndex);
+
+      const intRange = await devicData.walkOidOnlyValue(joid.basic_oids.oid_port_name, host, community);
+      const intList = await devicData.walkOidOnlyValue(joid.basic_oids.oid_ifIndex, host, community);
       const model = deviceArr.FilterDeviceModel(modelValue);
 
       const list = intList;
@@ -1036,11 +997,11 @@ const devicData = {
           ) {
             continue; // Пропускаем эту итерацию, если строка содержит исключенные подстроки или не содержит только цифры
           }
-          const portOperStatus = await getOidValue(
-            joid.basic_oids.oid_oper_ports + list[ifId]
+          const portOperStatus = await devicData.getOidValue(
+            joid.basic_oids.oid_oper_ports + list[ifId], host, community
           );
-          const portAdminStatus = await getOidValue(
-            joid.basic_oids.oid_admin_ports + list[ifId]
+          const portAdminStatus = await devicData.getOidValue(
+            joid.basic_oids.oid_admin_ports + list[ifId], host, community
           );
 
           if (
@@ -1052,13 +1013,14 @@ const devicData = {
         const resultMessage = `Коммутатор не поддерживает кабельную диагностику`;
         return resultMessage;
       }
-    } catch (error) {
-      const errorMessage = util.format(
-        "%s Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее",
-        symbols.SHORT
-      );
-      logger.error(error);
-      return errorMessage;
+    } catch (e: any) {
+      const error = {
+        date: currentDate,
+        action,
+        error: e.message as string,
+      };
+      logger.error(JSON.stringify(error));
+      return JSON.stringify(error);
     }
   },
   getLLDPdata: async (oidRemSysName: string, oidRemSysModel: string, oidRemIfName: string, ipAddress: string, community: string) => {
@@ -1131,7 +1093,6 @@ const devicData = {
     return new Promise((resolve) => {
       PythonShell.run('ps.py', options).then(messages => {
         // results is an array consisting of messages collected during execution
-        console.log('results: %j', messages);
         resolve(messages);
       });
     });

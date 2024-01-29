@@ -1,30 +1,32 @@
 {
-  "BotChatAdmin": "-1002084129010",
   "port": "443",
-  "snmp": {
-    "rw_community": [
-      "private"
-    ],
-    "community": [
-      "public",
-      "atbu+1",
-      "chinaPublic",
-      "ChinaPublic",
-      "public+"
-    ]
+  "mongoURI": "mongodb+srv://ttc-ttcnsa:GJWPwBmlUJvc9S2S@cluster0.c48ewsz.mongodb.net",
+  "smtp_client": {
+    "smtp_port": 587,
+    "smtp_from": "Transtelecom JSC Network Support BOT <ttcnsb1@hotmail.com>",
+    "smtp_server": "smtp-mail.outlook.com",
+    "smtp_user": "ttcnsb1@hotmail.com",
+    "smtp_pwd": "OSKQAZwsx2022*"
+  },
+  "BotChatAdmin": "-1002084129010",
+  "defaultAdmin": "6818244868",
+  "vendor_info": {
+    "botVendorContact": "@Oritorius",
+    "botVendor": "Denis Rykov",
+    "botVendorWContact": "+7-705-155-7619",
+    "botVendorEMailContact": "d.rykov@ttc.kz"
+  },
+  "defaultLanguage": "en",
+  "apiPort": "5000",
+  "databaseURL": "https://ttcnsa-default-rtdb.asia-southeast1.firebasedatabase.app",
+  "mongoOptions": {
+    "dbName": "ttcNSA"
   },
   "botTgID": "5493974365",
-  "vendor_info": {
-    "botVendorEMailContact": "d.rykov@ttc.kz",
-    "botVendor": "Denis Rykov",
-    "botVendorContact": "@Oritorius",
-    "botVendorWContact": "+7-705-155-7619"
-  },
   "mass_data": {
     "mii_subject": "Массовый инцидент",
     "mii_dest": "d.rykov@ttc.kz"
   },
-  "databaseURL": "https://ttcnsa-default-rtdb.asia-southeast1.firebasedatabase.app",
   "excludedSubstrings": [
     "Vl",
     "vl",
@@ -39,24 +41,22 @@
     "stack-port",
     "noSuchInstance"
   ],
-  "mongoOptions": {
-    "dbName": "ttcNSA"
+  "snmp": {
+    "rw_community": [
+      "private"
+    ],
+    "community": [
+      "public",
+      "atbu+1",
+      "chinaPublic",
+      "ChinaPublic",
+      "public+"
+    ]
   },
-  "defaultLanguage": "en",
   "pingDevice": {
-    "interval": 2,
+    "timeout": 10,
     "count": 4,
-    "timeout": 10
+    "interval": 2
   },
-  "smtp_client": {
-    "smtp_port": 587,
-    "smtp_user": "ttcnsb1@hotmail.com",
-    "smtp_server": "smtp-mail.outlook.com",
-    "smtp_pwd": "OSKQAZwsx2022*",
-    "smtp_from": "Transtelecom JSC Network Support BOT <ttcnsb1@hotmail.com>"
-  },
-  "sesionKey": "Zero0One1Two2Three3Four4",
-  "mongoURI": "mongodb+srv://ttc-ttcnsa:GJWPwBmlUJvc9S2S@cluster0.c48ewsz.mongodb.net",
-  "defaultAdmin": "6818244868",
-  "apiPort": "5000"
+  "sesionKey": "Zero0One1Two2Three3Four4"
 }

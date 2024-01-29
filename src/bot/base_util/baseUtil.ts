@@ -44,7 +44,6 @@ export default {
     } else if (type.includes("win32")) {
       extra = ["-n", config.pingDevice.count];
     }
-    // console.log(extra)
     return ping.promise
       .probe(host, {
         extra: extra,

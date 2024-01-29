@@ -119,6 +119,10 @@
   "cisco_oids": {
     "cisco_DDM_S200": ".1.3.6.1.4.1.9.6.1.101.90.1.2.1.3."
   },
+  "ios_oids":{
+    "cisco_ios_entPhysicalEntry":".1.3.6.1.2.1.47.1.1.1.1.7",
+    "cisco_ios_entSensorValueEntry":".1.3.6.1.4.1.9.9.91.1.1.1.1.4."
+  },
   "linux_server": {
     "oid_ifDescr": ".1.3.6.1.2.1.2.2.1.2.",
     "oid_ifName": ".1.3.6.1.2.1.31.1.1.1.1",

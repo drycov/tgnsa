@@ -3,144 +3,70 @@ import baseUtil from "./baseUtil";
 
 export default {
   FilterDeviceModel: (dirtyData: string) => {
-    // console.log(dirtyData)
-    var swModel;
-    if (dirtyData.includes("S2350")) {
-      swModel = "Huawei S2350-28TP-EI-AC";
-    } else if (dirtyData.includes("S2700-18TP-SI-AC")) {
-      swModel = "Huawei S2700-18TP-SI-AC";
-    } else if (dirtyData.includes("S2320")) {
-      swModel = "Huawei S2320-28TP-EI-AC";
-    } else if (dirtyData.includes("S5320-28TP-LI-AC")) {
-      swModel = "Huawei S5320-28TP-LI-AC";
-    } else if (dirtyData.includes("S5320-28P-LI-AC")) {
-      swModel = "Huawei S5320-28P-LI-AC";
-    } else if (dirtyData.includes("S6320-54C-EI-48S-AC")) {
-      swModel = "Huawei S6320-54C-EI-48S-AC";
-    } else if(dirtyData.includes("S5700-26X-SI-12S-AC")){
-      swModel = "Huawei S5700-26X-SI-12S-AC"
-    }
-    else if (dirtyData.includes("Huawei Integrated Access Software")) {
-      swModel = "Huawei SmartAX MA5616";
-    } else if (dirtyData.includes("DGS-3420-28SC")) {
-      swModel = "Dlink DGS-3420-28SC";
-    } else if (dirtyData.includes("DGS-3620-28SC")) {
-      swModel = "Dlink DGS-3620-28SC";
-    } else if (dirtyData.includes("MES2324")) {
-      if (dirtyData.includes("MES2324FB")) {
-        swModel = "Eltex MES2324FB";
-      } else if (dirtyData.includes("MES2324P")) {
-        swModel = "Eltex MES2324P";
-      }
-    } else if (dirtyData.includes("MES3324F")) {
-      swModel = "Eltex MES3324F";
-    } else if (dirtyData.includes("MES3308F")) {
-      swModel = "Eltex MES3308F";
-    } else if (dirtyData.includes("MES3316F")) {
-      swModel = "Eltex MES3316F";
-    } else if (dirtyData.includes("MES2428")) {
-      swModel = "Eltex MES2428";
-    } else if (dirtyData.includes("ZXR10 2928")) {
-      swModel = "ZTE 2928E";
-    } else if (dirtyData.includes("DES-3200-26")) {
-      swModel = "D-Link DES-3200-26";
-    } else if (dirtyData.includes("DES-3200-10")) {
-      swModel = "D-Link DES-3200-10";
-    } else if (dirtyData.includes("DES-3200-28")) {
-      swModel = "D-Link DES-3200-28";
-    } else if (dirtyData.includes("DES-1228/ME")) {
-      swModel = "D-Link DES-1228/ME";
-    } else if (dirtyData.includes("DES-1210-28/ME/B2")) {
-      swModel = "D-Link DES-1210-28/ME/B2";
-    } else if (dirtyData.includes("DES-1210-28")) {
-      swModel = "D-Link DES-1210-28";
-    } else if (dirtyData.includes("DES-1210-28/ME/B3")) {
-      swModel = "D-Link DES-1210-28/ME/B3";
-    } else if (dirtyData.includes("DGS-3000-10TC")) {
-      swModel = "D-Link DGS-3000-10T";
-    } else if (dirtyData.includes("DGS-3000-26TC")) {
-      swModel = "D-Link DGS-3000-26TC";
-    } else if (dirtyData.includes("JetStream 24-Port Gigabit")) {
-      if (
-        dirtyData.includes("Stackable L2+ Managed Switch with 4 10G SFP+ Slots")
-      ) {
-        swModel = "Tp-Link T2700G-28TQ";
-      } else if (dirtyData.includes("L2 Managed Switch with 4 SFP Slots")) {
-        swModel = "Tp-Link T2600G-28TS";
-      } else if (dirtyData.includes("L2+ Managed Switch with 4 SFP Slots")) {
-        swModel = "Tp-Link T2600G-28TS";
-      }
-    } else if (
-      dirtyData.includes("24-Port 10/100Mbps + 4-Port Gigabit Smart Switch")
-    ) {
-      swModel = "Tp-Link TL-SL2428";
-    } else if (
-      dirtyData.includes(
-        "JetStream 48-Port Gigabit Smart PoE Switch with 4 SFP Slots"
-      )
-    ) {
-      swModel = "Tp-Link TL-1600G-52PS";
-    } else if (dirtyData.includes("RouterOS")) {
-      if (dirtyData.includes("CRS326-24G-2S+")) {
-        swModel = "Mikrotik CRS326";
-      } else if (dirtyData.includes("CRS112")) {
-        swModel = "Mikrotik CRS112";
-      } else if (dirtyData.includes("RB2011LS")) {
-        swModel = "Mikrotik RB2011LS";
-      } else if (dirtyData.includes("RB760")) {
-        swModel = "Mikrotik RB760iGS";
-      }else if(dirtyData.includes("RB SXT")){
-        swModel = "MikroTik SXT SA5"
-      }else if (dirtyData.includes("RB911G-5HPacD")){
-        swModel = "Mikrotik NetBox 5"
-      }
-    } else if (dirtyData.includes("SwOS")) {
-      if (dirtyData.includes("CSS326-24G-2S+")) {
-        swModel = "Mikrotik CSS326";
-      }
-    } else if (dirtyData.includes("SNR")) {
-      if (dirtyData.includes("SNR-S2962-24T")) {
-        swModel = "SNR S2962-24T";
-      } else if (dirtyData.includes("SNR-S2995G-24FX")) {
-        swModel = "SNR S2995G";
-      } else if (dirtyData.includes("SNR-S2985G-24T")) {
-        swModel = "SNR S2985G 24T";
-      } else if (dirtyData.includes("SNR-S2985G-8T")) {
-        swModel = "SNR S2985G 8T";
-      } else if (dirtyData.includes("SNR-S2982G-24TE")){
-        swModel = "SNR S2982G 24T"
-      }
-    } else if (dirtyData.includes("IES-612")) {
-      swModel = "ZyXEL IES-612";
-    } else if (dirtyData.includes("IES1248")) {
-      swModel = "ZyXEL IES1248-51";
-    } else if (dirtyData.includes("ZyXEL IES-1000/SAM1008")) {
-      swModel = "ZyXEL SAM1008";
-    } else if (dirtyData.includes("SG200-26")) {
-      swModel = "Cisco SG200-26";
-    } else if (dirtyData.includes("8-port 10/100 Switch with CLI and WebView")) {
-      swModel = "LinkSys SPS 208G";
-    } else if (dirtyData.includes("Cisco")) {
-      if (dirtyData.includes("ME360x_t")) {
-        swModel = "Cisco ME3600";
-      } else if (dirtyData.includes("ASR901")) {
-        swModel = "Cisco ASR901";
-      } else if (dirtyData.includes("ASR9K")) {
-        swModel = "Cisco ASR9001";
-      } else if (dirtyData.includes("C2960")) {
-        swModel = "Cisco C2960";
-      }
-    } else if (dirtyData.includes("LPOS")){
-      swModel = "Sprinter TX TopGate E1"
-    } else if (dirtyData.includes("Linux")) {
-      swModel = "Linux Server";
-    } else {
-      swModel = dirtyData;
-    }
-    return swModel;
+    type ModelLookup = Record<string, string>;
+
+    const models: ModelLookup = {
+      "S2350": "Huawei S2350-28TP-EI-AC",
+      "S2700-18TP-SI-AC": "Huawei S2700-18TP-SI-AC",
+      "S2320": "Huawei S2320-28TP-EI-AC",
+      "S5320-28TP-LI-AC": "Huawei S5320-28TP-LI-AC",
+      "S5320-28P-LI-AC": "Huawei S5320-28P-LI-AC",
+      "S6320-54C-EI-48S-AC": "Huawei S6320-54C-EI-48S-AC",
+      "S5700-26X-SI-12S-AC": "Huawei S5700-26X-SI-12S-AC",
+      "Huawei Integrated Access Software": "Huawei SmartAX MA5616",
+      "DGS-3420-28SC": "Dlink DGS-3420-28SC",
+      "DGS-3620-28SC": "Dlink DGS-3620-28SC",
+      "MES2324FB": "Eltex MES2324FB",
+      "MES2324P": "Eltex MES2324P",
+      "MES3324F": "Eltex MES3324F",
+      "MES3308F": "Eltex MES3308F",
+      "MES3316F": "Eltex MES3316F",
+      "MES2428": "Eltex MES2428",
+      "ZXR10 2928": "ZTE 2928E",
+      "DES-3200-26": "D-Link DES-3200-26",
+      "DES-3200-10": "D-Link DES-3200-10",
+      "DES-3200-28": "D-Link DES-3200-28",
+      "DES-1228/ME": "D-Link DES-1228/ME",
+      "DES-1210-28/ME/B2": "D-Link DES-1210-28/ME/B2",
+      "DES-1210-28": "D-Link DES-1210-28",
+      "DES-1210-28/ME/B3": "D-Link DES-1210-28/ME/B3",
+      "DGS-3000-10TC": "D-Link DGS-3000-10T",
+      "DGS-3000-26TC": "D-Link DGS-3000-26TC",
+      "Tp-Link T2700G-28TQ": "Tp-Link T2700G-28TQ",
+      "Tp-Link T2600G-28TS": "Tp-Link T2600G-28TS",
+      "Tp-Link TL-SL2428": "Tp-Link TL-SL2428",
+      "Tp-Link TL-1600G-52PS": "Tp-Link TL-1600G-52PS",
+      "CRS326-24G-2S+": "Mikrotik CRS326",
+      "CRS112": "Mikrotik CRS112",
+      "RB2011LS": "Mikrotik RB2011LS",
+      "RB760": "Mikrotik RB760iGS",
+      "RB SXT": "MikroTik SXT SA5",
+      "RB911G-5HPacD": "Mikrotik NetBox 5",
+      "CSS326-24G-2S+": "Mikrotik CSS326",
+      "SNR-S2962-24T": "SNR S2962-24T",
+      "SNR-S2995G-24FX": "SNR S2995G",
+      "SNR-S2985G-24T": "SNR S2985G 24T",
+      "SNR-S2985G-8T": "SNR S2985G 8T",
+      "SNR-S2982G-24TE": "SNR S2982G 24T",
+      "IES-612": "ZyXEL IES-612",
+      "IES1248": "ZyXEL IES1248-51",
+      "ZyXEL IES-1000/SAM1008": "ZyXEL SAM1008",
+      "SG200-26": "Cisco SG200-26",
+      "LinkSys SPS 208G": "LinkSys SPS 208G",
+      "ME360x_t": "Cisco IOS ME3600",
+      "ASR901": "Cisco IOS ASR901",
+      "ASR9K": "Cisco IOS ASR9001",
+      "C2960": "Cisco C2960",
+      "LPOS": "Sprinter TX TopGate E1",
+      "Linux": "Linux Server"
+    };
+
+    // Поиск модели по ключам в "dirty data"
+    const swModel = Object.keys(models).find(key => dirtyData.includes(key));
+
+    return swModel ? models[swModel] : dirtyData;
   },
   ArrayInterfaceModel: async (model: any) => {
-    // console.log(model)
     // let ifRange, ifList, ifDDM, ifFibers;
     switch (model) {
       case "Huawei S6320-54C-EI-48S-AC":
@@ -241,7 +167,7 @@ export default {
           adsl: false,
           fibers: 2,
         });
-      case "Huawei MA5616":
+      case "Huawei SmartAX MA5616":
         return JSON.stringify({
           interfaceRange: baseUtil.InterfaceLoader(
             "s2700_interfaces",

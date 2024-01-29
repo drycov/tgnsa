@@ -25,8 +25,13 @@ interface TelegramCommand {
   port: number;
 }
 
+interface CommandParams {
+  [key: string]: string;
+}
+
 const helperFunctions = {
   delay: async (ms: number) => new Promise(resolve => setTimeout(resolve, ms)),
+  currentDate: new Date().toLocaleString("ru-RU"),
 
   getTextDimensions: (text: string, font: string) => {
     const canvas = createCanvas(800, 600);
@@ -36,6 +41,8 @@ const helperFunctions = {
   },
 
   textToPNG: async (inputFilePath: string, outputFilePath: string) => {
+    const action = helperFunctions.monitorFirestoreChanges.name;
+
     try {
       const textContent = fs.readFileSync(inputFilePath, 'utf-8');
       const lines = textContent.split('\n');
@@ -69,14 +76,24 @@ const helperFunctions = {
 
       const buffer = trimmedCanvas.toBuffer('image/png');
       fs.writeFileSync(outputFilePath, buffer);
-
-      console.log('Изображение успешно сохранено:', outputFilePath);
-    } catch (error) {
-      console.error('Произошла ошибка:', error);
+      const message = {
+        date: helperFunctions.currentDate,
+        action,
+        pid: process.pid,
+        status: `Изображение успешно сохранено ${outputFilePath}`,
+      };
+      logger.info(JSON.stringify(message));
+    } catch (e: any) {
+      const error = {
+        date: helperFunctions.currentDate,
+        action,
+        error: e.message as string,
+      };
+      logger.error(JSON.stringify(error));
     }
   },
 
-  noop: () => {},
+  noop: () => { },
 
   apptype: () => {
     const token = process.env.APP_TYPE === "DEV" ? process.env.DEV_TOKEN || "" : process.env.PROD_TOKEN || "";
@@ -114,7 +131,7 @@ const helperFunctions = {
     return date.toLocaleString("ru-RU", options);
   },
 
-  get2DigDate: (date: Date): string =>{
+  get2DigDate: (date: Date): string => {
     const options: Intl.DateTimeFormatOptions = {
       year: 'numeric',
       month: '2-digit',
@@ -123,8 +140,8 @@ const helperFunctions = {
       minute: '2-digit',
       second: '2-digit',
       hour12: false,
-  };
-  return date.toLocaleString("ru-RU", options);
+    };
+    return date.toLocaleString("ru-RU", options);
 
   },
 
@@ -141,7 +158,6 @@ const helperFunctions = {
     const filePath = path.join(__dirname, '../../', 'src', `${template}.ejs`);
     const htmlTemplate = fs.readFileSync(filePath, "utf-8");
     const compiledTemplate = ejs.compile(htmlTemplate);
-    console.log(mailData);
     const mailDataObj = JSON.parse(mailData);
     const renderedHtml = compiledTemplate(mailDataObj);
     return renderedHtml;
@@ -223,28 +239,57 @@ const helperFunctions = {
   },
 
   saveConfigToFirestore: async () => {
+    const action = helperFunctions.saveConfigToFirestore.name;
     try {
       const configData = require(configPath);
       const configDocRef = db.collection('configs').doc('mainConfig');
       const docSnapshot = await configDocRef.get();
       if (!docSnapshot.exists) {
         await configDocRef.set(configData);
-        console.log('Данные из /config.json сохранены в Firestore.');
+        const message = {
+          date: helperFunctions.currentDate,
+          action,
+          pid: process.pid,
+          status: "Данные из /config.json сохранены в Firestore",
+        };
+        logger.info(JSON.stringify(message));
       }
-    } catch (error) {
-      console.error('Ошибка сохранения данных в Firestore:', error);
+    } catch (e: any) {
+      const error = {
+        date: helperFunctions.currentDate,
+        action,
+        error: e.message as string,
+      };
+      logger.error(JSON.stringify(error));
     }
   },
 
   monitorFirestoreChanges: () => {
-    const configDocRef = db.collection('configs').doc('mainConfig');
-    configDocRef.onSnapshot(docSnapshot => {
-      if (docSnapshot.exists) {
-        const configDataFromFirestore = docSnapshot.data();
-        fs.writeFileSync(configPath, JSON.stringify(configDataFromFirestore, null, 2));
-        console.log('Файл /config.json обновлен данными из Firestore.');
-      }
-    });
+    const action = helperFunctions.monitorFirestoreChanges.name;
+
+    try {
+      const configDocRef = db.collection('configs').doc('mainConfig');
+      configDocRef.onSnapshot(docSnapshot => {
+        if (docSnapshot.exists) {
+          const configDataFromFirestore = docSnapshot.data();
+          fs.writeFileSync(configPath, JSON.stringify(configDataFromFirestore, null, 2));
+          const message = {
+            date: helperFunctions.currentDate,
+            action,
+            pid: process.pid,
+            status: "Файл /config.json обновлен данными из Firestore",
+          };
+          logger.info(JSON.stringify(message));
+        }
+      });
+    } catch (e: any) {
+      const error = {
+        date: helperFunctions.currentDate,
+        action,
+        error: e.message as string,
+      };
+      logger.error(JSON.stringify(error));
+    }
   },
 
   cablePairStatusIconizer: (cableStatus: string) => {
@@ -295,20 +340,26 @@ const helperFunctions = {
 
   parseTelegramCommand(text: string) {
     const parts = text.trim().split(' ');
+    console.log(text);
 
-    if (parts.length === 3 && parts[0].startsWith('/')) {
-      const command = parts[0];
-      const ipAddress = parts[1];
-      const vlan = parseInt(parts[2], 10);
+    if (parts.length >= 3 && parts[0].startsWith('/')) {
+        const command = parts[0];
+        const params: { [key: string]: string } = {};
 
-      const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
-      if (ipRegex.test(ipAddress) && !isNaN(vlan)) {
-        return { command, ipAddress, vlan };
-      }
+        for (let i = 1; i < parts.length; i++) {
+            const key = String(i - 1); // Преобразование числового индекса в строку
+            const value = parts[i];
+
+            if (key && value) {
+                params[key] = value;
+            }
+        }
+
+        return { command, params };
     }
 
     return null;
-  },
+},
   generateLLDPTable: (data: any[]) => {
     const table = new Table({
       chars: {
@@ -387,6 +438,8 @@ const helperFunctions = {
   // }
 
   checkJwtToken: async (token: string, secretKey: string): Promise<{ isValid: boolean, expiration?: string, error?: string | undefined }> => {
+    const action = helperFunctions.monitorFirestoreChanges.name;
+
     try {
       const decodedToken = jwt.verify(token, secretKey) as jwt.JwtPayload;
 
@@ -394,10 +447,16 @@ const helperFunctions = {
         isValid: true,
         expiration: decodedToken.exp?.toString(),
       };
-    } catch (error) {
+    } catch (e: any) {
+      const error = {
+        date: helperFunctions.currentDate,
+        action,
+        error: e.message as string,
+      };
+      logger.error(JSON.stringify(error));
       return {
         isValid: false,
-        error: (error as { name: string }).name,
+        error: (e as { name: string }).name,
         expiration: (jwt.decode(token) as jwt.JwtPayload)?.exp?.toString(),
       };
     }
