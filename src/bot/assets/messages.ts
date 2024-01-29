@@ -23,6 +23,8 @@ export default {
     " Доступ запрещен, пожалуйста обратитесь для доступа к администратору: ",
   PleaceEnterKbMessage: `Для начала работы нажмите кнопку ${labelsData.EnterLabel}`,
   UserSavedInDBMessage: `${symbolsData.OkEmo} Вы добавлены в базу. ${symbolsData.SandTimeEmo} Ожидайте одобрения Администратором`,
+  ApiCreateTokenMessage: `${symbolsData.LockManagerEmo} Создается токен-доступа в приложение`,
+  ApiCreatedTokenMessage: `${symbolsData.OkEmo} Ваш токен создан:`,
 
   //ip
   EnterIpMessage: "Введите IP-адрес адрес устройства ",

@@ -32,7 +32,7 @@ export default {
   BackEmo: "🔙",
   OkEmo: "🆗",
   CancelEmo: "🚫",
-
+  ErrorEmo:"🛑",
   //Menu list emoji
   MagnifierEmo: "🔍",
   GearEmo: "⚙️",
@@ -66,4 +66,6 @@ export default {
   RuporEmo: "📢",
   ShareEmo: "📤",
   LinerEMO: "📏",
+  LockManagerEmo: "🔐",
+  KeyEmo:"🔑"
 };

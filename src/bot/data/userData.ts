@@ -5,6 +5,26 @@ import User from "../models/User";
 
 const currentDate = new Date().toLocaleString("ru-RU");
 
+const handleError = (message: string, data: string, error: any): void => {
+    message += util.format('"%s":"%s",', "data", data);
+    message += util.format('"%s":"%s"}', "error", error);
+    logger.error(message);
+    throw error;
+};
+
+
+const handleResultNotFound = (message: string, status: string, description?: string): void => {
+    message += util.format('"%s":"%s"', "status", status);
+
+    if (description) {
+        message += util.format(', "%s":"%s"}', "description", description);
+    } else {
+        message += util.format('}');
+    }
+
+    logger.error(message);
+};
+
 const saveUser = async (userData: User): Promise<string> => {
     const action = "saveUser";
     let message = util.format('{"date":"%s", "%s":%s","%s":"%s", ', currentDate, "action", action);
@@ -31,15 +51,76 @@ const saveUser = async (userData: User): Promise<string> => {
     }
 };
 
-const getUserDataByTgId = async (tgId: string): Promise<any> => {
-    const action = getUserDataByTgId.name;
-    const message = util.format('{"date":"%s", "%s":%s","%s":"%s", ', currentDate, "action", action, "id", tgId);
+// const getUserDataByTgId = async (tgId: string): Promise<any> => {
+//     const action = getUserDataByTgId.name;
+//     const message = util.format('{"date":"%s", "%s":%s","%s":"%s", ', currentDate, "action", action, "id", tgId);
+
+//     try {
+//         const userSnapshot = await db.collection('users').where('tgId', '==', parseInt(tgId)).get();
+
+//         if (userSnapshot.empty) {
+//             handleUserNotFound(message, tgId);
+//             return null;
+//         }
+
+//         const userData = userSnapshot.docs[0].data();
+//         return userData;
+//     } catch (error) {
+//         handleError(message, "Error fetching user data", error);
+//         throw error;
+//     }
+// };
+
+// const getAdminsUsers = async (): Promise<any> => {
+//     const action = getAdminsUsers.name;
+//     const message = util.format('{"date":"%s", "%s":%s", ', currentDate, "action", action);
+
+//     try {
+//         const adminsSnapshot = await db.collection('users').where('isAdmin', '==', true).get();
+
+//         const admins: FirebaseFirestore.DocumentData[] = [];
+//         if (!adminsSnapshot.empty) {
+//             adminsSnapshot.forEach(doc => admins.push(doc.data()));
+//             return admins;
+//         } else {
+//             handleNoAdminUsersFound(message);
+//             return [];
+//         }
+//     } catch (error) {
+//         handleError(message, "Error fetching admin users", error);
+//         throw error;
+//     }
+// };
+
+const getAllUsers = async (): Promise<any[]> => {
+    const action = getAllUsers.name;
+    const message = util.format('{"date":"%s", "%s":"%s", ', currentDate, "action", action);
 
     try {
-        const userSnapshot = await db.collection('users').where('tgId', '==', tgId).get();
+        const userSnapshot = await db.collection('users').get();
 
         if (userSnapshot.empty) {
-            handleUserNotFound(message, tgId);
+            handleResultNotFound(message, "No users found");
+        }
+
+        const allUsers = userSnapshot.docs.map(doc => doc.data());
+        return allUsers;
+    } catch (error) {
+        handleError(message, "Error fetching user data", error);
+        throw error;
+    }
+};
+
+const getUserByTgId = async (tgId: string): Promise<any | null> => {
+    const action = getUserByTgId.name;
+    const message = util.format('{"date":"%s", "%s":%s","%s":"%s", ', currentDate, "action", action, "id", tgId);
+    const id = parseInt(tgId, 10);
+
+    try {
+        const userSnapshot = await db.collection('users').where('tgId', '==', id).get();
+
+        if (userSnapshot.empty) {
+            handleResultNotFound(message, "User not found", `User with id: ${tgId} not found`);
             return null;
         }
 
@@ -51,44 +132,60 @@ const getUserDataByTgId = async (tgId: string): Promise<any> => {
     }
 };
 
-const getAdminsUsers = async (): Promise<any> => {
+const getAdminsUsers = async (): Promise<any[]> => {
     const action = getAdminsUsers.name;
     const message = util.format('{"date":"%s", "%s":%s", ', currentDate, "action", action);
 
     try {
         const adminsSnapshot = await db.collection('users').where('isAdmin', '==', true).get();
 
-        const admins: FirebaseFirestore.DocumentData[] = [];
-        if (!adminsSnapshot.empty) {
-            adminsSnapshot.forEach(doc => admins.push(doc.data()));
-            return admins;
-        } else {
-            handleNoAdminUsersFound(message);
+        if (adminsSnapshot.empty) {
+            handleResultNotFound(message, "No admin users found");
             return [];
         }
+
+        const admins = adminsSnapshot.docs.map(doc => doc.data());
+        return admins;
     } catch (error) {
         handleError(message, "Error fetching admin users", error);
         throw error;
     }
 };
 
-const handleError = (message: string, data: string, error: any): void => {
-    message += util.format('"%s":"%s",', "data", data);
-    message += util.format('"%s":"%s"}', "error", error);
-    logger.error(message);
-    throw error;
+const updateUser = async (tgId: string, updatedUserData: any): Promise<any | null> => {
+    const action = updateUser.name;
+    const message = util.format('{"date":"%s", "%s":%s", ', currentDate, "action", action);
+
+    try {
+        // Найти id документа по tgId
+        const querySnapshot = await db.collection('users').where('tgId', '==', parseInt(tgId, 10)).get();
+
+        if (querySnapshot.empty) {
+            handleResultNotFound(message, "User not found", `User with id: ${tgId} not found`);
+            return null;
+        }
+
+        // Взять первый документ из результатов запроса (предполагается, что tgId уникально)
+        const userDoc = querySnapshot.docs[0];
+
+        // Получить ссылку на документ
+        const userRef = userDoc.ref;
+
+        // Обновить данные документа
+        await userRef.update(updatedUserData);
+
+        // Получить обновленные данные
+        const updatedUserSnapshot = await userRef.get();
+        const updatedUser = updatedUserSnapshot.data();
+
+        return updatedUser;
+    } catch (error) {
+        handleError(message, "Error updating user data", error);
+        throw error;
+    }
 };
 
-const handleUserNotFound = (message: string, tgId: string): void => {
-    message += util.format('"%s":"%s"}', "status", `User with id: ${tgId} not found`);
-    logger.error(message);
-};
 
-const handleNoAdminUsersFound = (message: string): void => {
-    message += util.format('"%s":"%s"}', "status", `No admin users found`);
-    logger.error(message);
-};
-
-const userData = { saveUser, getUserDataByTgId, getAdminsUsers };
+const userData = { saveUser, getAllUsers, getAdminsUsers, getUserByTgId, updateUser };
 
 export default userData;

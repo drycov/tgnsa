@@ -55,6 +55,7 @@ bot.errorBoundary(boundaryHandler
   createConversation(advancedCommands.p2p_calc),
   createConversation(advancedCommands.ping_device),
   createConversation(advancedCommands.massIncident),
+  createConversation(advancedCommands.apiTokenGen),
   createConversation(deviceCommands.check_device),
   createConversation(deviceCommands.portInfo),
   createConversation(deviceCommands.vlanList),
@@ -325,6 +326,14 @@ bot.hears(labels.CabelLengthLabel, async (ctx) => {
 
   await ctx.conversation.enter("cableMetr");
 });
+
+bot.hears(labels.ApiTokenCreate, async (ctx) => {
+  ctx.deleteMessage();
+  // helper.setSessionData(ctx)
+  await ctx.conversation.exit();
+  await ctx.conversation.enter("apiTokenGen");
+
+})
 
 
 async function boundaryHandler(err: BotError, next: NextFunction) {

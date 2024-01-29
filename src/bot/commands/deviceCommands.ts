@@ -19,6 +19,7 @@ import snmpFunctions from "../utils/snmpFunctions";
 import symbols from "../assets/symbols";
 import deviceArr from "../base_util/deviceArr";
 import joid from "../../src/oid.json";
+import messagesFunctions from "../utils/messagesFunctions";
 
 
 interface MyContext extends Context {
@@ -26,6 +27,7 @@ interface MyContext extends Context {
 }
 type MyConversation = Conversation<MyContext>;
 const currentDate = new Date().toLocaleString("ru-RU");
+// const mainCommands: Record<string, (conversation: MyConversation, ctx: MyContext) => Promise<void>> = {
 
 const deviceCommands = {
   check_device: async (conversation: MyConversation, ctx: MyContext) => {
@@ -42,10 +44,11 @@ const deviceCommands = {
 
     if (!host || !IpCheck(host)) {
       // Handle invalid IP address
-      ctx.reply(messages.ErroMessage + "\n", {
-        parse_mode: "HTML",
+      await ctx.reply(messagesFunctions.msgHandleError(), {
         reply_markup: baseMenu.inBack,
+        parse_mode: "HTML",
       }).catch(helperFunctions.noop);
+
     } else {
       const isAlive = await helperFunctions.isAlive(host);
 
@@ -62,10 +65,25 @@ const deviceCommands = {
             parse_mode: "HTML",
           }).catch(helperFunctions.noop);
         } else {
-          ctx.reply(messages.ErroMessage + "\n" + messages.ErrorSNMPMessage, {
+          await ctx.reply(messagesFunctions.msgHandleError(), {
+            reply_markup: baseMenu.inBack,
             parse_mode: "HTML",
-          }).catch(helperFunctions.noop);
+
+          });
         }
+      } else {
+        const error = {
+          date: currentDate,
+          action,
+          userId: ctx.session.userId,
+          error: `${host} isNotAlive`,
+        };
+        logger.error(JSON.stringify(error));
+
+        await ctx.reply(messagesFunctions.msgHandleError(JSON.stringify(error)), {
+          reply_markup: baseMenu.inBack,
+          parse_mode: "HTML",
+        }).catch(helperFunctions.noop);
       }
     }
 
@@ -90,7 +108,7 @@ const deviceCommands = {
         remove_keyboard: true,
       },
       parse_mode: "HTML",
-    });
+    }).catch(helperFunctions.noop);
 
     const portStatus = await deviceData
       .getPortStatus(host, community)
@@ -112,8 +130,7 @@ const deviceCommands = {
         {
           reply_markup: deviceMenu.checkDevice,
           parse_mode: "HTML",
-        }
-      );
+        }).catch(helperFunctions.noop);
     } catch (e: any) {
       const error = {
         date: currentDate,
@@ -123,9 +140,11 @@ const deviceCommands = {
       };
 
       logger.error(JSON.stringify(error));
-      await ctx.reply(messages.ErroMessage + "\n", {
+      await ctx.reply(messagesFunctions.msgHandleError(JSON.stringify(error)), {
         reply_markup: baseMenu.inBack,
-      });
+        parse_mode: "HTML",
+
+      }).catch(helperFunctions.noop);
     }
 
   },
@@ -141,8 +160,7 @@ const deviceCommands = {
       },
       parse_mode: "HTML",
 
-    });
-
+    }).catch(helperFunctions.noop);
     const vlanListResult = await deviceData
       .getVlanList(host, community)
       .then((status) => {
@@ -163,7 +181,7 @@ const deviceCommands = {
       await ctx.reply(res, {
         reply_markup: deviceMenu.checkDevice,
         parse_mode: "HTML",
-      });
+      }).catch(helperFunctions.noop);
     } catch (e: any) {
       const error = {
         date: currentDate,
@@ -173,9 +191,11 @@ const deviceCommands = {
       };
 
       logger.error(JSON.stringify(error));
-      await ctx.reply(messages.ErroMessage + "\n", {
+      await ctx.reply(messagesFunctions.msgHandleError(), {
         reply_markup: baseMenu.inBack,
-      });
+        parse_mode: "HTML",
+
+      }).catch(helperFunctions.noop);
     }
   },
   ddmInfo: async (_conveconversation: MyConversation, ctx: MyContext) => {
@@ -199,7 +219,7 @@ const deviceCommands = {
       },
       parse_mode: "HTML",
 
-    });
+    }).catch(helperFunctions.noop);
     const DDMInfo = await deviceData
       .getDDMInfo(host, community)
       .then((res) => res);
@@ -236,27 +256,45 @@ const deviceCommands = {
         };
 
         logger.error(JSON.stringify(error));
-        await ctx.reply(messages.ErroMessage + "\n", {
+        await ctx.reply(messagesFunctions.msgHandleError(JSON.stringify(error)), {
           reply_markup: baseMenu.inBack,
-        });
+          parse_mode: "HTML",
+
+        }).catch(helperFunctions.noop);
       }
     } else {
-      await ctx.reply(
-        `Уровень оптического сигнала/ADSL на устройстве: <code>${host}</code>\n<pre>${DDMInfo}</pre>` +
-        `\n<i>Выполнено:  <code>${currentDate}</code></i>`,
-        {
-          reply_markup: deviceMenu.checkDevice,
-          parse_mode: "HTML",
-        }
-      );
-      const message = {
-        date: currentDate,
-        action,
-        userId: ctx.session.userId,
-        status: "done",
-      };
+      try {
+        await ctx.reply(
+          `Уровень оптического сигнала/ADSL на устройстве: <code>${host}</code>\n<pre>${DDMInfo}</pre>` +
+          `\n<i>Выполнено:  <code>${currentDate}</code></i>`,
+          {
+            reply_markup: deviceMenu.checkDevice,
+            parse_mode: "HTML",
+          }
+        );
+        const message = {
+          date: currentDate,
+          action,
+          userId: ctx.session.userId,
+          status: "done",
+        };
 
-      logger.info(JSON.stringify(message));
+        logger.info(JSON.stringify(message));
+      } catch (e: any) {
+        const error = {
+          date: currentDate,
+          action,
+          userId: ctx.session.userId,
+          error: e.message as string,
+        };
+
+        logger.error(JSON.stringify(error));
+        await ctx.reply(messagesFunctions.msgHandleError(JSON.stringify(error)), {
+          reply_markup: baseMenu.inBack,
+          parse_mode: "HTML",
+
+        }).catch(helperFunctions.noop);
+      }
     }
   },
   cableMetr: async (_conversation: MyConversation, ctx: MyContext) => {
@@ -303,11 +341,11 @@ const deviceCommands = {
       };
 
       logger.error(JSON.stringify(error));
-      await ctx.reply(messages.ErroMessage + "\n", {
+      await ctx.reply(messagesFunctions.msgHandleError(JSON.stringify(error)), {
         reply_markup: baseMenu.inBack,
         parse_mode: "HTML",
 
-      });
+      }).catch(helperFunctions.noop);
     }
   },
   lldpData: async (_conversation: MyConversation, ctx: MyContext) => {
@@ -321,7 +359,7 @@ const deviceCommands = {
       const lldpData = await deviceData.getLLDPdata(joid.lldp_oids.lldpRemSysName, joid.lldp_oids.lldpRemSysDesc, joid.lldp_oids.lldpRemPortId, host, community);
       await ctx.reply(`LLDP соседство: \n   <pre>${lldpData}</pre>\n\n<i>Выполнено:  <code>${currentDate}</code></i>`, {
         parse_mode: "HTML",
-      });
+      }).catch(helperFunctions.noop);
     } catch (e: any) {
       const error = {
         date: currentDate,
@@ -329,7 +367,11 @@ const deviceCommands = {
         error: e.message as string,
       };
       logger.error(JSON.stringify(error));
-      return `${symbols.SHORT} Устройство не на связи или при выполнении задачи произошла ошибка! Попробуйте позднее`;
+      await ctx.reply(messagesFunctions.msgHandleError(JSON.stringify(error)), {
+        reply_markup: baseMenu.inBack,
+        parse_mode: "HTML",
+
+      }).catch(helperFunctions.noop);
     }
   }
 

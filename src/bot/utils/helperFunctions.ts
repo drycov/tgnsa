@@ -10,6 +10,8 @@ import { db } from "./firebaseConfig";
 import symbols from "../assets/symbols";
 import Table from "cli-table3";
 const configPath = path.join(__dirname, '../', '../', '../', `config.json`);
+import * as jwt from 'jsonwebtoken';
+import logger from "./logger";
 
 dotenv.config();
 
@@ -74,7 +76,7 @@ const helperFunctions = {
     }
   },
 
-  noop: () => { },
+  noop: () => {},
 
   apptype: () => {
     const token = process.env.APP_TYPE === "DEV" ? process.env.DEV_TOKEN || "" : process.env.PROD_TOKEN || "";
@@ -96,7 +98,7 @@ const helperFunctions = {
       minute: "numeric",
       second: "numeric",
     };
-    return date.toLocaleString(undefined, options);
+    return date.toLocaleString("ru-RU", options);
   },
 
   getHumanDate: (date: Date): string => {
@@ -109,7 +111,21 @@ const helperFunctions = {
       second: "numeric",
       hour12: false,
     };
-    return date.toLocaleString(undefined, options);
+    return date.toLocaleString("ru-RU", options);
+  },
+
+  get2DigDate: (date: Date): string =>{
+    const options: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+  };
+  return date.toLocaleString("ru-RU", options);
+
   },
 
   secToStr: (uptime: number) => {
@@ -310,7 +326,7 @@ const helperFunctions = {
     const [ip, deviceName, deviceModel, connections] = data;
 
     table.push([{ colSpan: 4, content: `${ip} ${deviceName} ${deviceModel}` }]);
-    table.push(['Loccal Port','Remote Port', 'Remote Device', 'Remote Model' ]);
+    table.push(['Loccal Port', 'Remote Port', 'Remote Device', 'Remote Model']);
 
     for (const connection of connections) {
       const [port, connectedPort, connectedDevice, connectedModel,] = connection;
@@ -319,6 +335,72 @@ const helperFunctions = {
 
     const tableString = table.toString().replace(/\x1B\[[0-9;]*m/g, '');
     return tableString;
+  },
+  hashUserId: async (confirmCode: string): Promise<string> => {
+    logger.info(confirmCode)
+
+    const bcrypt = await import('bcrypt-ts');
+    const saltRounds = 10; // Количество раундов для соли (можете изменить по необходимости)
+    const hashedUserId = await bcrypt.hash(confirmCode, saltRounds);
+    logger.info(hashedUserId)
+
+    return hashedUserId;
+  },
+
+  createJwtToken: async (data: {
+    tgId: string;
+    isAdmin: boolean;
+    userAllowed: boolean;
+    email: string;
+    userVerified: boolean;
+    verificationCode: string;
+  }, secretKey: string): Promise<string> => {
+    const { tgId, isAdmin, userAllowed, email, userVerified, verificationCode } = data;
+
+    // Проверка наличия необходимых свойств
+    if (!tgId || !isAdmin || !userAllowed || !email || !userVerified || !verificationCode) {
+      throw new Error('Invalid data provided for creating JWT token');
+    }
+
+    const payload = {
+      tgId,
+      isAdmin,
+      userAllowed,
+      email,
+      userVerified
+    };
+
+    const token = jwt.sign(payload, secretKey, { expiresIn: '42d' });
+    return token;
+  },
+  // checkJwtToken: async (token: string, secretKey: string): Promise<boolean|string> => {
+  //   const decodedToken = jwt.decode(token) as jwt.JwtPayload;
+  //   return new Promise<boolean|string>((resolve, reject) => {
+  //     jwt.verify(token, secretKey, (err, decoded) => {
+  //       if (err) {
+  //         resolve(err.name,decodedToken.exp?.toString);
+  //       } else {
+  //         resolve(true,decodedToken.exp?.toString);
+  //       }
+  //     });
+  //   });
+  // }
+
+  checkJwtToken: async (token: string, secretKey: string): Promise<{ isValid: boolean, expiration?: string, error?: string | undefined }> => {
+    try {
+      const decodedToken = jwt.verify(token, secretKey) as jwt.JwtPayload;
+
+      return {
+        isValid: true,
+        expiration: decodedToken.exp?.toString(),
+      };
+    } catch (error) {
+      return {
+        isValid: false,
+        error: (error as { name: string }).name,
+        expiration: (jwt.decode(token) as jwt.JwtPayload)?.exp?.toString(),
+      };
+    }
   }
 };
 

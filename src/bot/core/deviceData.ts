@@ -76,6 +76,7 @@ const devicData = {
           || /[a-zA-Z]+[0-9]\/[0-9]\/[0-9]\/[0-9]\./g.test(portIfRange[i])
           || portIfRange[i].includes('.ServiceInstance')
           || portIfRange[i].includes("E1")
+          || portIfRange[i].includes("AUX")
           || portIfRange[i].includes(`${testIntDescr}.`) // ИЛИ если строка НЕ содержит только цифры
         ) {
           continue; // Пропускаем эту итерацию, если строка содержит исключенные подстроки или не содержит только цифры
@@ -92,10 +93,16 @@ const devicData = {
         const get_inerrors = await getOidValue(
           joid.basic_oids.oid_inerrors + portIfList[i]
         );
-        if ((portIfRange[i].includes("Po") || portIfRange[i].includes("po") || portIfRange[i].includes("ControlEthernet")) && (portOperStatus != 1 || portAdminStatus == 2)) {
-          continue; // Пропускаем эту итерацию, если строка содержит исключенные подстроки или не содержит только цифры
-
+        if(!portIfRange[i].includes("port")){
+          if ((portIfRange[i].includes("Po") || portIfRange[i].includes("po") || portIfRange[i].includes("ControlEthernet")|| portIfRange[i].includes("Port"))) {
+            console.log(`Port ${i}: IF(${portIfRange[i]} ) Условие выполняется`);
+            continue;
+          } else {
+            console.log(`Port ${i}: IF(${portIfRange[i]} ) Условие НЕ выполняется`);
+          }
+          console.log(`${portIfRange[i]} ${portOperStatus} ${portAdminStatus}`)
         }
+        
 
         let operStatus;
         switch (portOperStatus) {

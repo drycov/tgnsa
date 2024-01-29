@@ -2,7 +2,7 @@ import userData from "../data/userData";
 
 const access = {
   UserExist: async (id: any) => {
-    let user = await userData.getUserDataByTgId(id).then((res) => {
+    let user = await userData.getUserByTgId(id).then((res) => {
       return res;
     });
     if (user) {
@@ -11,7 +11,7 @@ const access = {
     return false;
   },
   CheckAdminRole: async (id: any) => {
-    let user = await userData.getUserDataByTgId(id).then((res) => {
+    let user = await userData.getUserByTgId(id).then((res) => {
       return res;
     });
     if (user) {
@@ -26,7 +26,7 @@ const access = {
     return false;
   },
   CheckUserStatus: async (id: any) => {
-    let user = await userData.getUserDataByTgId(id).then((res) => {
+    let user = await userData.getUserByTgId(id).then((res) => {
       return res;
     });
     if (user) {

@@ -8,6 +8,7 @@ import {
   default as messages,
 } from "../assets/messages";
 import * as path from "path";
+import * as jwt from 'jsonwebtoken';
 
 const configPath = path.join(__dirname, '../', '../', '../', `config.json`);
 
@@ -35,7 +36,7 @@ const mainCommands = {
     ctx.session.currentCVid = "start";
     await ctx.reply(messageText.PleaceEnterKbMessage, {
       reply_markup: baseMenu.onEnter,
-    });
+    }).catch(helperFunctions.noop);
   },
   main: async (conversation: MyConversation, ctx: MyContext) => {
     let action = mainCommands.main.name;
@@ -48,26 +49,42 @@ const mainCommands = {
     ctx.session.previosCVid = "start";
     ctx.session.currentCVid = "main";
     let exist = await access.UserExist(ctx.session.userId);
+    let code = '';
+    let exp;
     message += util.format('"%s":"%s", ', "id", ctx.message?.from.id);
     if (exist) {
+      const user = await userData.getUserByTgId(ctx.session.userId).then((res) => { return res });
+
       let status = await access.CheckUserStatus(ctx.session.userId);
       if (status) {
+        if (user.apiToken != '' || typeof user.apiToken != "undefined") {
+          exp = await helperFunctions.checkJwtToken(user.apiToken, user.hash).then((res) => { return res })
+          if (exp.error === 'TokenExpiredError') {
+            ctx.reply(`${messagesFunctions.msgApiTokenHandleError(exp.expiration)}\n\n<i>Выполнено:  <code>${currentDate}</code></i>`, {
+              parse_mode: "HTML",
+            }).catch(helperFunctions.noop);
+          } else if (exp.error && exp.error !== 'TokenExpiredError') {
+            ctx.reply(`${messagesFunctions.msgApiTokenHandleError()}\n\n<i>Выполнено:  <code>${currentDate}</code></i>`, {
+              parse_mode: "HTML",
+            }).catch(helperFunctions.noop);
+          }
+        }
         let ua = await access.CheckAdminRole(ctx.session.userId);
         if (ua) {
           message += util.format('"%s":"%s"}', "info", "User logined is Admin");
           await ctx.reply("🤘🏻 " + labels.MainMenuLabel + " 🤘🏻", {
             reply_markup: mainMenu.admin,
-          });
+          }).catch(helperFunctions.noop);
           logger.info(message);
         } else {
           await ctx.reply(labels.MainMenuLabel, {
             reply_markup: mainMenu.main,
-          });
+          }).catch(helperFunctions.noop);
         }
       } else {
         ctx.reply(messagesFunctions.msgForbridedenUser(), {
           parse_mode: "HTML",
-        });
+        }).catch(helperFunctions.noop);
         message += util.format('"%s":"%s"}', "error", "User forbridden");
         logger.error(message);
       }
@@ -82,29 +99,29 @@ const mainCommands = {
         messg += util.format('"%s":"%s", ', "id", ctx.message?.from.id);
         await ctx.reply(messages.MsgAddFirstName, {
           reply_markup: baseMenu.inBack,
-        });
+        }).catch(helperFunctions.noop);
         const firstName = await conversation.form.text();
         await ctx.reply(messages.MsgAddLastName, {
           reply_markup: baseMenu.inBack,
-        });
+        }).catch(helperFunctions.noop);
         const lastName = await conversation.form.text();
         await ctx.reply(messages.MsgAddСompanyPost, {
           reply_markup: baseMenu.inBack,
-        });
+        }).catch(helperFunctions.noop);
 
         const companyPost = await conversation.form.text();
         await ctx.reply(messages.MsgAddpPhoneNumber, {
           reply_markup: baseMenu.sendContact,
-        });
+        }).catch(helperFunctions.noop);
         const { message } = await conversation.waitFor("message");
         const phoneNumber = message.contact?.phone_number;
         await ctx.reply(messages.MsgAddEMail, {
           reply_markup: {
             remove_keyboard: true,
           },
-        });
+        }).catch(helperFunctions.noop);
         const email = await conversation.form.text();
-        const code = await helperFunctions
+        code = await helperFunctions
           .verifyEmail(email)
           .then((res) => res);
         const newUserInfo: User = {
@@ -122,6 +139,8 @@ const mainCommands = {
           username: ctx.message?.from.username !== undefined ? ctx.message?.from.username : `firstName lastName`, // Здесь 0 - это ваше значение по умолчанию
           isAdmin: false,
           userAllowed: false,
+          apiToken: "",
+          hash: await helperFunctions.hashUserId(code)
         };
 
         const table = new Table({
@@ -148,7 +167,8 @@ const mainCommands = {
           ['Phone', newUserInfo.phoneNumber],
           ['E-Mail', newUserInfo.email],
           ['Verified', newUserInfo.userVerified ? symbols.OK_UP : symbols.OKEY],
-          
+          ['Token', newUserInfo.apiToken == ' ' ? symbols.ShootDown : symbols.OKEY]
+
         );
 
         const userProfile = table.toString().replace(/\x1B\[[0-9;]*m/g, '');
@@ -162,11 +182,11 @@ const mainCommands = {
               if (gc.error_code != 400) {
                 ctx.api.sendMessage(res.tgId, `<pre>${userProfile}</pre>`, {
                   parse_mode: "HTML",
-                });
+                }).catch(helperFunctions.noop);
               } else {
                 ctx.api.sendMessage(config.BotChatAdmin, `<pre>${userProfile}</pre>`, {
                   parse_mode: "HTML",
-                });
+                }).catch(helperFunctions.noop);
               }
             }
             const message = {
@@ -181,7 +201,7 @@ const mainCommands = {
           try {
             ctx.api.sendMessage(config.BotChatAdmin, `<pre>${userProfile}</pre>`, {
               parse_mode: "HTML",
-            });
+            }).catch(helperFunctions.noop);
           } catch (e: any) {
             const error = {
               date: currentDate,
@@ -191,7 +211,7 @@ const mainCommands = {
             logger.error(JSON.stringify(error));
             ctx.api.sendMessage(config.defaultAdmin, `<pre>${userProfile}</pre>`, {
               parse_mode: "HTML",
-            });
+            }).catch(helperFunctions.noop);
           }
         }
         delete ctx.session.conversation;
@@ -211,9 +231,12 @@ const mainCommands = {
           error: e.message as string,
         };
         logger.error(JSON.stringify(error));
-        ctx.reply(
-          "An error occurred during registration. Please try again later."
-        );
+        
+        await ctx.reply(messagesFunctions.msgHandleError(JSON.stringify(error)), {
+          reply_markup: baseMenu.inBack,
+          parse_mode: "HTML",
+  
+        }).catch(helperFunctions.noop);
       }
     }
   },

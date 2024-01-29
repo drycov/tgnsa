@@ -17,6 +17,8 @@ import messagesFunctions from "../utils/messagesFunctions";
 import helperFunctions from "../utils/helperFunctions";
 import massData from "../data/massData";
 import MassIncidient from "../models/MassIncidient";
+import { has } from "underscore";
+import logger from "../utils/logger";
 
 interface MyContext extends Context {
   session: { [key: string]: any }; // Change the type to match your session data structure
@@ -25,7 +27,7 @@ type MyConversation = Conversation<MyContext>;
 
 const currentDate = new Date().toLocaleString("ru-RU");
 
-export default {
+const advancedCommands ={
   additional: async (_conversation: MyConversation, ctx: MyContext) => {
     ctx.session.currentCVid = "additional";
     ctx.session.previosCVid = "main";
@@ -33,6 +35,7 @@ export default {
       reply_markup: advancedMenu.additional,
     });
   },
+
   cidr_calc: async (
     conversation: MyConversation,
     ctx: MyContext
@@ -64,6 +67,7 @@ export default {
       }
     );
   },
+
   p2p_calc: async (
     conversation: MyConversation,
     ctx: MyContext
@@ -95,6 +99,7 @@ export default {
       }
     );
   },
+
   ping_device: async (
     conversation: MyConversation,
     ctx: MyContext
@@ -147,7 +152,7 @@ export default {
     ctx.session.currentCVid = "massIncident";
     ctx.session.previosCVid = "additional";
 
-    const user = await userData.getUserDataByTgId(ctx.session.userId);
+    const user = await userData.getUserByTgId(ctx.session.userId);
     await ctx.reply(messages.MIIStationMessage, {
       reply_markup: baseMenu.inBack,
     });
@@ -240,4 +245,102 @@ export default {
       { reply_markup: baseMenu.inBack, parse_mode: "HTML" }
     );
   },
+
+  apiTokenGen: async (conversation: MyConversation, ctx: MyContext): Promise<void> => {
+    ctx.session.currentCVid = "api_token_gen";
+    ctx.session.previosCVid = "additional";
+    const action = advancedCommands.apiTokenGen.name;
+
+    await ctx.reply(messages.ApiCreateTokenMessage, {
+      reply_markup: {
+        remove_keyboard: true,
+      },
+    });
+
+    const userId: string | undefined = ctx.from?.id?.toString();
+
+    if (userId) {
+      try {
+        const user = await userData.getUserByTgId(userId);
+
+        if (!user.apiToken || typeof user.apiToken === "undefined") {
+          const secretKey = user.hash || await helperFunctions.hashUserId(user.verificationCode);
+          const token = await helperFunctions.createJwtToken(user, secretKey);
+
+          if (token) {
+            const updatedUserData = {
+              apiToken: token,
+              hash: secretKey,
+            };
+
+            await userData.updateUser(user.tgId, updatedUserData);
+
+            await ctx.reply(util.format(
+              "%s <pre><code>%s</code></pre>\n\n<i>Выполнено:  <code>%s</code></i>",
+              messages.ApiCreatedTokenMessage,
+              token,
+              currentDate
+            ), {
+              reply_markup: baseMenu.inBack,
+              parse_mode: "HTML",
+            });
+          }
+        } else {
+          const exp = await helperFunctions.checkJwtToken(user.apiToken, user.hash);
+
+          if (exp.error === 'TokenExpiredError' || (exp.error && exp.error !== 'TokenExpiredError')) {
+            const secretKey = user.hash || await helperFunctions.hashUserId(user.verificationCode);
+            const token = await helperFunctions.createJwtToken(user, secretKey);
+
+            if (token) {
+              const updatedUserData = {
+                apiToken: token,
+                hash: secretKey,
+              };
+
+              await userData.updateUser(user.tgId, updatedUserData);
+
+              await ctx.reply(util.format(
+                "%s <pre><code>%s</code></pre>\n\n<i>Выполнено:  <code>%s</code></i>",
+                messages.ApiCreatedTokenMessage,
+                token,
+                currentDate
+              ), {
+                reply_markup: baseMenu.inBack,
+                parse_mode: "HTML",
+              });
+            }
+          } else {
+            await ctx.reply(util.format(
+              "Ваш токен: <pre><code>%s</code></pre>\n\n<i>Выполнено:  <code>%s</code></i>",
+              user.apiToken,
+              currentDate
+            ), {
+              reply_markup: baseMenu.inBack,
+              parse_mode: "HTML",
+            });
+          }
+        }
+      } catch (e:any) {
+        const error = {
+          date: currentDate,
+          action,
+          error: e.message as string,
+        };
+        logger.error(JSON.stringify(error));
+        await ctx.reply(messagesFunctions.msgHandleError(JSON.stringify(error)), {
+          reply_markup: baseMenu.inBack,
+          parse_mode: "HTML",
+  
+        });
+      }
+    } else {
+      ctx.reply(messagesFunctions.msgHandleError(), {
+        reply_markup: baseMenu.inBack,
+      });
+    }
+  }
+
 };
+
+export default advancedCommands;

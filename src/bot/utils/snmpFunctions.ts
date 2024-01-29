@@ -29,7 +29,7 @@ const snmpFunctions = {
           session.close(); // Закрыть сессию после успешного выполнения
           resolve(value);
         } else {
-          const errorMessage = messageWithHost + util.format('"%s":"%s"}', "error", error);
+          const errorMessage = messageWithHost + util.format('"%s":"%s"}', "error", error.message);
           logger.error(errorMessage);
           session.close(); // Закрыть сессию в случае ошибки
           resolve(false);
@@ -58,12 +58,12 @@ const snmpFunctions = {
         if (!error) {
           return varbinds[0].value;
         } else {
-          message += util.format('"%s":"%s"}', "error", error);
+          message += util.format('"%s":"%s"}', "error", error.message);
           logger.error(message);
         }
       });
-    } catch (error) {
-      message += util.format('"%s":"%s"}', "error", error);
+    } catch (error:any) {
+      message += util.format('"%s":"%s"}', "error", error.message);
       logger.error(message);
     }
   },
@@ -100,9 +100,9 @@ const snmpFunctions = {
             // Try the next community
             tryCommunities(index + 1);
           }
-        } catch (error) {
+        } catch (error:any) {
           // Handle the error here, if needed
-          message += util.format('"%s":"%s"}', "error", error);
+          message += util.format('"%s":"%s"}', "error", error.message);
           logger.error(message);
 
           // Try the next community
@@ -111,9 +111,9 @@ const snmpFunctions = {
       }
       try {
         await tryCommunities(0); // Start trying communities from index 0
-      } catch (error) {
+      } catch (error:any) {
         messagesFunctions.msgSNMPError(host);
-        message += util.format('"%s":"%s"}', "error", error);
+        message += util.format('"%s":"%s"}', "error", error.message);
         logger.error(message);
         // Handle the error here, if needed
       }
@@ -158,7 +158,7 @@ const snmpFunctions = {
       let results: any[] = [];
       session.getSubtree({ oid: oid }, (error, varbinds) => {
         if (error) {
-          message += util.format('"%s":"%s"}', "error", error);
+          message += util.format('"%s":"%s"}', "error", error.message);
           logger.error(message);
           session.close(); // Закрыть сессию в случае 
           resolve(false);
@@ -196,7 +196,7 @@ const snmpFunctions = {
           const result = varbinds[0].value;
           resolve(result);
         } else {
-          message += util.format('"%s":"%s"}', "error", error);
+          message += util.format('"%s":"%s"}', "error", error.message);
           logger.error(message);
           session.close(); // Закрыть сессию в случае ошибки
           reject(error);

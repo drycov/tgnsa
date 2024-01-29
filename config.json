@@ -1,22 +1,30 @@
 {
   "BotChatAdmin": "-1002084129010",
-  "apiPort": "5000",
-  "defaultLanguage": "en",
-  "mongoOptions": {
-    "dbName": "ttcNSA"
-  },
+  "port": "443",
   "snmp": {
+    "rw_community": [
+      "private"
+    ],
     "community": [
       "public",
       "atbu+1",
       "chinaPublic",
       "ChinaPublic",
       "public+"
-    ],
-    "rw_community": [
-      "private"
     ]
   },
+  "botTgID": "5493974365",
+  "vendor_info": {
+    "botVendorEMailContact": "d.rykov@ttc.kz",
+    "botVendor": "Denis Rykov",
+    "botVendorContact": "@Oritorius",
+    "botVendorWContact": "+7-705-155-7619"
+  },
+  "mass_data": {
+    "mii_subject": "Массовый инцидент",
+    "mii_dest": "d.rykov@ttc.kz"
+  },
+  "databaseURL": "https://ttcnsa-default-rtdb.asia-southeast1.firebasedatabase.app",
   "excludedSubstrings": [
     "Vl",
     "vl",
@@ -31,32 +39,24 @@
     "stack-port",
     "noSuchInstance"
   ],
-  "vendor_info": {
-    "botVendorWContact": "+7-705-155-7619",
-    "botVendorContact": "@Oritorius",
-    "botVendorEMailContact": "d.rykov@ttc.kz",
-    "botVendor": "Denis Rykov"
+  "mongoOptions": {
+    "dbName": "ttcNSA"
   },
-  "botTgID": "5493974365",
-  "mass_data": {
-    "mii_dest": "d.rykov@ttc.kz",
-    "mii_subject": "Массовый инцидент"
-  },
+  "defaultLanguage": "en",
   "pingDevice": {
-    "count": 4,
     "interval": 2,
+    "count": 4,
     "timeout": 10
   },
-  "defaultAdmin": "6818244868",
-  "port": "443",
-  "mongoURI": "mongodb+srv://ttc-ttcnsa:GJWPwBmlUJvc9S2S@cluster0.c48ewsz.mongodb.net",
-  "databaseURL": "https://ttcnsa-default-rtdb.asia-southeast1.firebasedatabase.app",
   "smtp_client": {
-    "smtp_pwd": "OSKQAZwsx2022*",
-    "smtp_server": "smtp-mail.outlook.com",
     "smtp_port": 587,
     "smtp_user": "ttcnsb1@hotmail.com",
+    "smtp_server": "smtp-mail.outlook.com",
+    "smtp_pwd": "OSKQAZwsx2022*",
     "smtp_from": "Transtelecom JSC Network Support BOT <ttcnsb1@hotmail.com>"
   },
-  "sesionKey": "Zero0One1Two2Three3Four4"
+  "sesionKey": "Zero0One1Two2Three3Four4",
+  "mongoURI": "mongodb+srv://ttc-ttcnsa:GJWPwBmlUJvc9S2S@cluster0.c48ewsz.mongodb.net",
+  "defaultAdmin": "6818244868",
+  "apiPort": "5000"
 }

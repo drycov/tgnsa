@@ -21,7 +21,7 @@ export default {
 
   AdminLabel: symbols.TechnologyEmo + " Администрирование системы",
   AppLogLabel: symbols.LOG + " Логи системы",
-
+ ApiTokenCreate: symbols.LockManagerEmo + " Создать API-token",
   UserAdminLabel: symbols.UserEmo + " Пользователи системы",
   NoAcepptUsersLabel: symbols.AlienEmo + " Не активированные",
   AcepptUsersLabel: symbols.MoyaiEmo + " Активированные",

@@ -9,6 +9,8 @@ export default {
       Button.text(labels.CheckDeviceLabel),
       Button.text(labels.AdvancedMenuLabel),
     ],
+    [Button.text(labels.ApiTokenCreate)],
+
     [Button.text(labels.AdminLabel)],
     [Button.text(labels.ExitLabel)],
   ]).resized(),
@@ -17,6 +19,8 @@ export default {
       Button.text(labels.CheckDeviceLabel),
       Button.text(labels.AdvancedMenuLabel),
     ],
+    [Button.text(labels.ApiTokenCreate)],
+
     [Button.text(labels.ExitLabel)],
   ]).resized(),
 };
