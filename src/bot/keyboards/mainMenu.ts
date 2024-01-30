@@ -13,7 +13,7 @@ export default {
 
     [Button.text(labels.AdminLabel)],
     [Button.text(labels.ExitLabel)],
-  ]).resized(),
+  ]).resized().persistent(true),
   main: new Keyboard([
     [
       Button.text(labels.CheckDeviceLabel),
@@ -22,5 +22,5 @@ export default {
     [Button.text(labels.ApiTokenCreate)],
 
     [Button.text(labels.ExitLabel)],
-  ]).resized(),
+  ]).resized().persistent(true),
 };

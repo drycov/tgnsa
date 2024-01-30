@@ -1,4 +1,14 @@
 {
+  "mongoOptions": {
+    "dbName": "ttcNSA"
+  },
+  "vendor_info": {
+    "botVendorWContact": "+7-705-155-7619",
+    "botVendorContact": "@Oritorius",
+    "botVendor": "Denis Rykov",
+    "botVendorEMailContact": "d.rykov@ttc.kz"
+  },
+  "botTgID": "5493974365",
   "excludedSubstrings": [
     "Vl",
     "vl",
@@ -13,38 +23,29 @@
     "stack-port",
     "noSuchInstance"
   ],
-  "mongoOptions": {
-    "dbName": "ttcNSA"
-  },
-  "smtp_client": {
-    "smtp_user": "ttcnsb1@hotmail.com",
-    "smtp_from": "Transtelecom JSC Network Support BOT <ttcnsb1@hotmail.com>",
-    "smtp_server": "smtp-mail.outlook.com",
-    "smtp_port": 587,
-    "smtp_pwd": "OSKQAZwsx2022*"
-  },
-  "botTgID": "5493974365",
-  "mongoURI": "mongodb+srv://ttc-ttcnsa:GJWPwBmlUJvc9S2S@cluster0.c48ewsz.mongodb.net",
-  "BotChatAdmin": "-1002084129010",
-  "defaultAdmin": "6818244868",
-  "vendor_info": {
-    "botVendor": "Denis Rykov",
-    "botVendorContact": "@Oritorius",
-    "botVendorWContact": "+7-705-155-7619",
-    "botVendorEMailContact": "d.rykov@ttc.kz"
-  },
+  "apiPort": "5000",
+  "defaultLanguage": "en",
+  "port": "443",
+  "sesionKey": "Zero0One1Two2Three3Four4",
   "mass_data": {
     "mii_dest": "d.rykov@ttc.kz",
     "mii_subject": "Массовый инцидент"
   },
-  "defaultLanguage": "en",
-  "apiPort": "5000",
-  "port": "443",
+  "mongoURI": "mongodb+srv://ttc-ttcnsa:GJWPwBmlUJvc9S2S@cluster0.c48ewsz.mongodb.net",
   "pingDevice": {
     "interval": 2,
-    "timeout": 10,
-    "count": 4
+    "count": 4,
+    "timeout": 10
   },
+  "smtp_client": {
+    "smtp_from": "Transtelecom JSC Network Support BOT <ttcnsb1@hotmail.com>",
+    "smtp_port": 587,
+    "smtp_user": "ttcnsb1@hotmail.com",
+    "smtp_server": "smtp-mail.outlook.com",
+    "smtp_pwd": "OSKQAZwsx2022*"
+  },
+  "databaseURL": "https://ttcnsa-default-rtdb.asia-southeast1.firebasedatabase.app",
+  "BotChatAdmin": "-1002084129010",
   "snmp": {
     "community": [
       "public",
@@ -57,6 +58,5 @@
       "private"
     ]
   },
-  "databaseURL": "https://ttcnsa-default-rtdb.asia-southeast1.firebasedatabase.app",
-  "sesionKey": "Zero0One1Two2Three3Four4"
+  "defaultAdmin": "6818244868"
 }

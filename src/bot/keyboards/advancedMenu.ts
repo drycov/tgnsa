@@ -9,5 +9,5 @@ export default {
     [Button.text(labels.PingDeviceLabel), Button.text(labels.MIAllertLabel)],
     // [Button.text(labels.DOFLabel), Button.text(labels.DSLabel)],
     [Button.text(labels.BackLabel)],
-  ]).resized(),
+  ]).resized().persistent(true),
 };

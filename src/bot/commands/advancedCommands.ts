@@ -1,5 +1,5 @@
 import { type Conversation } from "@grammyjs/conversations";
-import { Context } from "grammy";
+import { Context, InputFile } from "grammy";
 import * as path from "path";
 import util from "util";
 import labels from "../assets/labels";
@@ -18,6 +18,9 @@ import MassIncidient from "../models/MassIncidient";
 import helperFunctions from "../utils/helperFunctions";
 import logger from "../utils/logger";
 import messagesFunctions from "../utils/messagesFunctions";
+import * as QRCode from 'qrcode';
+
+// import fetch from 'node-fetch';
 
 interface MyContext extends Context {
   session: { [key: string]: any }; // Change the type to match your session data structure
@@ -26,7 +29,7 @@ type MyConversation = Conversation<MyContext>;
 
 const currentDate = new Date().toLocaleString("ru-RU");
 
-const advancedCommands ={
+const advancedCommands = {
   additional: async (_conversation: MyConversation, ctx: MyContext) => {
     ctx.session.currentCVid = "additional";
     ctx.session.previosCVid = "main";
@@ -274,15 +277,8 @@ const advancedCommands ={
 
             await userData.updateUser(user.tgId, updatedUserData);
 
-            await ctx.reply(util.format(
-              "%s <pre><code>%s</code></pre>\n\n<i>Выполнено:  <code>%s</code></i>",
-              messages.ApiCreatedTokenMessage,
-              token,
-              currentDate
-            ), {
-              reply_markup: baseMenu.inBack,
-              parse_mode: "HTML",
-            });
+            await advancedCommands.generateAndSendQRCode(token, ctx);
+
           }
         } else {
           const exp = await helperFunctions.checkJwtToken(user.apiToken, user.hash);
@@ -299,28 +295,14 @@ const advancedCommands ={
 
               await userData.updateUser(user.tgId, updatedUserData);
 
-              await ctx.reply(util.format(
-                "%s <pre><code>%s</code></pre>\n\n<i>Выполнено:  <code>%s</code></i>",
-                messages.ApiCreatedTokenMessage,
-                token,
-                currentDate
-              ), {
-                reply_markup: baseMenu.inBack,
-                parse_mode: "HTML",
-              });
+              await advancedCommands.generateAndSendQRCode(token, ctx);
+
             }
           } else {
-            await ctx.reply(util.format(
-              "Ваш токен: <pre><code>%s</code></pre>\n\n<i>Выполнено:  <code>%s</code></i>",
-              user.apiToken,
-              currentDate
-            ), {
-              reply_markup: baseMenu.inBack,
-              parse_mode: "HTML",
-            });
+            await advancedCommands.generateAndSendQRCode(user.apiToken, ctx);
           }
         }
-      } catch (e:any) {
+      } catch (e: any) {
         const error = {
           date: currentDate,
           action,
@@ -330,12 +312,46 @@ const advancedCommands ={
         await ctx.reply(messagesFunctions.msgHandleError(JSON.stringify(error)), {
           reply_markup: baseMenu.inBack,
           parse_mode: "HTML",
-  
+
         });
       }
     } else {
       ctx.reply(messagesFunctions.msgHandleError(), {
         reply_markup: baseMenu.inBack,
+      });
+    }
+  },
+
+  generateAndSendQRCode: async (text: string, ctx: MyContext): Promise<void> => {
+    const action = advancedCommands.generateAndSendQRCode.name;
+    try {
+      // Генерация QR-кода
+      const qrCode = await QRCode.toBuffer(text);
+
+      // Отправка изображения в Telegram
+      // const response = await fetch(qrCode);
+      // const buffer = await response.buffer();
+
+      // Отправка изображения в чат
+      await ctx.replyWithPhoto(new InputFile(qrCode), {
+        caption: util.format(
+          "Ваш токен: <pre><code>%s</code></pre>\n\n<i>Выполнено:  <code>%s</code></i>",
+          text,
+          currentDate
+        ), parse_mode: 'HTML', reply_markup: baseMenu.inBack,
+      });
+      //  bot.sendPhoto(chatId, buffer, { caption: 'QR Code' });
+    } catch (e: any) {
+      const error = {
+        date: currentDate,
+        action,
+        error: e.message as string,
+      };
+      logger.error(JSON.stringify(error));
+      await ctx.reply(messagesFunctions.msgHandleError(JSON.stringify(error)), {
+        reply_markup: baseMenu.inBack,
+        parse_mode: "HTML",
+
       });
     }
   }

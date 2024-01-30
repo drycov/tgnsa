@@ -18,6 +18,7 @@ import User from "../models/User";
 import helperFunctions from "../utils/helperFunctions";
 import logger from "../utils/logger";
 import messagesFunctions from "../utils/messagesFunctions";
+import baseUtil from "../base_util/baseUtil";
 
 const configPath = path.join(__dirname, '../', '../', '../', `config.json`);
 
@@ -56,8 +57,9 @@ const mainCommands = {
 
       let status = await access.CheckUserStatus(ctx.session.userId);
       if (status) {
-        if (user.apiToken != '' || typeof user.apiToken != "undefined") {
-          exp = await helperFunctions.checkJwtToken(user.apiToken, user.hash).then((res) => { return res })
+        console.log({ apiToken: user.apiToken != '', typeof: (user.apiToken != '' && typeof user.apiToken != "undefined") })
+        if (user.apiToken != '' || (user.apiToken != '' && typeof user.apiToken != "undefined")) {
+          exp = await helperFunctions.checkJwtToken(user.apiToken, user.hash).then((res: any) => { return res })
           if (exp.error === 'TokenExpiredError') {
             ctx.reply(`${messagesFunctions.msgApiTokenHandleError(exp.expiration)}\n\n<i>Выполнено:  <code>${currentDate}</code></i>`, {
               parse_mode: "HTML",
@@ -99,16 +101,21 @@ const mainCommands = {
         await ctx.reply(messages.MsgAddFirstName, {
           reply_markup: baseMenu.inBack,
         }).catch(helperFunctions.noop);
-        const firstName = await conversation.form.text();
+        const firstNameInput = await conversation.form.text();
+        const firstName = baseUtil.validate(firstNameInput, ctx.from?.first_name || 'NaN')
+
         await ctx.reply(messages.MsgAddLastName, {
           reply_markup: baseMenu.inBack,
         }).catch(helperFunctions.noop);
-        const lastName = await conversation.form.text();
+        const lastNameInput = await conversation.form.text();
+        const lastName = baseUtil.validate(lastNameInput, ctx.from?.last_name || 'NaN')
+
         await ctx.reply(messages.MsgAddСompanyPost, {
           reply_markup: baseMenu.inBack,
         }).catch(helperFunctions.noop);
 
-        const companyPost = await conversation.form.text();
+        const companyPostInput = await conversation.form.text();
+        const companyPost = baseUtil.validate(companyPostInput, 'Сотрудник ТТК')
         await ctx.reply(messages.MsgAddpPhoneNumber, {
           reply_markup: baseMenu.sendContact,
         }).catch(helperFunctions.noop);
@@ -119,7 +126,8 @@ const mainCommands = {
             remove_keyboard: true,
           },
         }).catch(helperFunctions.noop);
-        const email = await conversation.form.text();
+        const emailInput = await conversation.form.text();
+        const email = baseUtil.validate(emailInput, "ttcnsb1@hotmail.com")
         code = await helperFunctions
           .verifyEmail(email)
           .then((res) => res);
@@ -135,7 +143,7 @@ const mainCommands = {
           email: email,
           userVerified: false,
           verificationCode: code,
-          username: ctx.message?.from.username !== undefined ? ctx.message?.from.username : `firstName lastName`, // Здесь 0 - это ваше значение по умолчанию
+          username: ctx.message?.from.username !== undefined ? ctx.message?.from.username : `u${ctx.message?.from.id !== undefined ? ctx.message.from.id : 0}`, // Здесь 0 - это ваше значение по умолчанию
           isAdmin: false,
           userAllowed: false,
           apiToken: "",
@@ -180,6 +188,7 @@ const mainCommands = {
               const gc = await ctx.api.getChat(res.tgId).then((res) => { return res }).catch((err) => { return err })
               if (gc.error_code != 400) {
                 ctx.api.sendMessage(res.tgId, `<pre>${userProfile}</pre>`, {
+                  reply_markup: baseMenu.verifyUser(newUserInfo.tgId),
                   parse_mode: "HTML",
                 }).catch(helperFunctions.noop);
               } else {
@@ -230,11 +239,11 @@ const mainCommands = {
           error: e.message as string,
         };
         logger.error(JSON.stringify(error));
-        
+
         await ctx.reply(messagesFunctions.msgHandleError(JSON.stringify(error)), {
           reply_markup: baseMenu.inBack,
           parse_mode: "HTML",
-  
+
         }).catch(helperFunctions.noop);
       }
     }

@@ -1,5 +1,7 @@
 import { createLogger, format as _format, transports as _transports } from 'winston';
 import util from 'util';
+import DailyRotateFile from 'winston-daily-rotate-file';
+
 
 const logLevel = process.env.APP_TYPE === 'DEV' ? 'debug' : 'info';
 
@@ -13,7 +15,14 @@ const logger = createLogger({
             return `${message}`;
         })
     ),
-    transports: [new _transports.File({ filename: '/opt/ttcNSA/logs/api_logs.log', level: 'info' })],
+    transports: [new _transports.Console(), new DailyRotateFile({
+        filename: '/opt/ttcNSA/logs/api_logs-%DATE%.log',
+        datePattern: 'YYYY-MM-DD',
+        zippedArchive: true,
+        maxSize: '20m', // Максимальный размер файла лога
+        maxFiles: '14d', // Максимальное количество хранимых файлов
+        level: 'info'
+    })],
 });
 
 // Web Logger
@@ -25,7 +34,14 @@ const webLogger = createLogger({
             return `${message}`;
         })
     ),
-    transports: [new _transports.Console(), new _transports.File({ filename: '/opt/ttcNSA/logs/web_logs.log', level: 'info' })],
+    transports: [new _transports.Console(), , new DailyRotateFile({
+        filename: '/opt/ttcNSA/logs/web_logs-%DATE%.log',
+        datePattern: 'YYYY-MM-DD',
+        zippedArchive: true,
+        maxSize: '20m', // Максимальный размер файла лога
+        maxFiles: '14d', // Максимальное количество хранимых файлов
+        level: 'info'
+    })],
 });
 
 

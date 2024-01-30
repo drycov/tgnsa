@@ -5,9 +5,14 @@ import ping from "ping";
 import * as path from 'path';
 import * as fs from 'fs';
 import util from "util";
+import { Context } from "grammy";
+import labels from "../assets/labels";
 const configPath = path.join(__dirname, '../', '../', '../', `config.json`);
 const config = require(configPath);// const Netmask = netmask.Netmask
 
+interface MyContext extends Context {
+  session: { [key: string]: any }; // Change the type to match your session data structure
+}
 export default {
   subnetCalculate: (host: any) => {
     // if (SubnetRegexp().test(host)) {
@@ -67,4 +72,13 @@ export default {
     });
     return result[0];
   },
+  validate: (text: string,  replace:string) => {
+    const isCommand = /^\/\w+/.test(text); // Проверка на команду
+    const labelValues = Object.values(labels) as string[];
+    const containsLabelOrCommand = labelValues.some((label: string) => text.includes(label));
+    console.log({isCommand,containsLabelOrCommand })
+    const validate = (isCommand || containsLabelOrCommand) ? replace : text;
+    console.log({replace,text })
+    return validate;
+  }
 };

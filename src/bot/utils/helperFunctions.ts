@@ -424,18 +424,6 @@ const helperFunctions = {
     const token = jwt.sign(payload, secretKey, { expiresIn: '42d' });
     return token;
   },
-  // checkJwtToken: async (token: string, secretKey: string): Promise<boolean|string> => {
-  //   const decodedToken = jwt.decode(token) as jwt.JwtPayload;
-  //   return new Promise<boolean|string>((resolve, reject) => {
-  //     jwt.verify(token, secretKey, (err, decoded) => {
-  //       if (err) {
-  //         resolve(err.name,decodedToken.exp?.toString);
-  //       } else {
-  //         resolve(true,decodedToken.exp?.toString);
-  //       }
-  //     });
-  //   });
-  // }
 
   checkJwtToken: async (token: string, secretKey: string): Promise<{ isValid: boolean, expiration?: string, error?: string | undefined }> => {
     const action = helperFunctions.monitorFirestoreChanges.name;

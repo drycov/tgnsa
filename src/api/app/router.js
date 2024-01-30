@@ -12,17 +12,9 @@ export default function (app) {
     });
 
     app.route('/api/v1/login')
-        .get((req, res) => {
-            res.json({ status: 200, api: 'v1', verify: true });
-        })
         .post((req, res) => {
             res.json({ status: 200, api: 'v1', verify: true });
         });
-
-    app.route('/api/v1/verify').get((req, res) => {
-        
-        res.json({ status: 200, api: 'v1', verify: true });
-    });
 
     app.route('/api/v1/users').get(checkTokenMiddleware, async (req, res) => {
         const queryParams = req.query;
@@ -31,18 +23,22 @@ export default function (app) {
             data = await userData.getAllUsers().then((data) => { return data })
             res.json({ status: 200, api: 'v1', data });
         } else if (queryParams.action == "getUser") {
-            data = await userData.getUserByTgId(queryParams.id).then((data) => { return data })
+            if (!queryParams.id || typeof queryParams.id == "undefined") {
+                data = await userData.getUserByTgId(req.user.tgId).then((data) => { return data })
+            } else {
+                data = await userData.getUserByTgId(queryParams.id).then((data) => { return data })
+            }
             res.json({ status: 200, api: 'v1', data })
         } else {
             res.json({ status: 200, api: 'v1', data });
         }
-
-
-    }).post(checkTokenMiddleware, async (req, res) => {});
-    app.route('/api/v1/validate').get((req, res) => {
-        res.json({ status: 200, api: 'v1', verify: true });
+    }).post(checkTokenMiddleware, async (req, res) => {
+        const queryParams = req.query;
+        if (queryParams.action == "update") {
+            data = await userData.getUserByTgId(queryParams.id).then((data) => { return data })
+            res.json({ status: 200, api: 'v1', data });
+        }
     });
-
     // Dynamically generate a list of routes with methods and access levels when a request is made to /api/
     app.route('/api/').get((req, res) => {
         const routes = app._router.stack

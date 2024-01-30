@@ -9,5 +9,5 @@ export default {
     [Button.text(labels.DDMInfoLabel), Button.text(labels.CabelLengthLabel)],
     [Button.text(labels.DeviceLLDPLabel)],
     [Button.text(labels.BackLabel)],
-  ]).resized(),
+  ]).resized().persistent(true),
 };

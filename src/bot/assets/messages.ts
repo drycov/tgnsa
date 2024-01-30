@@ -1,3 +1,4 @@
+import labels from "./labels";
 import labelsData from "./labels";
 import symbolsData from "./symbols";
 export default {
@@ -23,6 +24,8 @@ export default {
     " Доступ запрещен, пожалуйста обратитесь для доступа к администратору: ",
   PleaceEnterKbMessage: `Для начала работы нажмите кнопку ${labelsData.EnterLabel}`,
   UserSavedInDBMessage: `${symbolsData.OkEmo} Вы добавлены в базу. ${symbolsData.SandTimeEmo} Ожидайте одобрения Администратором`,
+  UserAllowedInDBMessage: `${symbolsData.OkEmo} Вы добавлены в базу. ${symbolsData.OK_UP} Для начала работы введите /start или ${labels.EnterLabel}`,
+
   ApiCreateTokenMessage: `${symbolsData.LockManagerEmo} Создается токен-доступа в приложение`,
   ApiCreatedTokenMessage: `${symbolsData.OkEmo} Ваш токен создан:`,
 
@@ -70,7 +73,7 @@ export default {
   MsgAddFirstName: `Введите Имя`,
   MsgAddLastName: `Введите фамилию`,
   MsgAddСompanyPost: `Введите должность`,
-  MsgAddpPhoneNumber: `Введите контактный телефон`,
+  MsgAddpPhoneNumber: `Поделитесь контактом нажав на кнопку в низу`,
   MsgAddEMail: `Введите вашу корпоративную почту`,
   MsgAddDeportament: `Введите филиал`,
   MsgAddCountry: `Введите участок обслуживания`,

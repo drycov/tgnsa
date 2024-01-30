@@ -21,6 +21,8 @@ const config = require(configPath);
 
 import baseMenu from "./keyboards/baseMenu";
 import messagesFunctions from "./utils/messagesFunctions";
+import userData from "./data/userData";
+import logger from "./utils/logger";
 
 const token = helperFunctions.apptype() || "";
 interface MainContext extends Context {
@@ -160,14 +162,14 @@ bot.command(["start", "st", "run"], async (ctx) => {
 //           sensorName: string;
 //           value: string;
 //         }
-      
+
 //         interface GroupedSensors {
 //           [interfaceName: string]: SensorData[];
 //         }
-      
+
 //         try {
 //           const resPhysSensorName = await walkOidValue(physName, ipAddress, community);
-      
+
 //           const parsedPhysSensorName: SensorData[] = await Promise.all(
 //             resPhysSensorName.map(async (item: any) => {
 //               const regex = /(\d+)$/;
@@ -175,12 +177,12 @@ bot.command(["start", "st", "run"], async (ctx) => {
 //               const match = oidString.match(regex);
 //               const sensorId = match ? match[0] : null;
 //               const intRange = await devicData.walkOidOnlyValue(joid.basic_oids.oid_port_name, ipAddress, community);
-      
+
 //               let resSensorType = await getOidValue(sensorType + '.' + sensorId, ipAddress, community);
-      
+
 //               if (resSensorType !== null && resSensorType !== 'noSuchInstance') {
 //                 let resSensorValue = await getOidValue(sensorValue + '.' + sensorId, ipAddress, community);
-      
+
 //                 if (resSensorValue !== null && resSensorValue !== 'noSuchInstance') {
 //                   let sensorName = item.value;
 //                   switch (sensorName) {
@@ -202,13 +204,13 @@ bot.command(["start", "st", "run"], async (ctx) => {
 //                     default:
 //                       break;
 //                   }
-      
+
 //                   const resDotPoint = await getOidValue(dotPoint + '.' + sensorId, ipAddress, community);
-      
+
 //                   if (resDotPoint && resDotPoint >= 1 && resDotPoint <= 3) {
 //                     resSensorValue /= 10 ** resDotPoint;
 //                   }
-      
+
 //                   switch (resSensorType) {
 //                     case '1':
 //                       resSensorType = 'other';
@@ -249,31 +251,31 @@ bot.command(["start", "st", "run"], async (ctx) => {
 //                     default:
 //                       break;
 //                   }
-      
+
 //                   return { sensorName, value: `${resSensorValue} ${resSensorType}` };
 //                 }
-      
+
 //                 return null;
 //               }
-      
+
 //               return null;
 //             })
 //           );
-      
+
 //           const sensorsData = parsedPhysSensorName.filter((item) => item !== null);
-      
+
 //           const groupedSensors: GroupedSensors = sensorsData.reduce((result: GroupedSensors, sensor) => {
 //             const interfaceNameMatch = sensor.sensorName.match(/([A-Za-z]+\d+\/\d+)/);
 //             if (interfaceNameMatch) {
 //               const interfaceName = interfaceNameMatch[1];
-      
+
 //               result[interfaceName] = result[interfaceName] || [];
 //               result[interfaceName].push(sensor);
 //             }
-      
+
 //             return result;
 //           }, {});
-      
+
 //           return groupedSensors;
 //         } catch (e: any) {
 //           const error = {
@@ -285,7 +287,7 @@ bot.command(["start", "st", "run"], async (ctx) => {
 //           return null;
 //         }
 //       };
-      
+
 
 
 
@@ -319,6 +321,46 @@ bot.callbackQuery("cancel", async (ctx) => {
 bot.callbackQuery("inContinue", async (ctx) => {
   await ctx.conversation.exit();
   await ctx.conversation.enter("main");
+});
+bot.callbackQuery(/^add_\d+$/, async (ctx) => {
+  await ctx.conversation.exit();
+  const data = ctx.callbackQuery.data;
+  const regex = /^add_(\d+)$/;
+  const match = regex.exec(data);
+  let id = ''
+  if (match) {
+    id = match[1];
+    const updatedUserData = {
+      userAllowed: true,
+    };
+    await userData.updateUser(id, updatedUserData);
+
+    bot.api.sendMessage(id, util.format(
+      "%s\n\n<i>Выполнено:  <code>%s</code></i>",
+      messages.UserAllowedInDBMessage,
+      helperFunctions.currentDate
+    ), { parse_mode: 'HTML', reply_markup: baseMenu.inBack, })
+    await ctx.reply(messages.UserAddSuccessMessage, {
+      reply_markup: {
+        remove_keyboard: true,
+      },
+    });
+  } else {
+    const error = {
+      date: helperFunctions.currentDate,
+      action: data,
+      error: "string is not match template"
+    };
+    logger.error(JSON.stringify(error));
+    await ctx.reply(messagesFunctions.msgHandleError(JSON.stringify(error)), {
+      reply_markup: baseMenu.inBack,
+      parse_mode: "HTML",
+
+    });
+  }
+
+
+  // await userData.updateUser(user.tgId, updatedUserData);  
 });
 // bot.callbackQuery(/\d+/, async (ctx) => {
 //   // Изменено регулярное выражение для чисел

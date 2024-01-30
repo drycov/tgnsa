@@ -1,4 +1,5 @@
 import winston from "winston";
+import DailyRotateFile from 'winston-daily-rotate-file';
 
 const logLevel = process.env.APP_TYPE === "DEV" ? "debug" : "info";
 
@@ -10,9 +11,17 @@ const logger = winston.createLogger({
       return `${message}`;
     })
   ),
+  
   transports: [
     new winston.transports.Console(),
-    new winston.transports.File({ filename: "./logs/bot_logs.log", level: "info" }),
+    new DailyRotateFile({
+      filename: './logs/bot_logs-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
+      zippedArchive: true,
+      maxSize: '20m', // Максимальный размер файла лога
+      maxFiles: '14d', // Максимальное количество хранимых файлов
+      level: "info" 
+    }),
   ],
 });
 

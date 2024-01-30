@@ -46,4 +46,5 @@ export default {
   M01TrafficGraphLabel: symbols.Group1 + " One Month",
   M03TrafficGraphLabel: symbols.Group1 + " Three Months",
   Y01TrafficGraphLabel: symbols.Group1 + " One Year",
+  UserAllowLabel:symbols.OK_UP +" Добавить пользователя"
 };
