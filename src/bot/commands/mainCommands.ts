@@ -1,28 +1,27 @@
 import { type Conversation } from "@grammyjs/conversations";
 import util from "util";
 
+import Table from "cli-table3";
 import { Context } from "grammy";
+import * as path from "path";
 import labels from "../assets/labels";
 import {
   default as messageText,
   default as messages,
 } from "../assets/messages";
-import * as path from "path";
-import * as jwt from 'jsonwebtoken';
-
-const configPath = path.join(__dirname, '../', '../', '../', `config.json`);
-
-const config = require(configPath);
+import symbols from "../assets/symbols";
 import access from "../core/access";
 import userData from "../data/userData";
 import baseMenu from "../keyboards/baseMenu";
 import mainMenu from "../keyboards/mainMenu";
-import helperFunctions from "../utils/helperFunctions";
-import messagesFunctions from "../utils/messagesFunctions";
-import logger from "../utils/logger";
 import User from "../models/User";
-import Table from "cli-table3";
-import symbols from "../assets/symbols";
+import helperFunctions from "../utils/helperFunctions";
+import logger from "../utils/logger";
+import messagesFunctions from "../utils/messagesFunctions";
+
+const configPath = path.join(__dirname, '../', '../', '../', `config.json`);
+
+const config = require(configPath);
 interface MyContext extends Context {
   session: { [key: string]: any }; // Change the type to match your session data structure
 }

@@ -1,18 +1,17 @@
+import { createCanvas } from 'canvas';
+import Table from "cli-table3";
 import * as dotenv from "dotenv";
-import * as path from 'path';
-import * as fs from 'fs';
-import { createCanvas, loadImage } from 'canvas';
 import ejs from "ejs";
+import * as fs from 'fs';
 import { Context } from "grammy";
+import * as jwt from 'jsonwebtoken';
+import * as path from 'path';
 import ping from "ping";
+import symbols from "../assets/symbols";
 import MailTo from "../core/MailTo";
 import { db } from "./firebaseConfig";
-import symbols from "../assets/symbols";
-import Table from "cli-table3";
-const configPath = path.join(__dirname, '../', '../', '../', `config.json`);
-import * as jwt from 'jsonwebtoken';
 import logger from "./logger";
-
+const configPath = path.join(__dirname, '../', '../', '../', `config.json`);
 dotenv.config();
 
 interface MyContext extends Context {
@@ -343,23 +342,23 @@ const helperFunctions = {
     console.log(text);
 
     if (parts.length >= 3 && parts[0].startsWith('/')) {
-        const command = parts[0];
-        const params: { [key: string]: string } = {};
+      const command = parts[0];
+      const params: { [key: string]: string } = {};
 
-        for (let i = 1; i < parts.length; i++) {
-            const key = String(i - 1); // Преобразование числового индекса в строку
-            const value = parts[i];
+      for (let i = 1; i < parts.length; i++) {
+        const key = String(i - 1); // Преобразование числового индекса в строку
+        const value = parts[i];
 
-            if (key && value) {
-                params[key] = value;
-            }
+        if (key && value) {
+          params[key] = value;
         }
+      }
 
-        return { command, params };
+      return { command, params };
     }
 
     return null;
-},
+  },
   generateLLDPTable: (data: any[]) => {
     const table = new Table({
       chars: {
@@ -408,10 +407,11 @@ const helperFunctions = {
   }, secretKey: string): Promise<string> => {
     const { tgId, isAdmin, userAllowed, email, userVerified, verificationCode } = data;
 
-    // Проверка наличия необходимых свойств
-    if (!tgId || !isAdmin || !userAllowed || !email || !userVerified || !verificationCode) {
-      throw new Error('Invalid data provided for creating JWT token');
-    }
+    // // Проверка наличия необходимых свойств
+    // if (!tgId || !isAdmin || !userAllowed || !email || !userVerified || !verificationCode) {
+    //   console.log({ tgId, isAdmin, userAllowed, email, userVerified, verificationCode })
+    //   throw new Error('Invalid data provided for creating JWT token');
+    // }
 
     const payload = {
       tgId,

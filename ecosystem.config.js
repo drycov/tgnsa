@@ -4,7 +4,7 @@ module.exports = {
       name: "TTC_NSA",
       cwd: "/opt/ttcNSA/",
       script: "npm run start:prod",
-      watch: false,
+      watch: true,
       autorestart: true,
       max_restarts: 10,
       ignore_watch: ["logs", ".git", "node_modules", "src/api", "sessions", ".vscode", "source", "config.json"],

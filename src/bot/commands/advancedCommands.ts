@@ -1,24 +1,23 @@
 import { type Conversation } from "@grammyjs/conversations";
 import { Context } from "grammy";
-import util from "util";
 import * as path from "path";
-const configPath = path.join(__dirname, '../', '../', '../', `config.json`);
-const config = require(configPath);
+import util from "util";
 import labels from "../assets/labels";
 import messages from "../assets/messages";
-import advancedMenu from "../keyboards/advancedMenu";
-import { SubnetCheck, P2PCheck, IpCheck } from "../assets/regexp";
+import { IpCheck, P2PCheck, SubnetCheck } from "../assets/regexp";
 import baseUtil from "../base_util/baseUtil";
 import MailTo from "../core/MailTo";
+import advancedMenu from "../keyboards/advancedMenu";
+const configPath = path.join(__dirname, '../', '../', '../', `config.json`);
+const config = require(configPath);
 // import massData from "../core/massData";
+import massData from "../data/massData";
 import userData from "../data/userData";
 import baseMenu from "../keyboards/baseMenu";
-import messagesFunctions from "../utils/messagesFunctions";
-import helperFunctions from "../utils/helperFunctions";
-import massData from "../data/massData";
 import MassIncidient from "../models/MassIncidient";
-import { has } from "underscore";
+import helperFunctions from "../utils/helperFunctions";
 import logger from "../utils/logger";
+import messagesFunctions from "../utils/messagesFunctions";
 
 interface MyContext extends Context {
   session: { [key: string]: any }; // Change the type to match your session data structure
@@ -248,7 +247,7 @@ const advancedCommands ={
 
   apiTokenGen: async (conversation: MyConversation, ctx: MyContext): Promise<void> => {
     ctx.session.currentCVid = "api_token_gen";
-    ctx.session.previosCVid = "additional";
+    ctx.session.previosCVid = "main";
     const action = advancedCommands.apiTokenGen.name;
 
     await ctx.reply(messages.ApiCreateTokenMessage, {

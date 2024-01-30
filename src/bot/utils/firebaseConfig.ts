@@ -1,6 +1,5 @@
 import * as admin from 'firebase-admin';
 import * as path from 'path';
-import * as fs from 'fs';
 import helperFunctions from './helperFunctions';
 import logger from './logger';
 const configPath = path.join(__dirname, '../', '../', '../', `config.json`);
@@ -28,4 +27,4 @@ try {
 const db = admin.firestore();
 
 
-export { db, admin };
+export { admin, db };

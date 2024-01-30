@@ -11,7 +11,6 @@ import helperFunctions from "./utils/helperFunctions";
 import os from "os";
 import * as path from "path";
 import util from "util";
-import joid from "../src/oid.json";
 import labels from "./assets/labels";
 import messages from "./assets/messages";
 import advancedCommands from "./commands/advancedCommands";
@@ -23,10 +22,6 @@ const config = require(configPath);
 import baseMenu from "./keyboards/baseMenu";
 import messagesFunctions from "./utils/messagesFunctions";
 
-import deviceArr from "./base_util/deviceArr";
-import logger from "./utils/logger";
-import snmpFunctions from "./utils/snmpFunctions";
-import devicData from "./core/deviceData";
 const token = helperFunctions.apptype() || "";
 interface MainContext extends Context {
   session: { [key: string]: any }; // Change the type to match your session data structure

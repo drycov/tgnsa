@@ -2,9 +2,9 @@ import mongoose from "mongoose";
 import util from "util";
 
 import * as path from "path";
+import logger from "./logger";
 const configPath = path.join(__dirname, '../', '../', '../', `config.json`);
 const config = require(configPath);
-import logger from "./logger";
 const currentDate = new Date().toLocaleString("ru-RU");
 
 const connectToDatabase = () => {

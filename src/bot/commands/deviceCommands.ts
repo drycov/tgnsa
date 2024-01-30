@@ -1,7 +1,6 @@
 import { type Conversation } from "@grammyjs/conversations";
-import { Context, InputFile } from "grammy";
-import util from "util";
 import * as fs from "fs";
+import { Context, InputFile } from "grammy";
 import * as path from "path";
 const configPath = path.join(__dirname, '../', '../', '../', `config.json`);
 const config = require(configPath);
@@ -10,16 +9,15 @@ import messages from "../assets/messages";
 import { IpCheck } from "../assets/regexp";
 // import config from "../config";
 
+import joid from "../../src/oid.json";
+import symbols from "../assets/symbols";
 import deviceData from "../core/deviceData";
 import baseMenu from "../keyboards/baseMenu";
 import deviceMenu from "../keyboards/deviceMenu";
 import helperFunctions from "../utils/helperFunctions";
 import logger from "../utils/logger";
-import snmpFunctions from "../utils/snmpFunctions";
-import symbols from "../assets/symbols";
-import deviceArr from "../base_util/deviceArr";
-import joid from "../../src/oid.json";
 import messagesFunctions from "../utils/messagesFunctions";
+import snmpFunctions from "../utils/snmpFunctions";
 
 
 interface MyContext extends Context {
