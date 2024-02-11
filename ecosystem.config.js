@@ -11,8 +11,7 @@ module.exports = {
       env: {
         NODE_ENV: "production",
         APP_TYPE: "PROD",
-        HOST: "91.185.5.210",
-        PORT: "5000"
+
       },
     },
     {
@@ -25,6 +24,9 @@ module.exports = {
       ignore_watch: ["node_modules", ".git", "config.json"],
       env: {
         NODE_ENV: "production",
+        HOST: "91.185.5.210",
+        PORT: "5000",
+        APP_TYPE: "PROD",
       }
     },
     

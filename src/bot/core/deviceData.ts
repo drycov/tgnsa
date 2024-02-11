@@ -79,18 +79,33 @@ const devicData = {
         const testIntDescr = await devicData.getOidValue(
           descrOid + portIfList[i], host, community
         );
-        if (
-          config.excludedSubstrings.some((substring: any) => portIfRange[i].includes(substring))
-          || /^\d+$/.test(portIfRange[i])
-          || /[a-zA-Z]+[0-9]\/[0-9]\/[0-9]\/[0-9]\./g.test(portIfRange[i])
-          || portIfRange[i].includes('.ServiceInstance')
-          || portIfRange[i].includes('noSuchInstance')
-          || portIfRange[i].includes("E1")
-          || portIfRange[i].includes("AUX")
-          || portIfRange[i].includes(`${testIntDescr}.`) // ИЛИ если строка НЕ содержит только цифры
-        ) {
-          continue; // Пропускаем эту итерацию, если строка содержит исключенные подстроки или не содержит только цифры
+        if (!portIfRange[i].includes("port")) {
+          if (!portIfRange[i].includes("D-Link")) {
+            if (
+              config.excludedSubstrings.some((substring: any) => portIfRange[i].includes(substring))
+              || /^\d+$/.test(portIfRange[i])
+              // || /[a-zA-Z]+[0-9]\/[0-9]\/[0-9]\/[0-9]\./g.test(portIfRange[i])
+              || portIfRange[i].includes('.ServiceInstance')
+              || portIfRange[i].includes('noSuchInstance')
+              || portIfRange[i].includes("E1")
+              || portIfRange[i].includes("AUX")
+              || portIfRange[i].includes(`${testIntDescr}.`)
+              || portIfRange[i].includes("Po")
+              || portIfRange[i].includes("po")
+              || portIfRange[i].includes("ControlEthernet")
+              || portIfRange[i].includes("Port")
+              || portIfRange[i].includes("802.1Q")
+              || portIfRange[i].includes("Logical-int")
+              || portIfRange[i].includes("rif")
+              || portIfRange[i].includes("stack-port")
+              || portIfRange[i].includes("loopback") // ИЛИ если строка НЕ содержит только цифры
+            ) {
+              continue; // Пропускаем эту итерацию, если строка содержит исключенные подстроки или не содержит только цифры
+            }
+          }
         }
+        console.log({ portIfRange: portIfRange[i], portIfList: portIfList[i] });
+
         const intDescr = await devicData.getOidValue(
           descrOid + portIfList[i], host, community
         );
@@ -103,9 +118,18 @@ const devicData = {
         const get_inerrors = await devicData.getOidValue(
           joid.basic_oids.oid_inerrors + portIfList[i], host, community
         );
-        if (!portIfRange[i].includes("port")) {
-          if ((portIfRange[i].includes("Po") || portIfRange[i].includes("po") || portIfRange[i].includes("ControlEthernet") || portIfRange[i].includes("Port"))) {
-            continue;
+        // if (!portIfRange[i].includes("D-Link")) {
+        // const regex = /(Port \d+)\s+(\S+)/g;
+        //   if ((portIfRange[i].includes("Po") || portIfRange[i].includes("po") || portIfRange[i].includes("ControlEthernet") || portIfRange[i].includes("Port"))) {
+        //     continue;
+        //   }
+        // }
+        if (portIfRange[i].includes("D-Link")) {
+          const regex = /(Port \d+)/g;
+          const match = regex.exec(portIfRange[i]);
+
+          if (match) {
+            portIfRange[i] = match[1];
           }
         }
 
@@ -145,7 +169,6 @@ const devicData = {
           fixIntName,
           fixInErrors,
           fixIntDescr
-
         ]);
       }
 
@@ -257,7 +280,13 @@ const devicData = {
                 ? portIfList[i] + ".2.1."
                 : portIfList[i]
             : +portIfList[i];
-
+        if (portIfRange[i].includes("D-Link")) {
+          const regex = /(Port \d+)/g;
+          const match = regex.exec(portIfRange[i]);
+          if (match) {
+            portIfRange[i] = match[1];
+          }
+        }
         const getDDMLevelRX = await snmpFunctions.getSingleOID(
           host,
           oidDDMRXPower,
@@ -288,8 +317,6 @@ const devicData = {
           getDDMVoltage !== "0" &&
           getDDMVoltage !== 0
         ) {
-          console.log({getDDMLevelRX,getDDMLevelTX,getDDMTemperature,getDDMVoltage})
-
           let DDMLevelRX = !unstandart
             ? parseFloat(parseFloat(getDDMLevelRX).toFixed(2))
             : parseFloat((parseFloat(getDDMLevelRX) / 1000).toFixed(2));
@@ -308,7 +335,7 @@ const devicData = {
             DDMLevelTX = powerConverter(DDMLevelTX);
           }
 
-          console.log({DDMLevelRX,DDMLevelTX,DDMVoltage,DDMTemperature})
+          console.log({ DDMLevelRX, DDMLevelTX, DDMVoltage, DDMTemperature })
 
           results.push([
             portIfRange[i],
@@ -910,6 +937,7 @@ const devicData = {
 
       const list = intList;
       const range = intRange;
+      console.log(results)
       await devicData.processPortStatus(host, list, range, community, results, model)
       return helperFunctions.tableFormattedOutput(results, ["St.", "IF", "Errors", "Descripion"])
     } catch (e: any) {

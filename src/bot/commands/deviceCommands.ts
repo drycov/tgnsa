@@ -113,6 +113,7 @@ const deviceCommands = {
       .then((status) => {
         return status;
       });
+      console.log(portStatus)
     const stateInfo = `P.S. Состояния: ${symbols.OK_UP} - Линк есть, ${symbols.OKEY} - Линка нет, ${symbols.AdminDownEmo} - Порт выключен, ${symbols.UNKNOWN} - Неизвестно`;
     try {
       const message = {

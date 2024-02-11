@@ -4,6 +4,13 @@ import DailyRotateFile from 'winston-daily-rotate-file';
 
 
 const logLevel = process.env.APP_TYPE === 'DEV' ? 'debug' : 'info';
+const currentDate = new Date();
+const options = { 
+  timeZone: 'Europe/Moscow', // Укажите нужный вам часовой пояс
+  hour12: false, // Формат 24 часа
+};
+
+const formattedDate = new Intl.DateTimeFormat('ru-RU', options).format(currentDate);
 
 
 // Function Logger
@@ -48,7 +55,7 @@ const webLogger = createLogger({
 const logError = (error, status, req) => {
     const userAgent = req.useragent || {};
     const { ip, method, url } = req;
-    const errorMessage = `[${new Date().toISOString()}] ip: ${ip} ${method} ${url} status:${status} error: '${error}' {Browser: ${userAgent.browser} Version: ${userAgent.version} OS: ${userAgent.os} Device: ${userAgent.device}}`;
+    const errorMessage = `[${formattedDate}] ip: ${ip} ${method} ${url} status:${status} error: '${error}' {Browser: ${userAgent.browser} Version: ${userAgent.version} OS: ${userAgent.os} Device: ${userAgent.device}}`;
     webLogger.error(errorMessage);
 };
 
