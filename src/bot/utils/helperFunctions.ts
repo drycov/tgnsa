@@ -9,7 +9,7 @@ import * as path from 'path';
 import ping from "ping";
 import symbols from "../assets/symbols";
 import MailTo from "../core/MailTo";
-import { db } from "./firebaseConfig";
+import { db, rdb } from "./firebaseConfig";
 import logger from "./logger";
 const configPath = path.join(__dirname, '../', '../', '../', `config.json`);
 dotenv.config();
@@ -291,6 +291,62 @@ const helperFunctions = {
     }
   },
 
+  saveConfigToRealtimeDb: async () => {
+    const action = helperFunctions.saveConfigToRealtimeDb.name;
+    try {
+      const configData = require(configPath);
+      const configRef = rdb.ref('configs/mainConfig');
+      const snapshot = await configRef.once('value');
+
+      if (!snapshot.exists()) {
+        await configRef.set(configData);
+        const message = {
+          date: helperFunctions.currentDate,
+          action,
+          pid: process.pid,
+          status: "Данные из /config.json сохранены в Realtime Database",
+        };
+        logger.info(JSON.stringify(message));
+      }
+    } catch (e: any) {
+      const error = {
+        date: helperFunctions.currentDate,
+        action,
+        error: e.message as string,
+      };
+      logger.error(JSON.stringify(error));
+    }
+  },
+  monitorRealtimeDbChanges: () => {
+    const action = helperFunctions.monitorRealtimeDbChanges.name;
+
+    try {
+      const configRef = rdb.ref('configs/mainConfig');
+
+      configRef.on('value', snapshot => {
+        const configDataFromRealtimeDb = snapshot.val();
+
+        if (configDataFromRealtimeDb) {
+          fs.writeFileSync(configPath, JSON.stringify(configDataFromRealtimeDb, null, 2));
+          const message = {
+            date: helperFunctions.currentDate,
+            action,
+            pid: process.pid,
+            status: "Файл /config.json обновлен данными из Realtime Database",
+          };
+          logger.info(JSON.stringify(message));
+        }
+      });
+    } catch (e: any) {
+      const error = {
+        date: helperFunctions.currentDate,
+        action,
+        error: e.message as string,
+      };
+      logger.error(JSON.stringify(error));
+    }
+  },
+
   cablePairStatusIconizer: (cableStatus: string) => {
     switch (cableStatus) {
       case "open":
@@ -386,6 +442,7 @@ const helperFunctions = {
     const tableString = table.toString().replace(/\x1B\[[0-9;]*m/g, '');
     return tableString;
   },
+  
   hashUserId: async (confirmCode: string): Promise<string> => {
     logger.info(confirmCode)
 

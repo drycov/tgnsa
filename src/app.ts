@@ -10,8 +10,8 @@ const runner = run(app);
 
 
 const startApplication = async () => {
-  await helperFunctions.saveConfigToFirestore();
-  helperFunctions.monitorFirestoreChanges();
+  await helperFunctions.saveConfigToRealtimeDb();
+  helperFunctions.monitorRealtimeDbChanges();
 
   try {
     await app.init();

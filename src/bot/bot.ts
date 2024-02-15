@@ -501,13 +501,13 @@ bot.catch((err: any) => {
   console.error(`Error while handling update ${ctx.update.update_id}:`);
   const e = err.error;
   if (e instanceof GrammyError) {
-    console.error("Error in request:", e.description);
+    console.error("Error in request:",e.message as string);
   } else if (e instanceof HttpError) {
-    console.error("Could not contact Telegram:", e);
+    console.error("Could not contact Telegram:", e.message as string);
   } else if (e instanceof BotError) {
-    console.error("Error in request:", e);
+    console.error("Error in request:",  e.message as string);
   } else {
-    console.error("Unknown error:", e);
+    console.error("Unknown error:",  e.message as string);
   }
 });
 

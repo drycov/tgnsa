@@ -104,8 +104,6 @@ const devicData = {
             }
           }
         }
-        console.log({ portIfRange: portIfRange[i], portIfList: portIfList[i] });
-
         const intDescr = await devicData.getOidValue(
           descrOid + portIfList[i], host, community
         );
@@ -624,27 +622,28 @@ const devicData = {
     let message = `{"date":"${currentDate}", "action":"${action}", `;
     message += util.format('"%s":"%s", ', "host", host);
     try {
-      const zipArray = zip(portIfList, portIfRange);
-      for (const [ifId] of zipArray.entries()) {
+      for (let i = 0; i < portIfList.length; i++) {
+        // const zipArray = zip(portIfList, portIfRange);
+        // for (const [ifId] of zipArray.entries()) {
         if (
-          config.excludedSubstrings.some((substring: any) => portIfRange[ifId].includes(substring)) || /^\d+$/.test(portIfRange[ifId])  // ИЛИ если строка НЕ содержит только цифры
+          config.excludedSubstrings.some((substring: any) => portIfRange[i].includes(substring)) || /^\d+$/.test(portIfRange[i])  // ИЛИ если строка НЕ содержит только цифры
         ) {
           continue;
         }
 
-        const portOperStatus = await devicData.getOidValue(joid.basic_oids.oid_oper_ports + portIfList[ifId], host, community);
-        const portAdminStatus = await devicData.getOidValue(joid.basic_oids.oid_admin_ports + portIfList[ifId], host, community);
+        const portOperStatus = await devicData.getOidValue(joid.basic_oids.oid_oper_ports + portIfList[i], host, community);
+        const portAdminStatus = await devicData.getOidValue(joid.basic_oids.oid_admin_ports + portIfList[i], host, community);
         if (
           portOperStatus == "2" ||
           (portOperStatus == "2" && portAdminStatus == "2")
         ) {
-
           const vtc_res = [];
+
           if (write) {
-            if (await snmpFunctions.setSnmpOID(host, vctOID + portIfList[ifId], 1)) {
+            if (await snmpFunctions.setSnmpOID(host, vctOID + portIfList[i], 1)) {
               let length = await snmpFunctions.getSingleOID(
                 host,
-                vctOIDRes + portIfList[ifId],
+                vctOIDRes + portIfList[i],
                 community
               );
               if (
@@ -658,9 +657,9 @@ const devicData = {
             }
           }
 
-          let fixIntName = portIfRange[ifId];
-          if (portIfRange[ifId].includes("Huawei")) {
-            fixIntName = await devicData.getOidValue(joid.linux_server.oid_ifName + '.' + portIfList[ifId], host, community);
+          let fixIntName = portIfRange[i];
+          if (portIfRange[i].includes("Huawei")) {
+            fixIntName = await devicData.getOidValue(joid.linux_server.oid_ifName + '.' + portIfList[i], host, community);
           }
 
           let operStatus;
@@ -1005,39 +1004,22 @@ const devicData = {
       const intList = await devicData.walkOidOnlyValue(joid.basic_oids.oid_ifIndex, host, community);
       const model = deviceArr.FilterDeviceModel(modelValue);
 
-      const list = intList;
-      const range = intRange;
+      // const list = intList;
+      // const range = intRange;
 
       if (model && model.includes("SNR")) {
 
         await devicData.processCableLengthInfo(host,
-          list,
-          range,
+          intList,
+          intRange,
           community,
           joid.snr_oids.snr_oid_vct,
           joid.snr_oids.snr_oid_vct_res, results, true)
-
         return helperFunctions.tableFormattedOutput(results, ["IF", "St.", "1,2", "3,6", "4,5", "7,8"])
-      } else if (model && model.includes("MES2428")) {
-        for (let ifId in zip(list, range)) {
-          if (
-            config.excludedSubstrings.some((substring: any) => range[ifId].includes(substring)) || /^\d+$/.test(range[ifId])  // ИЛИ если строка НЕ содержит только цифры
-          ) {
-            continue; // Пропускаем эту итерацию, если строка содержит исключенные подстроки или не содержит только цифры
-          }
-          const portOperStatus = await devicData.getOidValue(
-            joid.basic_oids.oid_oper_ports + list[ifId], host, community
-          );
-          const portAdminStatus = await devicData.getOidValue(
-            joid.basic_oids.oid_admin_ports + list[ifId], host, community
-          );
-
-          if (
-            portOperStatus == "2" ||
-            (portOperStatus == "2" && portAdminStatus == "2")
-          ) { }
-        }
-      } else {
+      }
+      // else if (model && model.includes("MES2428")) {
+      // } 
+      else {
         const resultMessage = `Коммутатор не поддерживает кабельную диагностику`;
         return resultMessage;
       }
