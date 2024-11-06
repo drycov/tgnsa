@@ -110,204 +110,6 @@ bot.command(["start", "st", "run"], async (ctx) => {
     await ctx.conversation.enter("start");
   }
 });
-// bot.command("test", async (ctx) => {
-//   ctx.deleteMessage();
-//   helperFunctions.setSessionData(ctx);
-//   if (ctx.message && ctx.message.text) {
-//     const data = helperFunctions.parseTelegramCommand(ctx.message.text);
-//    const res = await devicData.runNetmikoScript([data?.ipAddress, "public", joid.basic_oids.dot1qVlanStaticEgressPorts + data?.vlan, joid.basic_oids.dot1qVlanStaticUntaggedPorts + data?.vlan,joid.basic_oids.dot1qVlanForbiddenEgressPorts + data?.vlan]).then((res) => { return res });
-//    await ctx.reply(res);
-//     // Здесь можно использовать полученные данные из data
-//   }
-
-// });
-
-// bot.command("test", async (ctx) => {
-//   ctx.deleteMessage();
-//   helperFunctions.setSessionData(ctx);
-
-
-//   const walkOidValue = async (oid: string, host: string, community: string) => {
-//     try {
-//       return await snmpFunctions.getMultiOIDValue(host, oid, community);
-//     } catch (error) {
-//       logger.error(error);
-//       return error;
-//     }
-//   };
-
-//   const getOidValue = async (oid: string, host: string, community: string) => {
-//     try {
-//       return await snmpFunctions.getSingleOID(host, oid, community);
-//     } catch (error) {
-//       logger.error(error);
-//       return error;
-//     }
-//   };
-
-//   if (ctx.message && ctx.message.text) {
-//     const data = helperFunctions.parseTelegramCommand(ctx.message.text);
-
-//     if (data) {
-
-//       const processIOSDDM = async (
-//         physName: string,
-//         sensorValue: string,
-//         sensorType: string,
-//         dotPoint: string,
-//         ipAddress: string,
-//         community: string
-//       ) => {
-//         interface SensorData {
-//           sensorName: string;
-//           value: string;
-//         }
-
-//         interface GroupedSensors {
-//           [interfaceName: string]: SensorData[];
-//         }
-
-//         try {
-//           const resPhysSensorName = await walkOidValue(physName, ipAddress, community);
-
-//           const parsedPhysSensorName: SensorData[] = await Promise.all(
-//             resPhysSensorName.map(async (item: any) => {
-//               const regex = /(\d+)$/;
-//               const oidString = item.oid.join(',');
-//               const match = oidString.match(regex);
-//               const sensorId = match ? match[0] : null;
-//               const intRange = await devicData.walkOidOnlyValue(joid.basic_oids.oid_port_name, ipAddress, community);
-
-//               let resSensorType = await getOidValue(sensorType + '.' + sensorId, ipAddress, community);
-
-//               if (resSensorType !== null && resSensorType !== 'noSuchInstance') {
-//                 let resSensorValue = await getOidValue(sensorValue + '.' + sensorId, ipAddress, community);
-
-//                 if (resSensorValue !== null && resSensorValue !== 'noSuchInstance') {
-//                   let sensorName = item.value;
-//                   switch (sensorName) {
-//                     case 'Temperature':
-//                       sensorName = 'Temp';
-//                       break;
-//                     case 'Receive Power':
-//                       sensorName = 'RX';
-//                       break;
-//                     case 'Transmit Power':
-//                       sensorName = 'TX';
-//                       break;
-//                     case 'Bias Current':
-//                       sensorName = 'Bias';
-//                       break;
-//                     case 'Supply Voltage':
-//                       sensorName = 'Voltage';
-//                       break;
-//                     default:
-//                       break;
-//                   }
-
-//                   const resDotPoint = await getOidValue(dotPoint + '.' + sensorId, ipAddress, community);
-
-//                   if (resDotPoint && resDotPoint >= 1 && resDotPoint <= 3) {
-//                     resSensorValue /= 10 ** resDotPoint;
-//                   }
-
-//                   switch (resSensorType) {
-//                     case '1':
-//                       resSensorType = 'other';
-//                       break;
-//                     case '2':
-//                       resSensorType = 'unknown';
-//                       break;
-//                     case '3':
-//                       resSensorType = ', VAC';
-//                       break;
-//                     case '4':
-//                       resSensorType = ', VDC';
-//                       break;
-//                     case '5':
-//                       resSensorType = ', mA';
-//                       break;
-//                     case '6':
-//                       resSensorType = ', W';
-//                       break;
-//                     case '7':
-//                       resSensorType = ', Hz';
-//                       break;
-//                     case '8':
-//                       resSensorType = ', ˚C';
-//                       break;
-//                     case '9':
-//                       resSensorType = ', %RH';
-//                       break;
-//                     case '10':
-//                       resSensorType = ', RPM';
-//                       break;
-//                     case '11':
-//                       resSensorType = ', CMM';
-//                       break;
-//                     case '14':
-//                       resSensorType = ', dBm';
-//                       break;
-//                     default:
-//                       break;
-//                   }
-
-//                   return { sensorName, value: `${resSensorValue} ${resSensorType}` };
-//                 }
-
-//                 return null;
-//               }
-
-//               return null;
-//             })
-//           );
-
-//           const sensorsData = parsedPhysSensorName.filter((item) => item !== null);
-
-//           const groupedSensors: GroupedSensors = sensorsData.reduce((result: GroupedSensors, sensor) => {
-//             const interfaceNameMatch = sensor.sensorName.match(/([A-Za-z]+\d+\/\d+)/);
-//             if (interfaceNameMatch) {
-//               const interfaceName = interfaceNameMatch[1];
-
-//               result[interfaceName] = result[interfaceName] || [];
-//               result[interfaceName].push(sensor);
-//             }
-
-//             return result;
-//           }, {});
-
-//           return groupedSensors;
-//         } catch (e: any) {
-//           const error = {
-//             date: helperFunctions.currentDate,
-//             action: 'test',
-//             error: e.message as string,
-//           };
-//           console.error(JSON.stringify(error));
-//           return null;
-//         }
-//       };
-
-
-
-
-//       const res = await processIOSDDM(
-//         '.1.3.6.1.2.1.47.1.1.1.1.7',
-//         '.1.3.6.1.4.1.9.9.91.1.1.1.1.4',
-//         '.1.3.6.1.4.1.9.9.91.1.1.1.1.1',
-//         '.1.3.6.1.4.1.9.9.91.1.1.1.1.3',
-//         data.params[0],
-//         data.params[1]
-//       );
-
-//       console.log(JSON.stringify(res));
-
-//       await ctx.reply(`<pre><code>${JSON.stringify(res)}</code></pre>`, {
-//         parse_mode: "HTML",
-//       });
-//     }
-//   }
-// });
 
 /**App callbackQuery */
 bot.callbackQuery("back", async (ctx) => {
@@ -358,20 +160,8 @@ bot.callbackQuery(/^add_\d+$/, async (ctx) => {
 
     });
   }
-
-
-  // await userData.updateUser(user.tgId, updatedUserData);  
 });
-// bot.callbackQuery(/\d+/, async (ctx) => {
-//   // Изменено регулярное выражение для чисел
-//   const optionValue = parseInt(ctx.callbackQuery.data);
-//   // Преобразование строки в число
-//   // Выполните нужные действия на основе значения опции (optionValue)
-//   ctx.reply(`Выбрана проверка порта с идексом ${optionValue}`);
-//   await ctx.answerCallbackQuery(
-//     `Выбрана проверка порта с идексом ${optionValue}`
-//   );
-// });
+
 /**App command hears */
 bot.hears(labels.EnterLabel, async (ctx) => {
   ctx.deleteMessage();
@@ -397,13 +187,11 @@ bot.hears(labels.BackLabel, async (ctx) => {
 });
 bot.hears(labels.AdvancedMenuLabel, async (ctx) => {
   ctx.deleteMessage();
-  // helper.setSessionData(ctx)
   await ctx.conversation.exit();
   await ctx.conversation.enter("additional");
 });
 bot.hears(labels.CIDRCalcLabel, async (ctx) => {
   ctx.deleteMessage();
-  // helper.setSessionData(ctx)
   await ctx.conversation.exit();
 
   await ctx.conversation.enter("cidr_calc");
@@ -411,67 +199,52 @@ bot.hears(labels.CIDRCalcLabel, async (ctx) => {
 
 bot.hears(labels.P2PCalcLabel, async (ctx) => {
   ctx.deleteMessage();
-  // helper.setSessionData(ctx)
   await ctx.conversation.exit();
 
   await ctx.conversation.enter("p2p_calc");
 });
 bot.hears(labels.PingDeviceLabel, async (ctx) => {
   ctx.deleteMessage();
-  // helper.setSessionData(ctx)
   await ctx.conversation.exit();
 
   await ctx.conversation.enter("ping_device");
 });
 bot.hears(labels.MIAllertLabel, async (ctx) => {
   ctx.deleteMessage();
-  // let ua = await access.CheckAdminRole(ctx.message?.from.id)
-  // if (ua) {
   await ctx.conversation.exit();
-
   await ctx.conversation.enter("massIncident");
-  // } else {
-  //     // logger.info(`ID: ${ctx.session.userId}(${ctx.session.userFirstName} ${ctx.session.userLastName}) ${messagesData.ErrorActionMessage} ${ctx.message.text}`)
-  //     await ctx.reply(messagesData.ErrorNoAclMessage, { reply_markup: menu.main })
-  // }
 });
 bot.hears(labels.CheckDeviceLabel, async (ctx) => {
   ctx.deleteMessage();
-  // helper.setSessionData(ctx)
   await ctx.conversation.exit();
   await ctx.conversation.enter("check_device");
 });
 bot.hears(labels.PortInfoLabel, async (ctx) => {
   ctx.deleteMessage();
-  // helper.setSessionData(ctx)
   await ctx.conversation.exit();
 
   await ctx.conversation.enter("portInfo");
 });
 bot.hears(labels.VlanListLabel, async (ctx) => {
   ctx.deleteMessage();
-  // helper.setSessionData(ctx)
   await ctx.conversation.exit();
 
   await ctx.conversation.enter("vlanList");
 });
 bot.hears(labels.DDMInfoLabel, async (ctx) => {
   ctx.deleteMessage();
-  // helper.setSessionData(ctx)
   await ctx.conversation.exit();
 
   await ctx.conversation.enter("ddmInfo");
 });
 bot.hears(labels.DeviceLLDPLabel, async (ctx) => {
   ctx.deleteMessage();
-  // helper.setSessionData(ctx)
   await ctx.conversation.exit();
 
   await ctx.conversation.enter("lldpData");
 });
 bot.hears(labels.CabelLengthLabel, async (ctx) => {
   ctx.deleteMessage();
-  // helper.setSessionData(ctx)
   await ctx.conversation.exit();
 
   await ctx.conversation.enter("cableMetr");
@@ -479,7 +252,6 @@ bot.hears(labels.CabelLengthLabel, async (ctx) => {
 
 bot.hears(labels.ApiTokenCreate, async (ctx) => {
   ctx.deleteMessage();
-  // helper.setSessionData(ctx)
   await ctx.conversation.exit();
   await ctx.conversation.enter("apiTokenGen");
 
